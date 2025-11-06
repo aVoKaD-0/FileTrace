@@ -1,0 +1,227 @@
+2025-10-13 07:57:33.184 | INFO     | app.utils.logging:log:11 - Ошибка при анализе файла: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.DatatypeMismatchError'>: column "timestamp" is of type timestamp without time zone but expression is of type character varying
+HINT:  You will need to rewrite or cast the expression.
+[SQL: INSERT INTO analysis (user_id, filename, timestamp, status, analysis_id) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::UUID) RETURNING analysis.id]
+[parameters: ('8e2a135e-c9d1-4a01-be9b-5723f5373321', 'VirtualBox-7.1.12-169651-Win.exe', 'cd9bea4f-d852-4db6-9951-917d737d7e33', 'running', UUID('cd9bea4f-d852-4db6-9951-917d737d7e33'))]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-10-13 07:58:08.112 | INFO     | app.utils.logging:log:11 - Ошибка при анализе файла: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.DatatypeMismatchError'>: column "timestamp" is of type timestamp without time zone but expression is of type character varying
+HINT:  You will need to rewrite or cast the expression.
+[SQL: INSERT INTO analysis (user_id, filename, timestamp, status, analysis_id) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::UUID) RETURNING analysis.id]
+[parameters: ('8e2a135e-c9d1-4a01-be9b-5723f5373321', 'VirtualBox-7.1.12-169651-Win.exe', 'b0d6b37f-d5b4-42f2-acfa-34beda7fd520', 'running', UUID('b0d6b37f-d5b4-42f2-acfa-34beda7fd520'))]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-10-13 08:05:22.791 | INFO     | app.utils.logging:log:11 - Ошибка при анализе файла: (sqlalchemy.dialects.postgresql.asyncpg.ProgrammingError) <class 'asyncpg.exceptions.DatatypeMismatchError'>: column "timestamp" is of type timestamp without time zone but expression is of type character varying
+HINT:  You will need to rewrite or cast the expression.
+[SQL: INSERT INTO analysis (user_id, filename, timestamp, status, analysis_id) VALUES ($1::UUID, $2::VARCHAR, $3::VARCHAR, $4::VARCHAR, $5::UUID) RETURNING analysis.id]
+[parameters: ('8e2a135e-c9d1-4a01-be9b-5723f5373321', 'VirtualBox-7.1.12-169651-Win.exe', '19660f5d-0168-4062-8c76-1c69317b65bb', 'running', UUID('19660f5d-0168-4062-8c76-1c69317b65bb'))]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-10-13 08:08:11.450 | INFO     | app.utils.logging:log:11 - Ошибка при анализе файла: (sqlalchemy.dialects.postgresql.asyncpg.IntegrityError) <class 'asyncpg.exceptions.NotNullViolationError'>: null value in column "id" of relation "analysis" violates not-null constraint
+DETAIL:  Failing row contains (null, 8e2a135e-c9d1-4a01-be9b-5723f5373321, postgresql-18.0-2-windows-x64.exe, 2025-10-13 08:08:11.373345, running, 95a9528c-27d4-436d-b880-87b89397d4f1).
+[SQL: INSERT INTO analysis (user_id, filename, timestamp, status, analysis_id) VALUES ($1::UUID, $2::VARCHAR, $3::TIMESTAMP WITH TIME ZONE, $4::VARCHAR, $5::UUID) RETURNING analysis.id]
+[parameters: ('8e2a135e-c9d1-4a01-be9b-5723f5373321', 'postgresql-18.0-2-windows-x64.exe', datetime.datetime(2025, 10, 13, 8, 8, 11, 373345, tzinfo=datetime.timezone.utc), 'running', UUID('95a9528c-27d4-436d-b880-87b89397d4f1'))]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-10-13 08:08:31.747 | INFO     | app.utils.logging:log:11 - Ошибка при анализе файла: (sqlalchemy.dialects.postgresql.asyncpg.IntegrityError) <class 'asyncpg.exceptions.NotNullViolationError'>: null value in column "id" of relation "analysis" violates not-null constraint
+DETAIL:  Failing row contains (null, 8e2a135e-c9d1-4a01-be9b-5723f5373321, postgresql-18.0-2-windows-x64.exe, 2025-10-13 08:08:31.742414, running, 57f1d475-4718-4e3a-b9e2-0e7507900a7c).
+[SQL: INSERT INTO analysis (user_id, filename, timestamp, status, analysis_id) VALUES ($1::UUID, $2::VARCHAR, $3::TIMESTAMP WITH TIME ZONE, $4::VARCHAR, $5::UUID) RETURNING analysis.id]
+[parameters: ('8e2a135e-c9d1-4a01-be9b-5723f5373321', 'postgresql-18.0-2-windows-x64.exe', datetime.datetime(2025, 10, 13, 8, 8, 31, 742414, tzinfo=datetime.timezone.utc), 'running', UUID('57f1d475-4718-4e3a-b9e2-0e7507900a7c'))]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-10-13 08:10:13.978 | INFO     | app.utils.logging:log:11 - Ошибка при анализе файла: UserService.create_analysis() got an unexpected keyword argument 'uuid'
+2025-10-13 08:10:44.565 | INFO     | app.utils.logging:log:11 - Ошибка при анализе файла: (sqlalchemy.dialects.postgresql.asyncpg.IntegrityError) <class 'asyncpg.exceptions.NotNullViolationError'>: null value in column "id" of relation "analysis" violates not-null constraint
+DETAIL:  Failing row contains (null, 8e2a135e-c9d1-4a01-be9b-5723f5373321, postgresql-18.0-2-windows-x64.exe, 2025-10-13 08:10:44.557723, running, 24eb365d-be75-42f8-a87f-c5eec55bbc72).
+[SQL: INSERT INTO analysis (user_id, filename, timestamp, status, analysis_id) VALUES ($1::UUID, $2::VARCHAR, $3::TIMESTAMP WITH TIME ZONE, $4::VARCHAR, $5::UUID) RETURNING analysis.id]
+[parameters: ('8e2a135e-c9d1-4a01-be9b-5723f5373321', 'postgresql-18.0-2-windows-x64.exe', datetime.datetime(2025, 10, 13, 8, 10, 44, 557723, tzinfo=datetime.timezone.utc), 'running', UUID('24eb365d-be75-42f8-a87f-c5eec55bbc72'))]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-10-13 08:21:39.445 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: ac6e35b7-86ab-4cfc-985e-aa76acfe729d
+2025-10-13 08:21:39.555 | INFO     | app.utils.logging:log:11 - Ошибка при анализе: [Errno 2] No such file or directory: 'powershell'
+2025-10-13 08:21:39.615 | INFO     | app.utils.logging:log:11 - Внутренняя ошибка при обработке исключения: [Errno 2] No such file or directory: 'powershell'
+2025-10-13 08:24:35.854 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: 84046d9c-212d-4592-b84e-7dba8688cc66
+2025-10-13 08:24:35.964 | INFO     | app.utils.logging:log:11 - Ошибка при анализе: [Errno 2] No such file or directory: 'powershell'
+2025-10-13 08:24:36.038 | INFO     | app.utils.logging:log:11 - Внутренняя ошибка при обработке исключения: [Errno 2] No such file or directory: 'powershell'
+2025-10-13 08:31:21.714 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: d9162e05-2ecc-449a-961d-b763c0d076d9
+2025-10-13 08:31:21.842 | INFO     | app.utils.logging:log:11 - Ошибка при анализе: [Errno 2] No such file or directory: 'powershell'
+2025-10-13 08:31:21.924 | INFO     | app.utils.logging:log:11 - Внутренняя ошибка при обработке исключения: [Errno 2] No such file or directory: 'powershell'
+2025-10-13 08:31:22.079 | INFO     | app.utils.logging:log:11 - connect websocket d9162e05-2ecc-449a-961d-b763c0d076d9, 172.18.0.1
+2025-10-13 08:32:27.619 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: 081d3661-9895-407c-9c2c-bc6e18b1646a
+2025-10-13 08:32:27.661 | INFO     | app.utils.logging:log:11 - Ошибка при анализе: [Errno 2] No such file or directory: 'powershell'
+2025-10-13 08:32:27.807 | INFO     | app.utils.logging:log:11 - Внутренняя ошибка при обработке исключения: [Errno 2] No such file or directory: 'powershell'
+2025-10-13 08:32:27.911 | INFO     | app.utils.logging:log:11 - connect websocket 081d3661-9895-407c-9c2c-bc6e18b1646a, 172.18.0.1
+2025-10-13 08:32:45.367 | INFO     | app.utils.logging:log:11 - disconnect websocket 081d3661-9895-407c-9c2c-bc6e18b1646a, 172.18.0.1
+2025-10-13 08:32:48.251 | INFO     | app.utils.logging:log:11 - connect websocket 081d3661-9895-407c-9c2c-bc6e18b1646a, 172.18.0.1
+2025-10-18 13:14:42.744 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: f7402aa3-d09e-48fd-ae49-2377ca48fbeb
+2025-10-18 13:14:42.823 | INFO     | app.utils.logging:log:11 - Ошибка при анализе: [WinError 2] The system cannot find the file specified
+2025-10-18 13:14:42.885 | INFO     | app.utils.logging:log:11 - Внутренняя ошибка при обработке исключения: [WinError 2] The system cannot find the file specified
+2025-10-18 13:14:43.269 | INFO     | app.utils.logging:log:11 - connect websocket f7402aa3-d09e-48fd-ae49-2377ca48fbeb, 192.168.56.1
+2025-10-18 13:16:36.895 | INFO     | app.utils.logging:log:11 - disconnect websocket f7402aa3-d09e-48fd-ae49-2377ca48fbeb, 192.168.56.1
+2025-10-19 23:56:21.927 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: a934340b-2453-4adc-9114-780056126f84
+2025-10-19 23:56:22.137 | INFO     | app.utils.logging:log:11 - connect websocket a934340b-2453-4adc-9114-780056126f84, 127.0.0.1
+2025-10-19 23:57:48.543 | INFO     | app.utils.logging:log:11 - Ошибка в analysis_log: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.StringDataRightTruncationError'>: значение не умещается в тип character varying(255)
+[SQL: UPDATE results SET docker_output=$1::VARCHAR WHERE results.analysis_id = $2::UUID]
+[parameters: ('Анализ запущен\nСборка Docker-образа...\nЗапуск контейнера...\nЗапуск ETW для мониторинга файлов...\nETW успешно запущен.\nКонтейнер успешно завершил работу.\nОстановка ETW...\nETW успешно остановлен.\nЭкспорт ETL в CSV...\nЭкспорт ETL в JSON...\nETL успешно экспортирован.\n', UUID('a934340b-2453-4adc-9114-780056126f84'))]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2025-10-19 23:57:48.554 | INFO     | app.utils.logging:log:11 - Ошибка в analysis_log: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.StringDataRightTruncationError'>: значение не умещается в тип character varying(255)
+[SQL: UPDATE results SET docker_output=$1::VARCHAR WHERE results.analysis_id = $2::UUID]
+[parameters: ('Анализ запущен\nСборка Docker-образа...\nЗапуск контейнера...\nЗапуск ETW для мониторинга файлов...\nETW успешно запущен.\nКонтейнер успешно завершил ... (44 characters truncated) ... новлен.\nЭкспорт ETL в CSV...\nЭкспорт ETL в JSON...\n📄 Отслеживание изменений файлов в контейнере analysis_a934340b-2453-4adc-9114-780056126f84...\n', UUID('a934340b-2453-4adc-9114-780056126f84'))]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2025-10-19 23:57:51.495 | INFO     | app.utils.logging:log:11 - Ошибка в analysis_log: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.StringDataRightTruncationError'>: значение не умещается в тип character varying(255)
+[SQL: UPDATE results SET docker_output=$1::VARCHAR WHERE results.analysis_id = $2::UUID]
+[parameters: ('Анализ запущен\nСборка Docker-образа...\nЗапуск контейнера...\nЗапуск ETW для мониторинга файлов...\nETW успешно запущен.\nКонтейнер успешно завершил работу.\nОстановка ETW...\nETW успешно остановлен.\nЭкспорт ETL в CSV...\nЭкспорт ETL в JSON...\n🔍 Обнаружены изменения в файлах:\n\n', UUID('a934340b-2453-4adc-9114-780056126f84'))]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2025-10-19 23:57:51.520 | INFO     | app.utils.logging:log:11 - Ошибка в save_file_activity: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.StringDataRightTruncationError'>: значение не умещается в тип character varying(255)
+[SQL: UPDATE results SET file_activity=$1::VARCHAR WHERE results.analysis_id = $2::UUID]
+[parameters: ('C Files\nC Files/Documents and Settings\nC Files/ProgramData\nC Files/ProgramData/AdguardVpn\nC Files/ProgramData/AdguardVpn/Flags\nC Files/ProgramDa ... (23248 characters truncated) ... Windows/debug/PASSWD.LOG\nC Hives\nC Hives/DefaultUser_Delta\nC Hives/Sam_Delta\nC Hives/Security_Delta\nC Hives/Software_Delta\nC Hives/System_Delta', UUID('a934340b-2453-4adc-9114-780056126f84'))]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2025-10-19 23:57:51.525 | INFO     | app.utils.logging:log:11 - Ошибка в analysis_log: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.StringDataRightTruncationError'>: значение не умещается в тип character varying(255)
+[SQL: UPDATE results SET docker_output=$1::VARCHAR WHERE results.analysis_id = $2::UUID]
+[parameters: ('Анализ запущен\nСборка Docker-образа...\nЗапуск контейнера...\nЗапуск ETW для мониторинга файлов...\nETW успешно запущен.\nКонтейнер успешно завершил работу.\nОстановка ETW...\nETW успешно остановлен.\nЭкспорт ETL в CSV...\nЭкспорт ETL в JSON...\nАнализ завершен успешно\n', UUID('a934340b-2453-4adc-9114-780056126f84'))]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2025-10-19 23:57:51.574 | INFO     | app.utils.logging:log:11 - disconnect websocket a934340b-2453-4adc-9114-780056126f84, 127.0.0.1
+2025-10-19 23:57:51.684 | INFO     | app.utils.logging:log:11 - connect websocket a934340b-2453-4adc-9114-780056126f84, 127.0.0.1
+2025-10-20 00:04:18.193 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: 7bb3b44d-f2b7-49b4-a767-b68126f065e2
+2025-10-20 00:04:18.395 | INFO     | app.utils.logging:log:11 - connect websocket 7bb3b44d-f2b7-49b4-a767-b68126f065e2, 127.0.0.1
+2025-10-20 00:06:32.823 | INFO     | app.utils.logging:log:11 - Ошибка в analysis_log: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.StringDataRightTruncationError'>: значение не умещается в тип character varying(255)
+[SQL: UPDATE results SET docker_output=$1::VARCHAR WHERE results.analysis_id = $2::UUID]
+[parameters: ('Анализ запущен\nСборка Docker-образа...\nЗапуск контейнера...\nЗапуск ETW для мониторинга файлов...\nETW успешно запущен.\nКонтейнер успешно завершил работу.\nОстановка ETW...\nETW успешно остановлен.\nЭкспорт ETL в CSV...\nЭкспорт ETL в JSON...\nETL успешно экспортирован.\n', UUID('7bb3b44d-f2b7-49b4-a767-b68126f065e2'))]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2025-10-20 00:06:32.842 | INFO     | app.utils.logging:log:11 - Ошибка в analysis_log: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.StringDataRightTruncationError'>: значение не умещается в тип character varying(255)
+[SQL: UPDATE results SET docker_output=$1::VARCHAR WHERE results.analysis_id = $2::UUID]
+[parameters: ('Анализ запущен\nСборка Docker-образа...\nЗапуск контейнера...\nЗапуск ETW для мониторинга файлов...\nETW успешно запущен.\nКонтейнер успешно завершил ... (44 characters truncated) ... новлен.\nЭкспорт ETL в CSV...\nЭкспорт ETL в JSON...\n📄 Отслеживание изменений файлов в контейнере analysis_7bb3b44d-f2b7-49b4-a767-b68126f065e2...\n', UUID('7bb3b44d-f2b7-49b4-a767-b68126f065e2'))]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2025-10-20 00:06:35.433 | INFO     | app.utils.logging:log:11 - Ошибка в analysis_log: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.StringDataRightTruncationError'>: значение не умещается в тип character varying(255)
+[SQL: UPDATE results SET docker_output=$1::VARCHAR WHERE results.analysis_id = $2::UUID]
+[parameters: ('Анализ запущен\nСборка Docker-образа...\nЗапуск контейнера...\nЗапуск ETW для мониторинга файлов...\nETW успешно запущен.\nКонтейнер успешно завершил работу.\nОстановка ETW...\nETW успешно остановлен.\nЭкспорт ETL в CSV...\nЭкспорт ETL в JSON...\n🔍 Обнаружены изменения в файлах:\n\n', UUID('7bb3b44d-f2b7-49b4-a767-b68126f065e2'))]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2025-10-20 00:06:35.451 | INFO     | app.utils.logging:log:11 - Ошибка в save_file_activity: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.StringDataRightTruncationError'>: значение не умещается в тип character varying(255)
+[SQL: UPDATE results SET file_activity=$1::VARCHAR WHERE results.analysis_id = $2::UUID]
+[parameters: ('C Files\nC Files/Documents and Settings\nC Files/ProgramData\nC Files/ProgramData/AdguardVpn\nC Files/ProgramData/AdguardVpn/Flags\nC Files/ProgramDa ... (23248 characters truncated) ... Windows/debug/PASSWD.LOG\nC Hives\nC Hives/DefaultUser_Delta\nC Hives/Sam_Delta\nC Hives/Security_Delta\nC Hives/Software_Delta\nC Hives/System_Delta', UUID('7bb3b44d-f2b7-49b4-a767-b68126f065e2'))]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2025-10-20 00:06:35.457 | INFO     | app.utils.logging:log:11 - Ошибка в analysis_log: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.StringDataRightTruncationError'>: значение не умещается в тип character varying(255)
+[SQL: UPDATE results SET docker_output=$1::VARCHAR WHERE results.analysis_id = $2::UUID]
+[parameters: ('Анализ запущен\nСборка Docker-образа...\nЗапуск контейнера...\nЗапуск ETW для мониторинга файлов...\nETW успешно запущен.\nКонтейнер успешно завершил работу.\nОстановка ETW...\nETW успешно остановлен.\nЭкспорт ETL в CSV...\nЭкспорт ETL в JSON...\nАнализ завершен успешно\n', UUID('7bb3b44d-f2b7-49b4-a767-b68126f065e2'))]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+2025-10-20 00:06:35.672 | INFO     | app.utils.logging:log:11 - disconnect websocket 7bb3b44d-f2b7-49b4-a767-b68126f065e2, 127.0.0.1
+2025-10-20 00:06:35.806 | INFO     | app.utils.logging:log:11 - connect websocket 7bb3b44d-f2b7-49b4-a767-b68126f065e2, 127.0.0.1
+2025-10-20 00:06:56.226 | INFO     | app.utils.logging:log:11 - disconnect websocket 7bb3b44d-f2b7-49b4-a767-b68126f065e2, 127.0.0.1
+2025-10-20 00:06:56.327 | INFO     | app.utils.logging:log:11 - connect websocket 7bb3b44d-f2b7-49b4-a767-b68126f065e2, 127.0.0.1
+2025-10-20 00:06:58.671 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-16
+2025-10-20 00:11:01.449 | INFO     | app.utils.logging:log:11 - disconnect websocket 7bb3b44d-f2b7-49b4-a767-b68126f065e2, 127.0.0.1
+2025-10-20 00:11:03.626 | INFO     | app.utils.logging:log:11 - connect websocket a934340b-2453-4adc-9114-780056126f84, 127.0.0.1
+2025-10-20 00:17:53.109 | INFO     | app.utils.logging:log:11 - disconnect websocket a934340b-2453-4adc-9114-780056126f84, 127.0.0.1
+2025-10-20 00:17:57.173 | INFO     | app.utils.logging:log:11 - connect websocket a934340b-2453-4adc-9114-780056126f84, 127.0.0.1
+2025-10-20 00:17:57.948 | INFO     | app.utils.logging:log:11 - disconnect websocket a934340b-2453-4adc-9114-780056126f84, 127.0.0.1
+2025-10-20 00:17:58.091 | INFO     | app.utils.logging:log:11 - connect websocket a934340b-2453-4adc-9114-780056126f84, 127.0.0.1
+2025-10-20 00:17:59.642 | INFO     | app.utils.logging:log:11 - disconnect websocket a934340b-2453-4adc-9114-780056126f84, 127.0.0.1
+2025-10-20 00:18:03.524 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: 68399cfb-8622-4b4d-b5ef-caf3a4401124
+2025-10-20 00:18:03.735 | INFO     | app.utils.logging:log:11 - connect websocket 68399cfb-8622-4b4d-b5ef-caf3a4401124, 127.0.0.1
+2025-10-20 00:19:07.197 | INFO     | app.utils.logging:log:11 - Конвертация ETL в CSV для анализа 68399cfb-8622-4b4d-b5ef-caf3a4401124...
+2025-10-20 00:19:07.211 | INFO     | app.utils.logging:log:11 - connect websocket 68399cfb-8622-4b4d-b5ef-caf3a4401124, 127.0.0.1
+2025-10-20 00:19:11.796 | INFO     | app.utils.logging:log:11 - Конвертация ETL в JSON для анализа 68399cfb-8622-4b4d-b5ef-caf3a4401124...
+2025-10-20 00:19:15.316 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-20 00:19:19.434 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-20 00:19:22.791 | INFO     | app.utils.logging:log:11 - Конвертация завершена для анализа 68399cfb-8622-4b4d-b5ef-caf3a4401124
+2025-10-20 00:19:22.798 | INFO     | app.utils.logging:log:11 - disconnect websocket 68399cfb-8622-4b4d-b5ef-caf3a4401124, 127.0.0.1
+2025-10-20 00:19:36.800 | INFO     | app.utils.logging:log:11 - disconnect websocket 68399cfb-8622-4b4d-b5ef-caf3a4401124, 127.0.0.1
+2025-10-20 00:19:37.266 | INFO     | app.utils.logging:log:11 - connect websocket 68399cfb-8622-4b4d-b5ef-caf3a4401124, 127.0.0.1
+2025-10-20 00:20:14.115 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-16
+2025-10-20 00:26:39.423 | INFO     | app.utils.logging:log:11 - disconnect websocket 68399cfb-8622-4b4d-b5ef-caf3a4401124, 127.0.0.1
+2025-10-20 00:26:39.673 | INFO     | app.utils.logging:log:11 - connect websocket 68399cfb-8622-4b4d-b5ef-caf3a4401124, 127.0.0.1
+2025-10-20 00:35:39.252 | INFO     | app.utils.logging:log:11 - disconnect websocket 68399cfb-8622-4b4d-b5ef-caf3a4401124, 127.0.0.1
+2025-10-20 00:36:51.306 | INFO     | app.utils.logging:log:11 - connect websocket 68399cfb-8622-4b4d-b5ef-caf3a4401124, 127.0.0.1
+2025-10-20 00:37:02.086 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-16
+2025-10-20 00:37:04.990 | INFO     | app.utils.logging:log:11 - disconnect websocket 68399cfb-8622-4b4d-b5ef-caf3a4401124, 127.0.0.1
+2025-10-20 00:37:07.284 | INFO     | app.utils.logging:log:11 - connect websocket 68399cfb-8622-4b4d-b5ef-caf3a4401124, 127.0.0.1
+2025-10-20 00:37:31.937 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-16
+2025-10-20 00:38:30.066 | INFO     | app.utils.logging:log:11 - disconnect websocket 68399cfb-8622-4b4d-b5ef-caf3a4401124, 127.0.0.1
+2025-10-21 11:11:37.973 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: cc599792-7f93-486a-8093-6fb2b936627f
+2025-10-21 11:11:38.200 | INFO     | app.utils.logging:log:11 - connect websocket cc599792-7f93-486a-8093-6fb2b936627f, 127.0.0.1
+2025-10-21 11:11:44.075 | INFO     | app.utils.logging:log:11 - disconnect websocket cc599792-7f93-486a-8093-6fb2b936627f, 127.0.0.1
+2025-10-21 11:11:44.173 | INFO     | app.utils.logging:log:11 - connect websocket cc599792-7f93-486a-8093-6fb2b936627f, 127.0.0.1
+2025-10-21 11:11:47.576 | INFO     | app.utils.logging:log:11 - Ошибка при анализе: type object 'Logger' has no attribute 'update_analysis_status'
+2025-10-21 11:11:49.827 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-21 11:11:55.778 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-21 11:11:56.914 | INFO     | app.utils.logging:log:11 - disconnect websocket cc599792-7f93-486a-8093-6fb2b936627f, 127.0.0.1
+2025-10-21 11:11:57.048 | INFO     | app.utils.logging:log:11 - connect websocket cc599792-7f93-486a-8093-6fb2b936627f, 127.0.0.1
+2025-10-21 11:11:59.836 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-21 11:12:26.290 | INFO     | app.utils.logging:log:11 - disconnect websocket cc599792-7f93-486a-8093-6fb2b936627f, 127.0.0.1
+2025-10-21 11:12:41.034 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: 97c1abc6-0ac8-4168-9f56-ca023722c9bf
+2025-10-21 11:12:41.238 | INFO     | app.utils.logging:log:11 - connect websocket 97c1abc6-0ac8-4168-9f56-ca023722c9bf, 127.0.0.1
+2025-10-21 11:14:26.639 | INFO     | app.utils.logging:log:11 - Ошибка при анализе: type object 'Logger' has no attribute 'update_analysis_status'
+2025-10-21 11:14:26.749 | INFO     | app.utils.logging:log:11 - disconnect websocket 97c1abc6-0ac8-4168-9f56-ca023722c9bf, 127.0.0.1
+2025-10-21 11:14:47.185 | INFO     | app.utils.logging:log:11 - connect websocket 97c1abc6-0ac8-4168-9f56-ca023722c9bf, 127.0.0.1
+2025-10-21 11:15:44.227 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-21 11:16:17.709 | INFO     | app.utils.logging:log:11 - disconnect websocket 97c1abc6-0ac8-4168-9f56-ca023722c9bf, 127.0.0.1
+2025-10-21 11:17:08.853 | INFO     | app.utils.logging:log:11 - connect websocket 97c1abc6-0ac8-4168-9f56-ca023722c9bf, 127.0.0.1
+2025-10-21 11:17:08.867 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-21 11:17:13.997 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-21 11:17:38.548 | INFO     | app.utils.logging:log:11 - disconnect websocket 97c1abc6-0ac8-4168-9f56-ca023722c9bf, 127.0.0.1
+2025-10-21 11:19:48.181 | INFO     | app.utils.logging:log:11 - connect websocket 97c1abc6-0ac8-4168-9f56-ca023722c9bf, 127.0.0.1
+2025-10-21 11:19:48.193 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-21 11:19:57.549 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-21 11:20:45.547 | INFO     | app.utils.logging:log:11 - disconnect websocket 97c1abc6-0ac8-4168-9f56-ca023722c9bf, 127.0.0.1
+2025-10-21 11:20:48.342 | INFO     | app.utils.logging:log:11 - connect websocket 97c1abc6-0ac8-4168-9f56-ca023722c9bf, 127.0.0.1
+2025-10-21 11:20:56.648 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-21 11:21:02.353 | INFO     | app.utils.logging:log:11 - disconnect websocket 97c1abc6-0ac8-4168-9f56-ca023722c9bf, 127.0.0.1
+2025-10-21 11:21:31.942 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: 1c53a1fa-3173-4ccb-ae6a-b89d74130b11
+2025-10-21 11:21:53.537 | INFO     | app.utils.logging:log:11 - connect websocket 1c53a1fa-3173-4ccb-ae6a-b89d74130b11, 127.0.0.1
+2025-10-21 11:23:31.953 | INFO     | app.utils.logging:log:11 - Ошибка при анализе: type object 'Logger' has no attribute 'update_analysis_status'
+2025-10-21 11:23:32.076 | INFO     | app.utils.logging:log:11 - disconnect websocket 1c53a1fa-3173-4ccb-ae6a-b89d74130b11, 127.0.0.1
+2025-10-21 11:23:32.198 | INFO     | app.utils.logging:log:11 - connect websocket 1c53a1fa-3173-4ccb-ae6a-b89d74130b11, 127.0.0.1
+2025-10-21 11:23:36.690 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-21 11:23:39.768 | INFO     | app.utils.logging:log:11 - disconnect websocket 1c53a1fa-3173-4ccb-ae6a-b89d74130b11, 127.0.0.1
+2025-10-21 11:23:40.007 | INFO     | app.utils.logging:log:11 - connect websocket 1c53a1fa-3173-4ccb-ae6a-b89d74130b11, 127.0.0.1
+2025-10-21 11:23:41.175 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-21 11:26:33.075 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-21 11:27:41.600 | INFO     | app.utils.logging:log:11 - disconnect websocket 1c53a1fa-3173-4ccb-ae6a-b89d74130b11, 127.0.0.1
+2025-10-21 11:27:48.209 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: 2e9c1628-854b-4d4d-a6cb-88cac6e663f3
+2025-10-21 11:27:48.465 | INFO     | app.utils.logging:log:11 - connect websocket 2e9c1628-854b-4d4d-a6cb-88cac6e663f3, 127.0.0.1
+2025-10-21 11:29:08.874 | INFO     | app.utils.logging:log:11 - disconnect websocket 2e9c1628-854b-4d4d-a6cb-88cac6e663f3, 127.0.0.1
+2025-10-21 11:29:09.005 | INFO     | app.utils.logging:log:11 - connect websocket 2e9c1628-854b-4d4d-a6cb-88cac6e663f3, 127.0.0.1
+2025-10-21 11:29:37.655 | INFO     | app.utils.logging:log:11 - Ошибка при анализе: type object 'Logger' has no attribute 'update_analysis_status'
+2025-10-21 11:29:37.726 | INFO     | app.utils.logging:log:11 - disconnect websocket 2e9c1628-854b-4d4d-a6cb-88cac6e663f3, 127.0.0.1
+2025-10-21 11:29:37.923 | INFO     | app.utils.logging:log:11 - connect websocket 2e9c1628-854b-4d4d-a6cb-88cac6e663f3, 127.0.0.1
+2025-10-21 11:30:55.450 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-21 11:31:31.162 | INFO     | app.utils.logging:log:11 - disconnect websocket 2e9c1628-854b-4d4d-a6cb-88cac6e663f3, 127.0.0.1
+2025-10-21 13:45:15.295 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: 0497d49b-fc97-4105-8d73-ff13423a4c79
+2025-10-21 13:45:15.796 | INFO     | app.utils.logging:log:11 - connect websocket 0497d49b-fc97-4105-8d73-ff13423a4c79, 127.0.0.1
+2025-10-21 13:45:59.349 | INFO     | app.utils.logging:log:11 - disconnect websocket 0497d49b-fc97-4105-8d73-ff13423a4c79, 127.0.0.1
+2025-10-21 13:45:59.584 | INFO     | app.utils.logging:log:11 - connect websocket 0497d49b-fc97-4105-8d73-ff13423a4c79, 127.0.0.1
+2025-10-21 13:46:55.228 | INFO     | app.utils.logging:log:11 - Ошибка при анализе: type object 'Logger' has no attribute 'update_analysis_status'
+2025-10-21 13:46:55.344 | INFO     | app.utils.logging:log:11 - disconnect websocket 0497d49b-fc97-4105-8d73-ff13423a4c79, 127.0.0.1
+2025-10-21 13:46:55.936 | INFO     | app.utils.logging:log:11 - connect websocket 0497d49b-fc97-4105-8d73-ff13423a4c79, 127.0.0.1
+2025-10-21 13:49:06.669 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-21 13:49:16.647 | INFO     | app.utils.logging:log:11 - disconnect websocket 0497d49b-fc97-4105-8d73-ff13423a4c79, 127.0.0.1
+2025-10-21 14:18:53.288 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: d1ea7148-fae9-4329-a05a-23e0e54a0902
+2025-10-21 14:18:53.454 | INFO     | app.utils.logging:log:11 - connect websocket d1ea7148-fae9-4329-a05a-23e0e54a0902, 127.0.0.1
+2025-10-21 14:19:19.103 | INFO     | app.utils.logging:log:11 - disconnect websocket d1ea7148-fae9-4329-a05a-23e0e54a0902, 127.0.0.1
+2025-10-21 14:19:21.158 | INFO     | app.utils.logging:log:11 - connect websocket d1ea7148-fae9-4329-a05a-23e0e54a0902, 127.0.0.1
+2025-10-21 14:20:29.580 | INFO     | app.utils.logging:log:11 - Ошибка при анализе: type object 'Logger' has no attribute 'update_analysis_status'
+2025-10-21 14:20:29.640 | INFO     | app.utils.logging:log:11 - disconnect websocket d1ea7148-fae9-4329-a05a-23e0e54a0902, 127.0.0.1
+2025-10-21 14:20:30.022 | INFO     | app.utils.logging:log:11 - connect websocket d1ea7148-fae9-4329-a05a-23e0e54a0902, 127.0.0.1
+2025-10-21 14:20:55.368 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-21 14:22:08.245 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-21 14:23:49.429 | INFO     | app.utils.logging:log:11 - disconnect websocket d1ea7148-fae9-4329-a05a-23e0e54a0902, 127.0.0.1
+2025-10-21 14:23:54.633 | INFO     | app.utils.logging:log:11 - connect websocket d1ea7148-fae9-4329-a05a-23e0e54a0902, 127.0.0.1
+2025-10-21 14:24:03.261 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-21 14:24:14.492 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-8
+2025-10-21 14:31:27.987 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: 12375c75-9a4d-49c9-b5e4-4636e2d9c403
+2025-10-21 14:31:28.700 | INFO     | app.utils.logging:log:11 - connect websocket 12375c75-9a4d-49c9-b5e4-4636e2d9c403, 127.0.0.1
+2025-10-21 14:32:40.167 | INFO     | app.utils.logging:log:11 - Конвертация ETL в CSV для анализа 12375c75-9a4d-49c9-b5e4-4636e2d9c403...
+2025-10-21 14:32:40.177 | INFO     | app.utils.logging:log:11 - connect websocket 12375c75-9a4d-49c9-b5e4-4636e2d9c403, 127.0.0.1
+2025-10-21 14:32:44.896 | INFO     | app.utils.logging:log:11 - Конвертация ETL в JSON для анализа 12375c75-9a4d-49c9-b5e4-4636e2d9c403...
+2025-10-21 14:32:55.977 | INFO     | app.utils.logging:log:11 - Конвертация завершена для анализа 12375c75-9a4d-49c9-b5e4-4636e2d9c403
+2025-10-21 14:32:55.980 | INFO     | app.utils.logging:log:11 - disconnect websocket 12375c75-9a4d-49c9-b5e4-4636e2d9c403, 127.0.0.1
+2025-10-21 14:36:08.532 | INFO     | app.utils.logging:log:11 - disconnect websocket 12375c75-9a4d-49c9-b5e4-4636e2d9c403, 127.0.0.1
+2025-10-21 14:36:08.671 | INFO     | app.utils.logging:log:11 - connect websocket 12375c75-9a4d-49c9-b5e4-4636e2d9c403, 127.0.0.1
+2025-10-21 14:36:12.609 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-16
+2025-10-21 14:36:46.761 | INFO     | app.utils.logging:log:11 - disconnect websocket 12375c75-9a4d-49c9-b5e4-4636e2d9c403, 127.0.0.1
+2025-10-21 14:36:46.878 | INFO     | app.utils.logging:log:11 - connect websocket 12375c75-9a4d-49c9-b5e4-4636e2d9c403, 127.0.0.1
+2025-10-21 14:37:14.515 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-16
+2025-10-21 14:39:50.739 | INFO     | app.utils.logging:log:11 - disconnect websocket 12375c75-9a4d-49c9-b5e4-4636e2d9c403, 127.0.0.1
+2025-10-21 14:39:59.983 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: 64bc452e-aa06-45e7-92d5-311be892f300
+2025-10-21 14:40:00.498 | INFO     | app.utils.logging:log:11 - connect websocket 64bc452e-aa06-45e7-92d5-311be892f300, 127.0.0.1
+2025-10-21 14:40:41.648 | INFO     | app.utils.logging:log:11 - disconnect websocket 64bc452e-aa06-45e7-92d5-311be892f300, 127.0.0.1
+2025-10-21 14:40:51.941 | INFO     | app.utils.logging:log:11 - connect websocket 64bc452e-aa06-45e7-92d5-311be892f300, 127.0.0.1
+2025-10-21 14:45:38.201 | INFO     | app.utils.logging:log:11 - Ошибка при анализе: type object 'Logger' has no attribute 'update_analysis_status'
+2025-10-21 14:45:39.644 | INFO     | app.utils.logging:log:11 - disconnect websocket 64bc452e-aa06-45e7-92d5-311be892f300, 127.0.0.1
+2025-10-21 14:45:39.749 | INFO     | app.utils.logging:log:11 - connect websocket 64bc452e-aa06-45e7-92d5-311be892f300, 127.0.0.1
+2025-10-21 14:46:49.733 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-16
+2025-10-21 14:46:57.942 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-16
+2025-10-21 14:51:28.923 | INFO     | app.utils.logging:log:11 - disconnect websocket 64bc452e-aa06-45e7-92d5-311be892f300, 127.0.0.1
+2025-10-21 14:51:31.296 | INFO     | app.utils.logging:log:11 - Ошибка при анализе: type object 'Logger' has no attribute 'update_analysis_status'

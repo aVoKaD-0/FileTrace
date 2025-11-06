@@ -1,0 +1,19 @@
+services:
+  web:
+    build: .
+    container_name: web
+    ports:
+      - 8000:8000
+    volumes:
+      - "${PROJECT_PATH}:C:/app"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_FROM=${MAIL_FROM}
+      - MAIL_PORT=${MAIL_PORT}
+      - MAIL_SERVER=${MAIL_SERVER}
+      - MAIL_STARTTLS=${MAIL_STARTTLS}
+      - MAIL_SSL_TLS=${MAIL_SSL_TLS}
+      - MAIL_FROM_NAME=${MAIL_FROM_NAME}
+    restart: always

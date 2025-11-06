@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileTrace</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/styles/github.min.css">
+    <link rel="stylesheet" href="/static/analysis.css">
+</head>
+<style>
+#logoutBtnProfile, #changePasswordBtn {
+    position: absolute;
+    right: 0;
+    display: none;
+    z-index: 10;
+    margin-top: 10px; /* Отступ между кнопками */
+}
+
+#logoutBtn {
+    top: 50px; /* Расположение кнопки "Выйти" */
+}
+
+#changePasswordBtn {
+    top: 120px; /* Расположение кнопки "Сменить пароль" */
+}
+</style>
+<body>
+    {% if analysis_id %}
+    <script>
+        window.analysisId = "{{ analysis_id }}";
+    </script>
+    {% endif %}
+    {% if status %}
+    <script>
+        window.analysisStatus = "{{ status }}";
+    </script>
+    {% endif %}
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">FileTrace</h1>
+
+        <div class="profile-icon-container">
+            <img src="/static/profile-icon.svg" alt="Profile" class="profile-icon" id="profileIcon">
+            <button id="changePasswordBtn" class="btn btn-primary" style="display: none;"><i class="bi bi-key"></i> Сменить пароль</button>
+            <button id="logoutBtnProfile" class="btn btn-danger" style="display: none;"><i class="bi bi-box-arrow-right"></i> Выйти</button>
+        </div>
+
+        <div class="mb-4 text-center">
+            <a href="/" class="btn btn-primary"><i class="bi bi-house-door"></i> На главную</a>
+            <a href="/analysis" class="btn btn-secondary"><i class="bi bi-eye-slash"></i> Скрыть результаты</a>
+            <button id="logoutBtn" class="btn btn-danger" style="display: none;"><i class="bi bi-box-arrow-right"></i> Выйти</button>
+        </div>
+
+        <!-- Зона загрузки файла -->
+        <div class="upload-section" {% if analysis_id %}style="display: none;"{% else %}style="display: block;"{% endif %}>
+            <div id="dropZone" class="drop-zone">
+                <div class="drop-zone-content">
+                    <img src="/static/upload-icon.svg" alt="Upload" class="upload-icon mb-3">
+                    <p>Перетащите файл сюда или кликните для выбора</p>
+                    <input type="file" id="fileInput" accept=".exe" hidden>
+                </div>
+            </div>
+            <div id="progressBar" class="progress mt-3" style="display: none;">
+                <div id="progress" class="progress-bar" role="progressbar" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Секция результатов -->
+        <div id="resultsSection" class="results-section mt-4" {% if analysis_id %}style="display: block;"{% else %}style="display: none;"{% endif %}>
+            <!-- Контейнер для отображения статуса загрузки -->
+            <div id="uploadStatus">
+                <div class="status-bar d-flex align-items-center">
+                    <span id="analysisStatus">Ожидание...</span>
+                    <div id="statusSpinner" class="spinner-border spinner-border-sm ms-2" role="status" style="display: none;">
+                        <span class="visually-hidden">Загрузка...</span>
+                    </div>
+                </div>
+            </div>
+            <h3>Результаты анализа ({{ status }})</h3>
+            {% if status == 'completed' %}
+                <div class="alert alert-success">Анализ завершен</div>
+            {% elif status == 'running' %}
+                <div class="alert alert-warning">Анализ выполняется</div>
+            {% elif status == 'stopped' %}
+                <div class="alert alert-danger">Анализ остановлен</div>
+            {% elif status == 'error' %}
+                <div class="alert alert-danger">Ошибка анализа</div>
+            {% else %}
+                <div class="alert alert-info">Статус анализа: {{ status }}</div>
+            {% endif %}
+            
+            <div class="results-tabs mt-3">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#fileActivity">Файловая активность</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#dockerOutput">Логи Docker</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#etlOutput">ETL результаты</a>
+                    </li>
+                </ul>
+                
+                <div class="tab-content mt-3">
+                    <div class="tab-pane fade show active" id="fileActivity">
+                        <div id="fileActivityLoader" class="text-center mt-2">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Загрузка файловой активности...</span>
+                            </div>
+                            <p>Загрузка файловой активности...</p>
+                        </div>
+                        <div id="fileActivityContainer">
+                            <pre id="fileActivityContent" class="result-content" style="max-height: 600px; overflow-y: auto;">{% if file_activity %}{{ file_activity | map('trim') | join('\n') }}{% else %}Нет данных по файловой активности.{% endif %}</pre>
+                            <!-- Вывод остатка элементов -->
+                            <p id="remainingCount"></p>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="dockerOutput">
+                        <div id="dockerOutputLoader" class="text-center mt-2">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Загрузка логов Docker...</span>
+                            </div>
+                            <p>Загрузка логов Docker...</p>
+                        </div>
+                        <pre id="dockerOutputContent" class="result-content" style="max-height: 600px; overflow-y: auto;">{% if docker_output %}{{ docker_output }}{% else %}Нет данных по логам Docker.{% endif %}</pre>
+                    </div>
+                    <div class="tab-pane fade" id="etlOutput">
+                        <div id="etlOutputLoader" class="text-center mt-2">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Загрузка ETL результатов...</span>
+                            </div>
+                            <p>Загрузка ETL результатов...</p>
+                        </div>
+                        <div class="alert alert-info mt-2 mb-2" role="alert">
+                            <strong>Внимание!</strong> ETL результаты могут быть очень большими. Для удобства отображаются первые 500 строк.
+                            Вы можете загружать данные постепенно или скачать полный JSON файл или оригинальный ETL файл.
+                        </div>
+                        <pre id="etlOutputContent" class="result-content" style="max-height: 600px; overflow-y: auto;">{% if etl_output %}{{ etl_output | truncate(500) }}{% else %}Нет данных ETL результатов.{% endif %}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- История анализов -->
+        <div class="history-section mt-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3>История анализов</h3>
+                <button id="refreshHistory" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-clockwise"></i> Обновить
+                </button>
+            </div>
+            <div class="history-container">
+                {% for item in history %}
+                <div class="history-item {% if item.status == 'running' %}running{% endif %}" 
+                     data-analysis-id="{{ item.analysis_id }}">
+                    <div class="history-item-header">
+                        <span class="filename">{{ item.filename }}</span>
+                        <span class="timestamp">{{ item.timestamp }}</span>
+                    </div>
+                    <div class="history-item-details">
+                        <div class="status-indicator {{ item.status }}">{{ item.status }}</div>
+                        <button class="btn btn-sm btn-outline-secondary view-results-btn">
+                            Просмотреть результаты
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div id="noHistory" class="text-center text-muted mt-3" style="display: none;">
+                <p>История анализов пуста</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/highlight.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/languages/json.min.js"></script>
+    <script src="/static/analysis.js?v=1.0"></script>
+</body>
+</html> 

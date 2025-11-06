@@ -1,0 +1,249 @@
+:root {
+    --primary-color: #007bff;
+    --success-color: #28a745;
+    --error-color: #dc3545;
+    --warning-color: #ffc107;
+}
+
+.drop-zone {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--primary-color);
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.upload-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 1rem;
+}
+
+.progress {
+    height: 0.5rem;
+}
+
+.result-content {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 4px;
+    max-height: 600px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+.history-container {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.history-item {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.history-item:hover {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.history-item-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.filename {
+    font-weight: bold;
+}
+
+.timestamp {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.status-indicator {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+}
+
+.status-indicator.running {
+    background-color: var(--warning-color);
+    color: #000;
+}
+
+.status-indicator.completed {
+    background-color: var(--success-color);
+    color: #fff;
+}
+
+.status-indicator.stopped {
+    background-color: var(--error-color);
+    color: #fff;
+}
+
+.nav-tabs .nav-link {
+    color: #495057;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+#analysisStatus {
+    font-weight: bold;
+}
+
+.status-bar {
+    padding: 0.5rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+#statusSpinner {
+    color: var(--primary-color);
+}
+
+.running {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.history-item-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.view-results-btn {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.history-item:hover .view-results-btn {
+    opacity: 1;
+}
+
+.history-item.active {
+    border-color: var(--primary-color);
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+#refreshHistory {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#refreshHistory i {
+    transition: transform 0.3s ease;
+}
+
+#refreshHistory:active i {
+    transform: rotate(180deg);
+}
+
+.profile-icon-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: inline-block;
+}
+
+.profile-icon {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+}
+
+#logoutBtnProfile, #changePasswordBtn {
+    position: absolute;
+    right: 0;
+    display: none;
+    z-index: 10;
+    margin-top: 10px; /* Отступ между кнопками */
+}
+
+#logoutBtn {
+    top: 50px; /* Расположение кнопки "Выйти" */
+}
+
+#changePasswordBtn {
+    top: 120px; /* Расположение кнопки "Сменить пароль" */
+}
+
+/* Стили для блоков JSON */
+.json-block {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.json-block code {
+    display: block;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Увеличиваем максимальную высоту блока с ETL данными на мобильных устройствах */
+@media (max-width: 768px) {
+    #etlOutputContent {
+        max-height: 400px;
+    }
+}
+
+/* Стили для кнопок в блоке ETL */
+#etlButtonArea {
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 15px;
+    margin-top: 15px;
+}
+
+#etlRemainingCount {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+#downloadJsonBtn, #loadMoreEtlBtn, #downloadEtlBtn {
+    min-width: 200px;
+    margin-right: 10px;
+}
+
+.mb-4.text-center .btn {
+    margin: 0 5px;
+    min-width: 150px;
+} 

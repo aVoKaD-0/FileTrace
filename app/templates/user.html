@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/user.css">
+</head>
+<style>
+    .password-container {
+        position: relative;
+    }
+    
+    .eye-button {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .captcha-image {
+        max-width: 100%;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        margin-top: 5px;
+    }
+
+    .refresh-captcha {
+        min-width: 40px;
+    }
+
+    .captcha-container {
+        margin-bottom: 20px;
+    }
+    
+    .captcha-error {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 5px;
+        font-weight: 500;
+    }
+    
+    .message {
+        margin-top: 15px;
+        padding: 8px;
+        border-radius: 4px;
+    }
+    
+    .message.error {
+        color: #dc3545;
+    }
+    
+    .message.success {
+        color: #198754;
+    }
+</style>
+<body>
+    <div class="container mt-4">
+        <h1 id="pageTitle" class="text-center mb-4">Регистрация</h1>
+
+        <div class="mb-4 text-center">
+            <a href="#" class="btn btn-primary" id="registerTab">Регистрация</a>
+            <a href="#" class="btn btn-secondary" id="loginTab">Вход</a>
+        </div>
+
+        <!-- Форма регистрации -->
+        <div id="registerForm" class="form-section">
+            <form>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Электронная почта</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Пароль</label>
+                    <div class="password-container">
+                        <input type="password" class="form-control" id="password" name="password" required>
+                        <button type="button" class="eye-button" onclick="togglePassword('password', this)">👁</button>
+                    </div>
+                </div>
+                <!-- CAPTCHA для регистрации -->
+                <div class="mb-3 captcha-container">
+                    <label for="captchaText" class="form-label">Код с картинки</label>
+                    <div class="d-flex">
+                        <input type="text" class="form-control me-2" id="captchaText" name="captchaText" required>
+                        <button type="button" class="btn btn-outline-secondary refresh-captcha" onclick="refreshCaptcha('register')">🔄</button>
+                    </div>
+                    <div class="mt-2">
+                        <img id="registerCaptchaImage" class="captcha-image" src="" alt="CAPTCHA">
+                        <input type="hidden" id="registerCaptchaId" name="captchaId">
+                    </div>
+                    <div id="registerCaptchaError" class="captcha-error" style="display: none;">Неверный код с картинки. Попробуйте еще раз.</div>
+                </div>
+                <button type="submit" class="btn btn-success">Зарегистрироваться</button>
+                <div class="message" id="message"></div>
+            </form>
+        </div>
+
+        <!-- Форма входа -->
+        <div id="loginForm" class="form-section" style="display: none;">
+            <form>
+                <div class="mb-3">
+                    <label for="loginEmail" class="form-label">Электронная почта</label>
+                    <input type="email" class="form-control" id="loginEmail" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="loginPassword" class="form-label">Пароль</label>
+                    <div class="password-container">
+                        <input type="password" class="form-control" id="loginPassword" name="password" required>
+                        <button type="button" class="eye-button" onclick="togglePassword('loginPassword', this)">👁</button>
+                    </div>
+                </div>
+                <!-- CAPTCHA для входа (изначально скрыта) -->
+                <div class="mb-3 captcha-container" id="loginCaptchaContainer">
+                    <label for="loginCaptchaText" class="form-label">Код с картинки</label>
+                    <div class="d-flex">
+                        <input type="text" class="form-control me-2" id="loginCaptchaText" name="captchaText" required>
+                        <button type="button" class="btn btn-outline-secondary refresh-captcha" onclick="refreshCaptcha('login')">🔄</button>
+                    </div>
+                    <div class="mt-2">
+                        <img id="loginCaptchaImage" class="captcha-image" src="" alt="CAPTCHA">
+                        <input type="hidden" id="loginCaptchaId" name="captchaId">
+                    </div>
+                    <div id="loginCaptchaError" class="captcha-error" style="display: none;">Неверный код с картинки. Попробуйте еще раз.</div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <button type="submit" class="btn btn-success">Войти</button>
+                    <a href="/users/reset-password" class="text-decoration-none">Забыли пароль?</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="loadingIcon" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+    <!-- <script>
+        // Функция для смены заголовка
+        function changeTitle(title) {
+            document.title = title;
+            document.getElementById('pageTitle').innerText = title;
+        }
+
+        document.getElementById('registerTab').addEventListener('click', function() {
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('loginForm').style.display = 'none';
+            changeTitle('Регистрация');
+        });
+
+        document.getElementById('loginTab').addEventListener('click', function() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            changeTitle('Вход');
+        });
+    </script> -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/user.js?v=1.0"></script>
+</body>
+</html>
