@@ -138,7 +138,7 @@ class UserService:
         # Хэшируем пароль для безопасного хранения
         hashed_password = get_password_hash(password)
         # Генерируем код подтверждения
-        confiration_code = generate_code()
+        confirmation_code = generate_code()
         # Устанавливаем срок действия кода (10 минут)
         expires_at = datetime.utcnow() + timedelta(minutes=10)
         created_at = datetime.utcnow()
@@ -147,14 +147,14 @@ class UserService:
         new_user = Users(
             email=email, 
             hashed_password=hashed_password, 
-            confiration_code=confiration_code, 
+            confirmation_code=confirmation_code, 
             created_at=created_at, 
             expires_at=expires_at
         )
         self.db.add(new_user)
         await self.db.commit()
         await self.db.refresh(new_user)
-        return confiration_code
+        return confirmation_code
     
     async def update_password(self, email=None, password=None, refresh_token=None):
         # Обновляет пароль пользователя

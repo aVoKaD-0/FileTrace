@@ -13,7 +13,7 @@ class Users(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(VARCHAR(255))
     confirmed = Column(Boolean, default=False)
-    confiration_code = Column(String, nullable=True)
+    confirmation_code = Column(String, nullable=True)
     refresh_token = Column(String, nullable=True, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     expires_at = Column(DateTime, nullable=True)

@@ -89,10 +89,10 @@ async def confirm_email(request: Request, response: Response, EmailConfirmation:
     userservice = UserService(db)
     email = request.cookies.get("email")
     user = await userservice.get_user_by_email(email)
-    if user and EmailConfirmation.code == user.confiration_code:
+    if user and EmailConfirmation.code == user.confirmation_code:
         # Код верный, подтверждаем пользователя
         user.confirmed = True
-        user.confiration_code = None
+        user.confirmation_code = None
         
         # Создаем токены авторизации
         access_token = create_access_token({"sub": str(user.id)})
@@ -242,7 +242,7 @@ async def reset_code_page(request: Request, db: AsyncSession = Depends(get_db)):
     
     # Генерируем новый код
     confirmation_code = generate_code()
-    user.confiration_code = confirmation_code
+    user.confirmation_code = confirmation_code
     await userservice.__commit__()
     
     # Отправляем код на email
