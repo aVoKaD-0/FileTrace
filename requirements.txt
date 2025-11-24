@@ -17,3 +17,5 @@ loguru
 sse_starlette
 apscheduler
 etl-parser
+cryptography
+python-dotenv

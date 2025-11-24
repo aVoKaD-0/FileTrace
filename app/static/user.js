@@ -25,13 +25,14 @@ document.querySelector('#registerForm form').addEventListener('submit', async fu
             message.style.color = 'red';
             flag = 1;
         }
-        if (!/[A-Za-z0-9]/.test(password) || !/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+        if (!/[A-Za-z0-9]/.test(password) || !/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>\/?]/.test(password)) {
             message.textContent = 'Пароль должен содержать прописные, заглавные буквы, цифры и специальные символы.';
             message.style.color = 'red';
             flag = 1;
         }
         
         if (flag === 1) {
+            clearAfterDelay(message);
             document.getElementById('loadingIcon').style.display = 'none';
             return;
         }
@@ -54,6 +55,7 @@ document.querySelector('#registerForm form').addEventListener('submit', async fu
             console.log('Регистрация успешна');
             message.textContent = responseData.message || 'Регистрация успешна. Проверьте вашу почту для подтверждения.';
             message.style.color = 'green';
+            clearAfterDelay(message);
             this.reset();
             refreshCaptcha('register'); // Обновляем капчу после успешной регистрации
             window.location.href = '/users/confirm-email';
@@ -65,6 +67,7 @@ document.querySelector('#registerForm form').addEventListener('submit', async fu
                 // Показываем ошибку CAPTCHA прямо под полем
                 const captchaError = document.getElementById('registerCaptchaError');
                 captchaError.style.display = 'block';
+                clearAfterDelay(captchaError, 15000, true);
                 
                 // Очищаем поле ввода CAPTCHA
                 document.getElementById('captchaText').value = '';
@@ -75,6 +78,7 @@ document.querySelector('#registerForm form').addEventListener('submit', async fu
                 // Обычная ошибка - показываем общее сообщение
                 message.textContent = responseData.detail || 'Ошибка при регистрации';
                 message.style.color = 'red';
+                clearAfterDelay(message);
                 refreshCaptcha('register'); // Обновляем капчу после ошибки
             }
         }
@@ -83,6 +87,7 @@ document.querySelector('#registerForm form').addEventListener('submit', async fu
         const message = document.getElementById('message');
         message.textContent = 'Произошла ошибка при отправке данных';
         message.style.color = 'red';
+        clearAfterDelay(message);
         refreshCaptcha('register'); // Обновляем капчу после ошибки
     } finally {
         document.getElementById('loadingIcon').style.display = 'none';
@@ -135,6 +140,7 @@ document.querySelector('#loginForm form').addEventListener('submit', async funct
                 // Показываем ошибку CAPTCHA прямо под полем
                 const captchaError = document.getElementById('loginCaptchaError');
                 captchaError.style.display = 'block';
+                clearAfterDelay(captchaError, 15000, true);
                 
                 // Очищаем поле ввода CAPTCHA
                 document.getElementById('loginCaptchaText').value = '';
@@ -184,6 +190,22 @@ function togglePassword(fieldId, button) {
         field.type = "password";
         button.textContent = "👁"; // Изменяем иконку на открытый глаз
     }
+}
+
+function clearAfterDelay(element, delay = 15000, hideElement = false) {
+    if (!element) return;
+
+    if (element._clearTimeout) {
+        clearTimeout(element._clearTimeout);
+    }
+
+    element._clearTimeout = setTimeout(() => {
+        element.textContent = '';
+
+        if (hideElement) {
+            element.style.display = 'none';
+        }
+    }, delay);
 }
 
 // Функция для получения и отображения новой CAPTCHA

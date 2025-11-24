@@ -3,12 +3,15 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.sql import text
 from app.auth.auth import generate_code
-from app.domain.models.user import Users
+from app.models.user import Users
+from app.core.crypto import normalize_email, encrypt_str, decrypt_str, hmac_hash
+
 from datetime import datetime, timedelta   
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.utils.sse_operations import subscribers
-from app.domain.models.analysis import Analysis
-from app.domain.models.result import Results
+from app.models.analysis import Analysis
+from app.models.result import Results
+
 from app.core.security import get_password_hash, verify_password
 
 class UserService:
@@ -133,7 +136,7 @@ class UserService:
         #   email: Email пользователя
         #   password: Пароль пользователя (будет хэширован)
         # Возвращает:
-        #   Кортеж (объект пользователя, код подтверждения)
+        #   Кортеж (ID пользователя, код подтверждения)
         
         # Хэшируем пароль для безопасного хранения
         hashed_password = get_password_hash(password)
@@ -145,7 +148,8 @@ class UserService:
         
         # Создаем нового пользователя
         new_user = Users(
-            email=email, 
+            email_hash=hmac_hash(normalize_email(email)),
+            email_encrypted=encrypt_str(email), 
             hashed_password=hashed_password, 
             confirmation_code=confirmation_code, 
             created_at=created_at, 
@@ -154,7 +158,7 @@ class UserService:
         self.db.add(new_user)
         await self.db.commit()
         await self.db.refresh(new_user)
-        return confirmation_code
+        return new_user.id, confirmation_code
     
     async def update_password(self, email=None, password=None, refresh_token=None):
         # Обновляет пароль пользователя
@@ -296,14 +300,23 @@ class UserService:
         return user
 
     async def get_by_email(self, email: str):
-        # Получает пользователя по email
-        # Параметры:
-        #   email: Email пользователя
-        # Возвращает:
-        #   Объект пользователя или None
-        query = select(Users).where(Users.email == email.lower())
+        # Получает пользователя по email (поиск по детерминированному хэшу)
+        email_norm = normalize_email(email)
+        email_hash = hmac_hash(email_norm)
+        query = select(Users).where(Users.email_hash == email_hash)
         result = await self.db.execute(query)
         return result.scalar_one_or_none()
+
+    async def update_refresh_token_by_user_id(self, user_id: uuid.UUID, refresh_token):
+        # Обновляет refresh token по user_id
+        result = await self.db.execute(select(Users).filter(Users.id == user_id))
+        user = result.scalars().first()
+        if not user:
+            return None
+        user.refresh_token = refresh_token
+        self.db.add(user)
+        await self.db.commit()
+        return user
 
     async def get_login_attempts(self, email: str) -> int:
         # Получает количество неудачных попыток входа для пользователя

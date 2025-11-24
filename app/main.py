@@ -10,15 +10,19 @@ from app.config.auth import SECRET_KEY, ALGORITHM
 from app.services.user_service import UserService
 from app.api.analysis import router as analysis_router
 from app.services.cleanup_service import CleanupService
-from app.domain.models.database import AsyncSessionLocal
+from app.core.db import AsyncSessionLocal
+from app.core.logging import setup_logging, set_request_id, clear_request_id
 from app.auth.auth import verify_token, create_access_token
 from fastapi.responses import HTMLResponse, RedirectResponse
+import logging
+import time
 
 def create_app() -> FastAPI:
     # Функция создания и настройки приложения FastAPI
     # Инициализирует роутеры, middleware, обработчики событий и статические файлы
     # Возвращает:
     #   FastAPI: Настроенное приложение
+    setup_logging()
     app = FastAPI()
 
     # Подключаем статические файлы (CSS, JavaScript, изображения)
@@ -28,6 +32,25 @@ def create_app() -> FastAPI:
 
     # Инициализация сервиса очистки (удаляет старые временные файлы и анализы)
     cleanup_service = CleanupService()
+
+    @app.middleware("http")
+    async def request_logger(request: Request, call_next):
+        rid = set_request_id(request.headers.get("X-Request-ID"))
+        start = time.perf_counter()
+        logger = logging.getLogger("app")
+        try:
+            logger.info(f"{request.method} {request.url.path} started")
+            response = await call_next(request)
+            duration_ms = (time.perf_counter() - start) * 1000
+            response.headers["X-Request-ID"] = rid
+            logger.info(f"{request.method} {request.url.path} {response.status_code} {duration_ms:.1f}ms")
+            return response
+        except Exception:
+            duration_ms = (time.perf_counter() - start) * 1000
+            logger.exception(f"Unhandled error {request.method} {request.url.path} {duration_ms:.1f}ms")
+            raise
+        finally:
+            clear_request_id()
 
     @app.on_event("startup")
     async def startup_event():
@@ -103,7 +126,8 @@ def create_app() -> FastAPI:
                         value=access_token,
                         httponly=True,
                         samesite="Lax",
-                        max_age=30*60
+                        max_age=30*60,
+                        secure=True
                     )
                     return response
                     

@@ -1,5 +1,5 @@
 from sqlalchemy.future import select
-from app.domain.models.user import Users
+from app.models.user import Users
 from sqlalchemy.ext.asyncio import AsyncSession
 
 async def get_user(db: AsyncSession, user_id: int):

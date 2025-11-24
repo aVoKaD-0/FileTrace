@@ -7,7 +7,7 @@ from app.utils.logging import Logger
 from app.auth.auth import uuid_by_token
 from datetime import datetime, timezone
 from fastapi.staticfiles import StaticFiles
-from app.domain.models.database import get_db
+from app.core.db import get_db
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.utils.websocket_manager import manager
@@ -17,7 +17,8 @@ from app.services.user_service import UserService
 from concurrent.futures import ThreadPoolExecutor
 from app.utils.file_operations import FileOperations
 from app.services.analysis_service import AnalysisService
-from app.infrastructure.repositories.analysis import docker
+from app.services.audit_service import AuditService
+from app.repositories.analysis import docker
 from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse, FileResponse
 from fastapi import APIRouter, UploadFile, File, Request, HTTPException, Depends, WebSocket, WebSocketDisconnect
 
@@ -32,6 +33,8 @@ async def root(request: Request, db: AsyncSession = Depends(get_db)):
     userservice = UserService(db)
     history = await userservice.get_user_analyses(uuid_by_token(request.cookies.get("refresh_token")))
 
+    # Audit: analyses list viewed
+    await AuditService(db).log(request=request, event_type="analysis.list_viewed", user_id=str(uuid_by_token(request.cookies.get("refresh_token"))))
     return templates.TemplateResponse(
         "analisys.html",
         {"request": request, "history": history}
@@ -77,6 +80,8 @@ async def get_analysis_page(request: Request, analysis_id: uuid.UUID, db: AsyncS
             except Exception as e:
                 Logger.log(f"Ошибка при чтении ETL результатов: {str(e)}")
 
+        # Audit: analysis details viewed
+        await AuditService(db).log(request=request, event_type="analysis.viewed", user_id=str(uuid_by_token(request.cookies.get("refresh_token"))), metadata={"analysis_id": str(analysis_id)})
         return templates.TemplateResponse(
             "analisys.html",
             {
@@ -106,6 +111,8 @@ async def analyze_file(request: Request, file: UploadFile = File(...), db: Async
         FileOperations.user_file_upload(file=file, user_upload_folder=upload_folder)
         await userservice.create_analysis(user_id=uuid, filename=file.filename, status="running", analysis_id=run_id)
         await userservice.create_result(run_id)
+        # Audit: analysis started
+        await AuditService(db).log(request=request, event_type="analysis.started", user_id=str(uuid), metadata={"filename": file.filename, "analysis_id": str(run_id)})
         analysis_service = AnalysisService(file.filename, str(run_id), str(uuid))
         asyncio.create_task(analysis_service.analyze())
         Logger.log(f"Файл загружен и анализ запущен. ID анализа: {run_id}")
@@ -122,6 +129,7 @@ async def get_results(analysis_id: uuid.UUID, db: AsyncSession = Depends(get_db)
     try:
         userservice = UserService(db)
         result_data = await userservice.get_result_data(str(analysis_id))
+        await AuditService(db).log(request=None, event_type="analysis.results_viewed", metadata={"analysis_id": str(analysis_id)})
         return JSONResponse(result_data)
     except Exception as e:
         return JSONResponse(status_code=500, content={"detail": str(e)})
@@ -131,6 +139,7 @@ async def get_results_chunk(analysis_id: uuid.UUID, offset: int = 0, limit: int 
     try:
         userservice = UserService(db)
         result, total = await userservice.get_chunk_result(str(analysis_id), offset, limit)
+        await AuditService(db).log(request=None, event_type="analysis.results_chunk_viewed", metadata={"analysis_id": str(analysis_id), "offset": offset, "limit": limit})
         return JSONResponse({
             "chunk": result,
             "offset": offset,
@@ -193,11 +202,12 @@ async def websocket_endpoint(websocket: WebSocket, analysis_id: str):
         manager.disconnect(analysis_id, websocket)
 
 @router.get("/download-etl/{analysis_id}")
-async def download_etl(analysis_id: str, format: str = "etl"):
+async def download_etl(analysis_id: str, format: str = "etl", db: AsyncSession = Depends(get_db)):
     try:
         etl_file = f"{docker}\\analysis\\{analysis_id}\\trace.etl"
 
         if format.lower() == "etl":
+            await AuditService(db).log(request=None, event_type="analysis.etl_downloaded", metadata={"analysis_id": analysis_id, "format": format})
             return FileResponse(
                 path=str(etl_file),
                 filename=f"analysis_{analysis_id}.etl",
@@ -252,6 +262,7 @@ async def get_etl_json(analysis_id: str, db: AsyncSession = Depends(get_db)):
             with open(json_file_path, 'r', encoding=encoding, errors='replace') as json_file:
                 try:
                     data = json_file.read(100)  # Читаем первые 100 символов для проверки
+                    await AuditService(db).log(request=None, event_type="analysis.json_available", metadata={"analysis_id": analysis_id})
                     return JSONResponse({
                         "status": "converted",
                         "message": "ETL файл успешно конвертирован в JSON. Используйте /analysis/etl-chunk/{analysis_id} для постраничной загрузки."
@@ -277,7 +288,7 @@ async def get_etl_json(analysis_id: str, db: AsyncSession = Depends(get_db)):
         )
 
 @router.get("/etl-chunk/{analysis_id}")
-async def get_etl_chunk(analysis_id: str, offset: int = 0, limit: int = 200):
+async def get_etl_chunk(analysis_id: str, offset: int = 0, limit: int = 200, db: AsyncSession = Depends(get_db)):
     try:
         json_file_path = f"{docker}\\analysis\\{analysis_id}\\trace.json"
         
@@ -312,6 +323,7 @@ async def get_etl_chunk(analysis_id: str, offset: int = 0, limit: int = 200):
                         break
                     lines.append(line.rstrip('\n'))
             
+            await AuditService(db).log(request=None, event_type="analysis.json_chunk_viewed", metadata={"analysis_id": analysis_id, "offset": offset, "limit": limit, "total": total_lines})
             return JSONResponse({
                 "chunk": lines,
                 "offset": offset,
@@ -334,7 +346,7 @@ async def get_etl_chunk(analysis_id: str, offset: int = 0, limit: int = 200):
         )
 
 @router.get("/download-json/{analysis_id}")
-async def download_json(analysis_id: str):
+async def download_json(analysis_id: str, db: AsyncSession = Depends(get_db)):
     try:
         json_file_path = f"{docker}\\analysis\\{analysis_id}\\trace.json"
         
@@ -344,6 +356,7 @@ async def download_json(analysis_id: str):
                 content={"error": "ETL результаты не найдены"}
             )
             
+        await AuditService(db).log(request=None, event_type="analysis.json_downloaded", metadata={"analysis_id": analysis_id})
         return FileResponse(
             path=str(json_file_path),
             filename=f"analysis_{analysis_id}.json",
@@ -357,7 +370,7 @@ async def download_json(analysis_id: str):
         )
 
 @router.post("/convert-etl/{analysis_id}")
-async def convert_etl(analysis_id: str):
+async def convert_etl(analysis_id: str, db: AsyncSession = Depends(get_db)):
     try:
         etl_file = f"{docker}\\analysis\\{analysis_id}\\trace.etl"
         json_file = f"{docker}\\analysis\\{analysis_id}\\trace.json"
@@ -412,6 +425,7 @@ async def convert_etl(analysis_id: str):
                 }))
         
         # Запускаем конвертацию в фоновом режиме
+        await AuditService(db).log(request=None, event_type="analysis.conversion_started", metadata={"analysis_id": analysis_id})
         asyncio.create_task(run_conversion())
         
         return JSONResponse({

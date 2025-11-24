@@ -148,7 +148,7 @@
 
     <div class="auth-container">
         <h2>Аутентификация</h2>
-        <p id="phone-info"></p>
+        <p id="phone-info">Введите код, отправленный на {{ masked_email or '' }}</p>
         <form id="confirmationForm">
             <div class="code-inputs">
                 <input type="text" maxlength="1">
@@ -179,16 +179,10 @@
         const phoneInfo = document.getElementById("phone-info");
         const errorSound = document.getElementById("error-sound");
         const resendElement = document.getElementById('resendCode');
+        const userId = "{{ user_id or '' }}";
         
-        // Получаем email из куки
-        function getCookie(name) {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-        }
-        
-        const email = getCookie('email');
-        phoneInfo.innerText = `Введите код, отправленный на ${email}`;
+        // Email приходит маскированным с сервера (без PII в куках)
+        // phoneInfo уже заполнен через шаблон
         
         inputs.forEach((input, index) => {
             input.addEventListener("input", () => {
@@ -262,7 +256,7 @@
             const res = await fetch('/users/confirm', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code: code })
+                body: JSON.stringify({ code: code, user_id: userId })
             });
             if (res.ok) {
                 window.location.href = '/analysis';
@@ -325,7 +319,7 @@
             resendElement.classList.add('disabled');
             resendElement.innerHTML = `Отправка<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span>`;
 
-            fetch('/users/resend-code', { 
+            fetch(`/users/resend-code?user_id=${encodeURIComponent(userId)}`, { 
                 method: 'POST',
                 credentials: 'include'
             })

@@ -53,6 +53,7 @@ class UserDeleteResponse(BaseModel):
 class EmailConfirmation(BaseModel):
     # Схема для подтверждения электронной почты
     # Используется для верификации адреса пользователя
+    user_id: str  # ID пользователя
     code: str  # Код подтверждения из письма
 
 class ResetPasswordRequest(BaseModel):

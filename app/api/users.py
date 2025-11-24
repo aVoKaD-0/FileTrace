@@ -1,15 +1,18 @@
 from fastapi import Response
 from fastapi.staticfiles import StaticFiles
 from app.core.security import verify_password
-from app.domain.models.database import get_db
+from app.core.db import get_db
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.security import OAuth2PasswordBearer
 from app.services.user_service import UserService
 from fastapi import APIRouter, HTTPException, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+import uuid
 from app.auth.auth import send_email, create_access_token, create_refresh_token, generate_code
+from app.services.audit_service import AuditService
 from app.schemas.users import EmailConfirmation, UserLogin, UserRegistration, UserPasswordReset
+from app.core.crypto import decrypt_str
 
 
 # Создаем маршрутизатор для пользовательских операций
@@ -26,7 +29,7 @@ async def root(request: Request):
     return templates.TemplateResponse("user.html", {"request": request})
 
 @router.post("/registration")
-async def register_user(response: Response, user_data: UserRegistration, db: AsyncSession = Depends(get_db)):
+async def register_user(request: Request, response: Response, user_data: UserRegistration, db: AsyncSession = Depends(get_db)):
     # Обработчик регистрации нового пользователя
     # Принимает данные пользователя, проверяет капчу и создает новую учетную запись
     try:
@@ -45,8 +48,6 @@ async def register_user(response: Response, user_data: UserRegistration, db: Asy
         
         print(3, is_captcha_valid)
         
-        response.set_cookie(key="email", value=user_data.email, max_age=60 * 10*60)
-        
         user_service = UserService(db)
         print(4, user_service)
         
@@ -60,11 +61,13 @@ async def register_user(response: Response, user_data: UserRegistration, db: Asy
             )
         
         # Создаем нового пользователя
-        confirm_code = await user_service.create_user(user_data.email, user_data.password)
-        print(6, confirm_code)
-        # Отправляем email с токеном для подтверждения
+        user_id, confirm_code = await user_service.create_user(user_data.email, user_data.password)
+        print(6, user_id, confirm_code, user_data.email)
         await send_email(email=user_data.email, verification_code=f"{confirm_code}")
-        print(7, confirm_code)
+        # Аудит регистрации
+        await AuditService(db).log(request=request, event_type="user.registered", user_id=str(user_id), metadata={"email": user_data.email})
+        print(7, confirm_code, user_id)
+        response.set_cookie(key="user_id", value=str(user_id), httponly=True, max_age=30*60, samesite="Lax", secure=True)
         return {"message": "Пользователь успешно зарегистрирован"}
     except Exception as e:
         # Обработка ошибок при регистрации
@@ -75,21 +78,46 @@ async def register_user(response: Response, user_data: UserRegistration, db: Asy
         )
 
 @router.get("/confirm-email", response_class=HTMLResponse)
-def confirm_email_page(request: Request):
+async def confirm_email_page(request: Request, db: AsyncSession = Depends(get_db)):
     # Страница подтверждения email
-    # Проверяет куки и отображает форму для ввода кода подтверждения
-    if not request.cookies.get("email") or request.cookies.get("refresh_token") or request.cookies.get("access_token"):
-        return RedirectResponse(url="/users/")
-    return templates.TemplateResponse("confirm_email.html", {"request": request})
+    # Отображает форму для ввода кода подтверждения и маскированный email
+    print(1, request.cookies.get("user_id"))
+    user_id = request.cookies.get("user_id")
+    masked_email = None
+    if user_id:
+        try:
+            print(2, user_id)
+            userservice = UserService(db)
+            user = await userservice.get_user_by_id(uuid.UUID(str(user_id)))
+            print(3, user)
+            if user and user.email_encrypted:
+                email = decrypt_str(user.email_encrypted)
+                print(4, email) 
+                # простое маскирование email
+                local, _, domain = email.partition("@")
+                if domain:
+                    print(5, local, domain)
+                    masked_local = (local[0] + "***" + (local[-1] if len(local) > 1 else "")) if local else "***"
+                    parts = domain.split(".")
+                    masked_domain = (parts[0][0] + "***") if parts and parts[0] else "***"
+                    if len(parts) > 1:
+                        masked_domain = masked_domain + "." + parts[-1]
+                    masked_email = f"{masked_local}@{masked_domain}"
+        except Exception:
+            print(6, "except")
+            masked_email = None
+    else:
+        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    return templates.TemplateResponse("confirm_email.html", {"request": request, "masked_email": masked_email, "user_id": user_id})
 
 @router.post("/confirm")
-async def confirm_email(request: Request, response: Response, EmailConfirmation: EmailConfirmation, db: AsyncSession = Depends(get_db)):
+async def confirm_email(request: Request, response: Response, data: EmailConfirmation, db: AsyncSession = Depends(get_db)):
     # Обработчик подтверждения email
     # Проверяет код подтверждения и активирует аккаунт
     userservice = UserService(db)
-    email = request.cookies.get("email")
-    user = await userservice.get_user_by_email(email)
-    if user and EmailConfirmation.code == user.confirmation_code:
+    user_id = uuid.UUID(str(data.user_id))
+    user = await userservice.get_user_by_id(user_id)
+    if user and data.code == user.confirmation_code:
         # Код верный, подтверждаем пользователя
         user.confirmed = True
         user.confirmation_code = None
@@ -99,13 +127,17 @@ async def confirm_email(request: Request, response: Response, EmailConfirmation:
         refresh_token = create_refresh_token({"sub": str(user.id)})
         
         # Сохраняем refresh токен и устанавливаем куки
-        await userservice.update_refresh_token(email, refresh_token)
-        response.set_cookie(key="access_token", value=access_token, httponly=True, max_age=30*60)
-        response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, max_age=7*24*60*60)
+        await userservice.update_refresh_token_by_user_id(user.id, refresh_token)
+        response.set_cookie(key="access_token", value=access_token, httponly=True, max_age=30*60, samesite="Lax", secure=True)
+        response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, max_age=7*24*60*60, samesite="Lax", secure=True)
         await userservice.__commit__()
+        # Аудит подтверждения email
+        await AuditService(db).log(request=request, event_type="user.email_confirmed", user_id=str(user.id))
         return {"message": "Email confirmed"}
     
     # Неверный код подтверждения
+    # Аудит неуспешного подтверждения
+    await AuditService(db).log(request=request, event_type="user.email_confirm_failed", user_id=str(data.user_id))
     raise HTTPException(status_code=400, detail="Invalid code")
 
 # Схема для OAuth2 авторизации
@@ -122,11 +154,13 @@ async def login(request: Request, response: Response, user_data: UserLogin, db: 
             is_captcha_valid = captcha.verify_captcha(user_data.captcha_id, user_data.captcha_text)
             
             if not is_captcha_valid:
+                await AuditService(db).log(request=request, event_type="auth.captcha_required", metadata={"email": user_data.email})
                 return JSONResponse(
                     status_code=400,
                     content={"detail": "Неверный код с картинки. Пожалуйста, попробуйте еще раз."}
                 )
         else:
+            await AuditService(db).log(request=request, event_type="auth.captcha_required", metadata={"email": user_data.email})
             return JSONResponse(
                 status_code=400,
                 content={"detail": "Пожалуйста, введите код с картинки."}
@@ -159,6 +193,7 @@ async def login(request: Request, response: Response, user_data: UserLogin, db: 
             
             if login_attempts >= 3:
                 # Если попыток больше 3, требуем капчу
+                await AuditService(db).log(request=request, event_type="auth.login_failed", metadata={"email": user_data.email, "reason": "invalid_credentials", "captcha_required": True})
                 return JSONResponse(
                     status_code=400,
                     content={
@@ -168,6 +203,7 @@ async def login(request: Request, response: Response, user_data: UserLogin, db: 
                 )
             
             # Обычная ошибка авторизации
+            await AuditService(db).log(request=request, event_type="auth.login_failed", metadata={"email": user_data.email, "reason": "invalid_credentials"})
             return JSONResponse(
                 status_code=400,
                 content={"detail": "Неверный email или пароль"}
@@ -181,15 +217,17 @@ async def login(request: Request, response: Response, user_data: UserLogin, db: 
         refresh_token = create_refresh_token(data={"sub": str(user.id)})
         
         # Сохраняем refresh_token в базе данных
-        await user_service.update_refresh_token(user.email, refresh_token)
+        await user_service.update_refresh_token_by_user_id(user.id, refresh_token)
         
         # Устанавливаем cookie с токенами
-        response.set_cookie(key="access_token", value=access_token, httponly=True, max_age=30*60)
-        response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, max_age=7*24*60*60)
+        response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, max_age=30*60)
+        response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True, max_age=7*24*60*60)
         
+        await AuditService(db).log(request=request, event_type="auth.login_success", user_id=str(user.id), metadata={"email": user_data.email})
         return {"message": "Вход выполнен успешно"}
     except Exception as e:
         # Обработка ошибок при входе
+        await AuditService(db).log(request=request, event_type="error.app_exception", metadata={"route": "users.login", "error": str(e)})
         return JSONResponse(
             status_code=500,
             content={"detail": f"Ошибка при входе: {str(e)}"}
@@ -218,7 +256,7 @@ async def logout(response: Response, request: Request, db: AsyncSession = Depend
             return {"message": "Logout successful"}
             
         # Удаляем refresh токен из базы
-        await user_service.update_refresh_token(user.email, None)
+        await user_service.update_refresh_token_by_user_id(user.id, None)
         
         # Удаляем куки
         if access_token:
@@ -233,12 +271,12 @@ async def logout(response: Response, request: Request, db: AsyncSession = Depend
 async def reset_code_page(request: Request, db: AsyncSession = Depends(get_db)):
     # Повторная отправка кода подтверждения
     # Генерирует новый код и отправляет его на email
-    email = request.cookies.get("email")
-    if not email:
-        return RedirectResponse(url="/users/")
-        
+    user_id = request.query_params.get("user_id")
+    if not user_id:
+        return JSONResponse(status_code=400, content={"detail": "user_id is required"})
+
     userservice = UserService(db)
-    user = await userservice.get_user_by_email(email)
+    user = await userservice.get_user_by_id(uuid.UUID(str(user_id)))
     
     # Генерируем новый код
     confirmation_code = generate_code()
@@ -246,7 +284,8 @@ async def reset_code_page(request: Request, db: AsyncSession = Depends(get_db)):
     await userservice.__commit__()
     
     # Отправляем код на email
-    await send_email(email, f"Confirmation code: {confirmation_code}")
+    await send_email(decrypt_str(user.email_encrypted), f"Confirmation code: {confirmation_code}")
+    await AuditService(db).log(request=request, event_type="user.confirmation_resent", user_id=str(user.id))
     return JSONResponse(content={"message": "Email sent"})
 
 @router.get("/reset-password", response_class=HTMLResponse)
@@ -294,6 +333,7 @@ async def reset_password(request: Request, user_data: UserPasswordReset, db: Asy
                 # Если токен недействителен, пробуем использовать email
                 if user_data.email:
                     await user_service.update_password(user_data.email, user_data.password)
+                    await AuditService(db).log(request=request, event_type="user.password_changed", metadata={"by": "email"})
                     return {"message": "Пароль успешно обновлен"}
                 else:
                     return JSONResponse(
@@ -329,11 +369,11 @@ async def reset_password(request: Request, user_data: UserPasswordReset, db: Asy
                 
             await user_service.update_password(user_data.email, user_data.password)
             
+        await AuditService(db).log(request=request, event_type="user.password_changed", metadata={"by": "reset_password"})
         return {"message": "Пароль успешно обновлен"}
     except Exception as e:
         # Обработка ошибок при сбросе пароля
-        import logging
-        logging.error(f"Ошибка при сбросе пароля: {str(e)}")
+        await AuditService(db).log(request=request, event_type="error.app_exception", metadata={"route": "users.reset_password", "error": str(e)})
         return JSONResponse(
             status_code=500,
             content={"detail": f"Ошибка при сбросе пароля: {str(e)}"}

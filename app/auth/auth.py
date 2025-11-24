@@ -131,8 +131,9 @@ async def send_email(email: str, verification_code: str):
             subtype="html"
         )
 
-        ssl_context = ssl.create_default_context(cafile=certifi.where())
+        # ssl_context = ssl.create_default_context(cafile=certifi.where())
         # Инициализируем FastMail с настройками SMTP
+        print("send_email", SMTP)
         fm = FastMail(SMTP)
 
         # print("send_email", message)

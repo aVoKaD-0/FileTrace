@@ -1,8 +1,8 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.domain.models.database import AsyncSessionLocal
-from app.domain.models.analysis import Analysis
-from app.domain.models.result import Results
+from app.core.db import AsyncSessionLocal
+from app.models.analysis import Analysis
+from app.models.result import Results
 
 class AnalysisDbService:
     async def get_database(self):

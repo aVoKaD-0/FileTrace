@@ -1,8 +1,8 @@
 from sqlalchemy import select
 from datetime import datetime
-from app.domain.models.user import Users
+from app.models.user import Users
 from apscheduler.triggers.interval import IntervalTrigger
-from app.domain.models.database import AsyncSessionLocal
+from app.core.db import AsyncSessionLocal
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 class CleanupService:

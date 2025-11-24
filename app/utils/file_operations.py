@@ -1,7 +1,7 @@
 import os
 import uuid
 from shutil import copyfileobj
-from app.infrastructure.repositories.analysis import docker
+from app.repositories.analysis import docker
 
 
 project_dir = os.getcwd()

@@ -5,7 +5,7 @@ import subprocess
 from app.utils.logging import Logger
 from app.utils.websocket_manager import manager
 from concurrent.futures import ThreadPoolExecutor
-from app.infrastructure.repositories.analysis import docker
+from app.repositories.analysis import docker
 
 username = "docker"
 password = "docker"
