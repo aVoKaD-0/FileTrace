@@ -9,9 +9,9 @@ from app.services.user_service import UserService
 from fastapi import APIRouter, HTTPException, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 import uuid
-from app.auth.auth import send_email, create_access_token, create_refresh_token, generate_code
+from app.auth.auth import send_email, create_access_token, create_refresh_token, generate_code, send_reset_password_email, uuid_by_token
 from app.services.audit_service import AuditService
-from app.schemas.users import EmailConfirmation, UserLogin, UserRegistration, UserPasswordReset
+from app.schemas.users import EmailConfirmation, UserLogin, UserRegistration, UserPasswordReset, ForgotPasswordRequest
 from app.core.crypto import decrypt_str
 
 
@@ -288,87 +288,130 @@ async def reset_code_page(request: Request, db: AsyncSession = Depends(get_db)):
     await AuditService(db).log(request=request, event_type="user.confirmation_resent", user_id=str(user.id))
     return JSONResponse(content={"message": "Email sent"})
 
+@router.get("/forgot-password", response_class=HTMLResponse)
+async def forgot_password_page(request: Request):
+    return templates.TemplateResponse("forgot_password.html", {"request": request})
+
+
+@router.post("/forgot-password")
+async def forgot_password(request: Request, data: ForgotPasswordRequest, db: AsyncSession = Depends(get_db)):
+    try:
+        from app.utils.captcha import captcha
+        is_captcha_valid = captcha.verify_captcha(data.captcha_id, data.captcha_text)
+
+        if not is_captcha_valid:
+            return JSONResponse(
+                status_code=400,
+                content={"detail": "Неверный код с картинки. Пожалуйста, попробуйте еще раз."}
+            )
+
+        user_service = UserService(db)
+        user = await user_service.get_by_email(data.email)
+
+        # Не раскрываем, существует ли email, возвращаем одинаковый ответ
+        if not user:
+            await AuditService(db).log(request=request, event_type="user.password_reset_requested", metadata={"email": data.email, "found": False})
+            return {"message": "Если пользователь с таким email существует, на него отправлено письмо со ссылкой для сброса пароля."}
+
+        email_plain = decrypt_str(user.email_encrypted)
+        reset_token = create_access_token({"sub": str(user.id)})
+        reset_link = str(request.url_for("reset_password")) + f"?token={reset_token}"
+
+        await send_reset_password_email(email_plain, reset_link)
+        await AuditService(db).log(request=request, event_type="user.password_reset_requested", user_id=str(user.id), metadata={"email": data.email, "found": True})
+
+        return {"message": "Письмо со ссылкой для сброса пароля отправлено, проверьте вашу почту."}
+    except Exception as e:
+        await AuditService(db).log(request=request, event_type="error.app_exception", metadata={"route": "users.forgot_password", "error": str(e)})
+        return JSONResponse(
+            status_code=500,
+            content={"detail": f"Ошибка при запросе сброса пароля: {str(e)}"}
+        )
+
+
 @router.get("/reset-password", response_class=HTMLResponse)
-async def reset_password(request: Request, response: Response, db: AsyncSession = Depends(get_db)):
+async def reset_password(request: Request, response: Response, token: str | None = None, db: AsyncSession = Depends(get_db)):
     # Страница сброса пароля
-    # Проверяет наличие refresh токена и определяет тип формы для отображения
+    # Проверяет наличие токена сброса или refresh токена и определяет тип формы для отображения
+    reset_token = token
     refresh_token = request.cookies.get("refresh_token")
-    if refresh_token:
+
+    has_token = False
+
+    if reset_token:
+        # Сброс по ссылке из письма
+        has_token = True
+    elif refresh_token:
+        # Пользователь авторизован, проверяем refresh токен
         userservice = UserService(db)
         user = await userservice.get_refresh_token(refresh_token=refresh_token)
         if user is None:
             # Если токен недействителен, удаляем его
             response.cookies.delete("refresh_token")
             return RedirectResponse(url="/users/")
-            
-    # Определяем, авторизован ли пользователь
-    has_token = refresh_token is not None
+        has_token = True
+
     return templates.TemplateResponse(
-        "reset_password.html", 
-        {"request": request, "has_token": has_token}
+        "reset_password.html",
+        {"request": request, "has_token": has_token, "reset_token": reset_token}
     )
+
 
 @router.post("/reset-password")
 async def reset_password(request: Request, user_data: UserPasswordReset, db: AsyncSession = Depends(get_db)):
     # Обработчик сброса пароля
-    # Проверяет капчу, старый пароль (если требуется) и обновляет пароль пользователя
+    # Проверяет капчу, токен сброса или refresh токен и обновляет пароль пользователя
     try:
         # Проверяем капчу для защиты от автоматизированного перебора
         from app.utils.captcha import captcha
         is_captcha_valid = captcha.verify_captcha(user_data.captcha_id, user_data.captcha_text)
-        
+
         if not is_captcha_valid:
             return JSONResponse(
                 status_code=400,
                 content={"detail": "Неверный код с картинки. Пожалуйста, попробуйте еще раз."}
             )
-            
+
         user_service = UserService(db)
         refresh_token = request.cookies.get("refresh_token")
-        
-        if refresh_token:
+
+        # Приоритет: токен из письма для незалогиненного пользователя
+        if user_data.reset_token:
+            try:
+                user_id_str = uuid_by_token(user_data.reset_token)
+                user_id = uuid.UUID(str(user_id_str))
+            except Exception:
+                return JSONResponse(
+                    status_code=400,
+                    content={"detail": "Ссылка для сброса пароля недействительна или устарела."}
+                )
+
+            user = await user_service.get_user_by_id(user_id)
+            if user is None:
+                return JSONResponse(
+                    status_code=404,
+                    content={"detail": "Пользователь не найден"}
+                )
+
+            from app.core.security import get_password_hash
+            user.hashed_password = get_password_hash(user_data.password)
+            user.login_attempts = 0
+            db.add(user)
+            await db.commit()
+        elif refresh_token:
             # Пользователь авторизован, используем его токен для сброса
             user = await user_service.update_password(refresh_token=refresh_token, password=user_data.password)
             if user is None:
-                # Если токен недействителен, пробуем использовать email
-                if user_data.email:
-                    await user_service.update_password(user_data.email, user_data.password)
-                    await AuditService(db).log(request=request, event_type="user.password_changed", metadata={"by": "email"})
-                    return {"message": "Пароль успешно обновлен"}
-                else:
-                    return JSONResponse(
-                        status_code=404, 
-                        content={"detail": "Пользователь не найден"}
-                    )
-        else:
-            # Пользователь не авторизован, используем email и старый пароль
-            if not user_data.email:
                 return JSONResponse(
-                    status_code=400, 
-                    content={"detail": "Email обязателен, если вы не авторизованы"}
-                )
-                
-            user = await user_service.get_by_email(user_data.email)
-            if user is None:
-                return JSONResponse(
-                    status_code=404, 
+                    status_code=404,
                     content={"detail": "Пользователь не найден"}
                 )
-                
-            if not user_data.old_password:
-                return JSONResponse(
-                    status_code=400, 
-                    content={"detail": "Старый пароль обязателен, если вы не авторизованы"}
-                )
-                
-            if not verify_password(user_data.old_password, user.hashed_password):
-                return JSONResponse(
-                    status_code=400, 
-                    content={"detail": "Неверный старый пароль"}
-                )
-                
-            await user_service.update_password(user_data.email, user_data.password)
-            
+        else:
+            return JSONResponse(
+                status_code=400,
+                content={"detail": "Токен сброса пароля недействителен или отсутствует."}
+            )
+
         await AuditService(db).log(request=request, event_type="user.password_changed", metadata={"by": "reset_password"})
         return {"message": "Пароль успешно обновлен"}
     except Exception as e:

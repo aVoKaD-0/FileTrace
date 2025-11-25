@@ -68,6 +68,12 @@ class ResetPasswordResponse(BaseModel):
     # Возвращает статус операции
     status: bool  # Флаг успешного сброса (True/False)
 
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+    captcha_id: str
+    captcha_text: str
+
 class UserLogin(BaseModel):
     # Схема для входа пользователя с поддержкой CAPTCHA
     # CAPTCHA становится обязательной после нескольких неудачных попыток входа
@@ -92,3 +98,4 @@ class UserPasswordReset(BaseModel):
     captcha_text: str  # Текст, введенный пользователем с CAPTCHA
     email: Optional[str] = None  # Email пользователя (опционально, если пользователь авторизован)
     old_password: Optional[str] = None  # Старый пароль (требуется если пользователь не авторизован)
+    reset_token: Optional[str] = None

@@ -142,3 +142,30 @@ async def send_email(email: str, verification_code: str):
         print("send_email success")
     except Exception as e:
         print("send_email error", e)
+
+async def send_reset_password_email(email: str, reset_link: str):
+    try:
+        html_body = f"""
+        <html>
+            <body>
+                <p>Здравствуйте!</p>
+                <p>Вы запросили сброс пароля для вашей учетной записи.</p>
+                <p>Перейдите по ссылке ниже, чтобы установить новый пароль:</p>
+                <p><a href="{reset_link}">Сбросить пароль</a></p>
+                <p>Если вы не запрашивали сброс пароля, просто проигнорируйте это письмо.</p>
+            </body>
+        </html>
+        """
+
+        message = MessageSchema(
+            subject="Reset your password",
+            recipients=[email],
+            body=html_body,
+            subtype="html"
+        )
+
+        fm = FastMail(SMTP)
+        await fm.send_message(message)
+        print("send_reset_password_email success")
+    except Exception as e:
+        print("send_reset_password_email error", e)

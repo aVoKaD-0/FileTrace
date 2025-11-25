@@ -1,0 +1,16 @@
+[
+    {
+        "line_number": 3,
+        "event": "Image",
+        "details": "134084812126037743 135 585 0x217C0910000 0x67A000 20812 6814...",
+        "level": "CRITICAL",
+        "msg": "CRITICAL: Использование PowerShell"
+    },
+    {
+        "line_number": 4,
+        "event": "Image",
+        "details": "134084812126038585 135 585 0x217C0F90000 0x67A000 20812 6814...",
+        "level": "CRITICAL",
+        "msg": "CRITICAL: Использование PowerShell"
+    }
+]
