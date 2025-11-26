@@ -5,7 +5,6 @@ from app.services.db_service import AnalysisDbService
 from app.utils.websocket_manager import manager
 
 class Logger:
-    # Добавляем лог в файл только один раз при старте
     logger.add("app/logs/GlobalLog.log", level="INFO", rotation="10 GB")
 
     @staticmethod

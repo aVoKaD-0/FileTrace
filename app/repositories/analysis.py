@@ -17,13 +17,3 @@ os.path.join(hyper, "results")
 os.path.join(hyper, "temporary_disks")
 os.path.join(hyper, "analysis_VMs")
 
-# Структура
-# Hyper
-#     dock
-#         Virtual Hard Disks
-#         Virtual Machines
-#         Snapshots
-#     files
-#     results
-#     temporary_disks
-#     analysis_VMs

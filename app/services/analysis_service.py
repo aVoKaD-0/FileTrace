@@ -99,19 +99,16 @@ CMD ["powershell", "-command", "Start-Process -FilePath 'C:\\\\sandbox\\\\{self.
         
         await Logger.analysis_log("Экспорт ETL в CSV...", self.analysis_id)
         
-        # Запуск tracerpt асинхронно
         tracerpt_command = ["powershell", "-command", f"tracerpt {etl} -o {output_csv} -of CSV"]
         await self.run_in_executor(tracerpt_command)
         
         await Logger.analysis_log("Экспорт ETL в JSON...", self.analysis_id)
         
-        # Запуск преобразования CSV в JSON асинхронно
         json_command = ["powershell", "-command", f"Import-Csv {output_csv} | ConvertTo-Json | Out-File {output_json}"]
         await self.run_in_executor(json_command)
         
         await Logger.analysis_log("ETL успешно экспортирован.", self.analysis_id)
         
-        # Отправляем сообщение о готовности ETL через WebSocket
         await manager.send_message(self.analysis_id, json.dumps({
             "event": "etl_converted", 
             "message": "ETL данные успешно конвертированы"
@@ -212,11 +209,9 @@ procmon /Backingfile D:\\programming\\GIt\\gitlab\\antivirus\\dockerer\\1\\docke
             self.update_dockerfile()
             await self.build_docker()
             
-            # Создаем задачи для асинхронного выполнения
             run_etw_task = asyncio.create_task(self.run_etw())
             run_docker_task = asyncio.create_task(self.run_docker())
             
-            # Ожидаем завершения задач
             await asyncio.gather(run_docker_task, run_etw_task)
 
             await self.lock.acquire()

@@ -4,7 +4,6 @@ import re
 import sys
 import os
 
-# === НАСТРОЙКИ ===
 TARGET_EXE = "mc1.exe"        
 CSV_INPUT = "trace.csv"       
 JSON_INPUT = "trace.json"     
@@ -36,24 +35,18 @@ def is_garbage(event_name, event_type, user_data):
     Возвращает True, если строку нужно УДАЛИТЬ из отчета.
     """
     
-    # 1. Убираем завершение операций ввода-вывода (шум)
     if "OperationEnd" in event_type or "SimpleOp" in event_type:
         return True
         
-    # 2. УБИРАЕМ ЗАВЕРШЕНИЕ ПРОЦЕССА (Process End / Terminate)
-    # Пользователь увидит только активность, но не смерть вируса.
     if event_name == "Process" and ("Terminate" in event_type or "End" in event_type):
         return True
 
-    # 3. Убираем события FileIo с адресами памяти вместо путей
     if event_name == "FileIo" and (user_data.startswith("0x") or user_data.startswith("0X") or user_data.startswith("0xFFFF")):
         return True
         
-    # 4. Убираем шум потоков
     if event_name == "Thread":
         return True
         
-    # 5. Убираем выгрузку библиотек (UnLoad)
     if event_name == "Image" and "UnLoad" in event_type:
         return True
 
@@ -65,7 +58,6 @@ def detect_threat(event_name, user_data):
     """
     data = user_data.lower()
     
-    # 1. Shell / Скрипты
     if "powershell" in data:
         return "CRITICAL: Использование PowerShell"
     if "cmd.exe" in data:
@@ -73,15 +65,12 @@ def detect_threat(event_name, user_data):
     if "wscript" in data or "cscript" in data:
         return "CRITICAL: Запуск скриптов Windows"
 
-    # 2. DLL
     if event_name == "Image" and "clr.dll" in data:
         return "WARNING: Загрузка .NET Runtime (подозрительно для C++)"
 
-    # 3. Сеть
     if "TcpIp" in event_name:
         return "WARNING: Сетевая активность"
 
-    # 4. Файлы
     if event_name == "FileIo":
         if ".exe" in data or ".bat" in data or ".vbs" in data:
             if "Create" in str(data) or "Write" in str(data):
@@ -99,13 +88,12 @@ def main():
     threats_log = []
     start_found = False
     
-    # --- 1. ОБРАБОТКА CSV ---
     try:
         with open(CSV_INPUT, 'r', encoding='utf-8', errors='ignore') as f:
             reader = csv.reader(f, skipinitialspace=True)
             headers = next(reader, None)
             
-            for row_data in enumerate(reader): # enumerate дает (index, row)
+            for row_data in enumerate(reader):
                 row = row_data[1]
                 if len(row) < 10: continue
                 
@@ -113,11 +101,9 @@ def main():
                 event_type = row[1].strip()
                 pid_raw = row[9].strip()
                 
-                # Собираем данные (пути, аргументы)
                 user_data_full = " ".join(row[15:]).strip().replace('"', '')
                 full_row_str = str(row).lower()
 
-                # A. ПОИСК НАЧАЛА
                 if not start_found:
                     is_start = (event_name == "Process" and (event_type == "Start" or row[6] == "1"))
                     if "dcstart" in event_type.lower(): is_start = False
@@ -127,19 +113,15 @@ def main():
                         if pid > 0 and pid != 0xFFFFFFFF:
                             tracked_pids.add(pid)
                             start_found = True
-                            # Сохраняем строку запуска (это всегда безопасно показать)
                             rows_to_keep.append(row) 
                     continue
 
-                # B. СЛЕЖКА
                 current_pid = hex_to_int(pid_raw)
                 
                 if current_pid in tracked_pids:
-                    # Фильтр мусора (включая End/Terminate)
                     if is_garbage(event_name, event_type, user_data_full):
                         continue
                     
-                    # Поиск угроз для отчета
                     threat_msg = detect_threat(event_name, user_data_full)
                     if threat_msg:
                         line_idx = len(rows_to_keep) + 1
@@ -153,7 +135,6 @@ def main():
 
                     rows_to_keep.append(row)
                     
-                    # Рост дерева процессов
                     if event_name == "Process" and (event_type == "Start" or row[6] == "1"):
                          if "dcstart" not in event_type.lower():
                             potential_childs = get_pids_from_row(row[10:])
@@ -167,17 +148,14 @@ def main():
     if not tracked_pids:
         raise HTTPException(status_code=500, detail=f"Не найден запуск {TARGET_EXE}")
     
-    # CSV
     with open(CSV_OUTPUT, 'w', encoding='utf-8', newline='') as f:
         writer = csv.writer(f)
         if headers: writer.writerow(headers)
         writer.writerows(rows_to_keep)
 
-    # THREAT REPORT
     with open(REPORT_OUTPUT, 'w', encoding='utf-8') as f:
         json.dump(threats_log, f, indent=4, ensure_ascii=False)
 
-    # JSON LOG (Clean)
     try:
         json_data = None
         for enc in ['utf-16', 'utf-8-sig', 'utf-8']:
