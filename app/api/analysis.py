@@ -35,7 +35,6 @@ async def root(request: Request, db: AsyncSession = Depends(get_db)):
     userservice = UserService(db)
     history = await userservice.get_user_analyses(uuid_by_token(request.cookies.get("refresh_token")))
 
-    # Audit: analyses list viewed
     await AuditService(db).log(request=request, event_type="analysis.list_viewed", user_id=str(uuid_by_token(request.cookies.get("refresh_token"))))
     return templates.TemplateResponse(
         "analisys.html",
@@ -53,27 +52,23 @@ async def get_analysis_page(request: Request, analysis_id: uuid.UUID, db: AsyncS
         if not analysis_data:
             return RedirectResponse(url="/main")
 
-        # Проверяем наличие JSON файла с ETL данными
         etl_output = ""
         json_file_path = f"{docker}\\analysis\\{analysis_id}\\trace.json"
         if os.path.exists(json_file_path):
             try:
-                # Определяем кодировку файла
                 with open(json_file_path, 'rb') as f:
                     raw_data = f.read()
                     
-                    # Проверяем BOM (Byte Order Mark)
-                    if raw_data.startswith(b'\xef\xbb\xbf'):  # UTF-8 BOM
+                    if raw_data.startswith(b'\xef\xbb\xbf'): 
                         encoding = 'utf-8-sig'
-                    elif raw_data.startswith(b'\xff\xfe') or raw_data.startswith(b'\xfe\xff'):  # UTF-16 BOM
+                    elif raw_data.startswith(b'\xff\xfe') or raw_data.startswith(b'\xfe\xff'): 
                         encoding = 'utf-16'
                     else:
                         encoding = 'utf-8'
                 
-                # Читаем только первые 500 строк файла
                 with open(json_file_path, 'r', encoding=encoding, errors='replace') as f:
                     lines = []
-                    for _ in range(500):  # Ограничиваем до 500 строк
+                    for _ in range(500):  
                         line = f.readline()
                         if not line:
                             break
@@ -82,7 +77,6 @@ async def get_analysis_page(request: Request, analysis_id: uuid.UUID, db: AsyncS
             except Exception as e:
                 Logger.log(f"Ошибка при чтении ETL результатов: {str(e)}")
 
-        # Audit: analysis details viewed
         await AuditService(db).log(request=request, event_type="analysis.viewed", user_id=str(uuid_by_token(request.cookies.get("refresh_token"))), metadata={"analysis_id": str(analysis_id)})
         return templates.TemplateResponse(
             "analisys.html",
@@ -113,7 +107,6 @@ async def analyze_file(request: Request, file: UploadFile = File(...), db: Async
         FileOperations.user_file_upload(file=file, user_upload_folder=upload_folder)
         await userservice.create_analysis(user_id=uuid, filename=file.filename, status="running", analysis_id=run_id)
         await userservice.create_result(run_id)
-        # Audit: analysis started
         await AuditService(db).log(request=request, event_type="analysis.started", user_id=str(uuid), metadata={"filename": file.filename, "analysis_id": str(run_id)})
         analysis_service = AnalysisService(file.filename, str(run_id), str(uuid))
         asyncio.create_task(analysis_service.analyze())
@@ -227,43 +220,36 @@ async def get_etl_json(analysis_id: str, db: AsyncSession = Depends(get_db)):
     try:
         json_file_path = f"{docker}\\analysis\\{analysis_id}\\trace.json"
         
-        # Проверяем, существует ли JSON файл
         if not os.path.exists(json_file_path):
             etl_file = f"{docker}\\analysis\\{analysis_id}\\trace.etl"
             
-            # Проверяем, существует ли ETL файл
             if not os.path.exists(etl_file):
                 return JSONResponse(
                     status_code=404, 
                     content={"error": "ETL файл не найден"}
                 )
             
-            # Возвращаем статус, что конвертация не выполнена
             return JSONResponse({
                 "status": "not_converted",
                 "message": "ETL файл требует конвертации. Используйте /analysis/convert-etl/{analysis_id}."
             })
         
         try:
-            # Читаем файл в бинарном режиме и определяем его кодировку
             with open(json_file_path, 'rb') as f:
                 raw_data = f.read()
                 
-                # Проверяем BOM (Byte Order Mark)
-                if raw_data.startswith(b'\xef\xbb\xbf'):  # UTF-8 BOM
+                if raw_data.startswith(b'\xef\xbb\xbf'):  
                     encoding = 'utf-8-sig'
-                elif raw_data.startswith(b'\xff\xfe') or raw_data.startswith(b'\xfe\xff'):  # UTF-16 BOM
+                elif raw_data.startswith(b'\xff\xfe') or raw_data.startswith(b'\xfe\xff'): 
                     encoding = 'utf-16'
                 else:
-                    # Если нет BOM, пробуем utf-8
                     encoding = 'utf-8'
                 
                 Logger.log(f"Определена кодировка файла: {encoding}")
                 
-            # Теперь читаем файл с правильной кодировкой
             with open(json_file_path, 'r', encoding=encoding, errors='replace') as json_file:
                 try:
-                    data = json_file.read(100)  # Читаем первые 100 символов для проверки
+                    data = json_file.read(100) 
                     await AuditService(db).log(request=None, event_type="analysis.json_available", metadata={"analysis_id": analysis_id})
                     return JSONResponse({
                         "status": "converted",
@@ -377,24 +363,20 @@ async def convert_etl(analysis_id: str, db: AsyncSession = Depends(get_db)):
         etl_file = f"{docker}\\analysis\\{analysis_id}\\trace.etl"
         json_file = f"{docker}\\analysis\\{analysis_id}\\trace.json"
         
-        # Проверяем, существует ли исходный ETL файл
         if not os.path.exists(etl_file):
             return JSONResponse(
                 status_code=404, 
                 content={"error": "ETL файл не найден"}
             )
         
-        # Проверяем, существует ли уже JSON файл
         if os.path.exists(json_file):
             return JSONResponse(
                 status_code=200, 
                 content={"status": "completed", "message": "ETL уже конвертирован в JSON"}
             )
         
-        # Запуск асинхронного процесса конвертации
         async def run_conversion():
             try:
-                # Создаём CSV файл из ETL
                 csv_file = f"{docker}\\analysis\\{analysis_id}\\trace.csv"
                 Logger.log(f"Конвертация ETL в CSV для анализа {analysis_id}...")
                 
@@ -414,7 +396,6 @@ async def convert_etl(analysis_id: str, db: AsyncSession = Depends(get_db)):
                 
                 Logger.log(f"Конвертация завершена для анализа {analysis_id}")
                 
-                # Отправляем сообщение о завершении процесса через WebSocket
                 await manager.send_message(analysis_id, json.dumps({
                     "event": "etl_converted",
                     "message": "ETL данные успешно конвертированы"
@@ -426,7 +407,6 @@ async def convert_etl(analysis_id: str, db: AsyncSession = Depends(get_db)):
                     "message": f"Ошибка при конвертации ETL: {str(e)}"
                 }))
         
-        # Запускаем конвертацию в фоновом режиме
         await AuditService(db).log(request=None, event_type="analysis.conversion_started", metadata={"analysis_id": analysis_id})
         asyncio.create_task(run_conversion())
         
@@ -474,9 +454,6 @@ async def get_clean_tree(analysis_id: str, db: AsyncSession = Depends(get_db)):
             for idx, row in enumerate(reader, start=1):
                 threat = threats_map.get(idx)
 
-                # В trace/clean_tree пути лежат не только в колонке "User Data",
-                # но и в дополнительных полях после неё. DictReader складывает
-                # лишние колонки в ключ None, поэтому собираем всё вместе.
                 base_user_data = row.get("User Data", "")
                 extra_fields = row.get(None, [])
                 parts = []
@@ -495,12 +472,10 @@ async def get_clean_tree(analysis_id: str, db: AsyncSession = Depends(get_db)):
                 details_value = ""
 
                 if isinstance(user_data_combined, str) and user_data_combined:
-                    # Сначала пытаемся вытащить путь вида "\\Device\\..."
                     path_match = re.search(r'(\\Device\\[^\s,\"]+.*)', user_data_combined)
                     if path_match:
                         details_value = path_match.group(1)
                     else:
-                        # Если такого пути нет, пробуем найти путь с буквой диска ("C:\\...")
                         drive_match = re.search(r'([A-Za-z]:\\[^\s,\"]+.*)', user_data_combined)
                         if drive_match:
                             details_value = drive_match.group(1)

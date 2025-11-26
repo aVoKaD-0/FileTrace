@@ -100,6 +100,12 @@ document.querySelector('#loginForm form').addEventListener('submit', async funct
     const formData = new FormData(this);
     const data = Object.fromEntries(formData.entries());
 
+    const loginMessage = document.getElementById('loginMessage');
+    if (loginMessage) {
+        loginMessage.textContent = '';
+        loginMessage.style.color = '';
+    }
+
     document.getElementById('loadingIcon').style.display = 'block';
     
     // Скрываем предыдущие сообщения об ошибках CAPTCHA
@@ -147,14 +153,20 @@ document.querySelector('#loginForm form').addEventListener('submit', async funct
                 
                 // Обновляем изображение CAPTCHA
                 refreshCaptcha('login');
-            } else {
-                // Обычная ошибка - показываем в alert
-                alert('Ошибка: ' + error.detail);
+            } else if (loginMessage) {
+                // Обычная ошибка - показываем под формой
+                loginMessage.textContent = error.detail || 'Ошибка при входе. Попробуйте снова.';
+                loginMessage.style.color = 'red';
+                clearAfterDelay(loginMessage);
             }
         }
     } catch (error) {
         console.error('Ошибка:', error);
-        alert('Произошла ошибка при отправке данных');
+        if (loginMessage) {
+            loginMessage.textContent = 'Произошла ошибка при отправке данных. Попробуйте позже.';
+            loginMessage.style.color = 'red';
+            clearAfterDelay(loginMessage);
+        }
     } finally {
         document.getElementById('loadingIcon').style.display = 'none';
     }

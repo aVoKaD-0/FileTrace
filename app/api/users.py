@@ -15,30 +15,20 @@ from app.schemas.users import EmailConfirmation, UserLogin, UserRegistration, Us
 from app.core.crypto import decrypt_str
 
 
-# Создаем маршрутизатор для пользовательских операций
 router = APIRouter(prefix="/users", tags=["users"])
 
-# Подключаем статические файлы и шаблоны
 router.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
 @router.get("/", response_class=HTMLResponse)
 async def root(request: Request):
-    # Главная страница пользовательского интерфейса
-    # Возвращает HTML-страницу с формами входа и регистрации
     return templates.TemplateResponse("user.html", {"request": request})
 
 @router.post("/registration")
 async def register_user(request: Request, response: Response, user_data: UserRegistration, db: AsyncSession = Depends(get_db)):
-    # Обработчик регистрации нового пользователя
-    # Принимает данные пользователя, проверяет капчу и создает новую учетную запись
     try:
-        # Проверяем капчу для защиты от автоматической регистрации
-        print(1, user_data.captcha_id, user_data.captcha_text)
         from app.utils.captcha import captcha
         is_captcha_valid = captcha.verify_captcha(user_data.captcha_id, user_data.captcha_text)
-
-        print(2, is_captcha_valid)
         
         if not is_captcha_valid:
             return JSONResponse(
@@ -46,32 +36,21 @@ async def register_user(request: Request, response: Response, user_data: UserReg
                 content={"detail": "Неверный код с картинки. Пожалуйста, попробуйте еще раз."}
             )
         
-        print(3, is_captcha_valid)
-        
         user_service = UserService(db)
-        print(4, user_service)
         
-        # Проверяем, существует ли пользователь с таким email
         existing_user = await user_service.get_by_email(user_data.email)
-        print(5, existing_user)
         if existing_user:
             return JSONResponse(
                 status_code=400,
                 content={"detail": "Пользователь с таким email уже существует"}
             )
         
-        # Создаем нового пользователя
         user_id, confirm_code = await user_service.create_user(user_data.email, user_data.password)
-        print(6, user_id, confirm_code, user_data.email)
         await send_email(email=user_data.email, verification_code=f"{confirm_code}")
-        # Аудит регистрации
         await AuditService(db).log(request=request, event_type="user.registered", user_id=str(user_id), metadata={"email": user_data.email})
-        print(7, confirm_code, user_id)
         response.set_cookie(key="user_id", value=str(user_id), httponly=True, max_age=30*60, samesite="Lax", secure=True)
         return {"message": "Пользователь успешно зарегистрирован"}
     except Exception as e:
-        # Обработка ошибок при регистрации
-        print(8, e)
         return JSONResponse(
             status_code=500,
             content={"detail": f"Ошибка при регистрации: {str(e)}"}
@@ -81,22 +60,17 @@ async def register_user(request: Request, response: Response, user_data: UserReg
 async def confirm_email_page(request: Request, db: AsyncSession = Depends(get_db)):
     # Страница подтверждения email
     # Отображает форму для ввода кода подтверждения и маскированный email
-    print(1, request.cookies.get("user_id"))
     user_id = request.cookies.get("user_id")
     masked_email = None
     if user_id:
         try:
-            print(2, user_id)
             userservice = UserService(db)
             user = await userservice.get_user_by_id(uuid.UUID(str(user_id)))
-            print(3, user)
             if user and user.email_encrypted:
                 email = decrypt_str(user.email_encrypted)
-                print(4, email) 
                 # простое маскирование email
                 local, _, domain = email.partition("@")
                 if domain:
-                    print(5, local, domain)
                     masked_local = (local[0] + "***" + (local[-1] if len(local) > 1 else "")) if local else "***"
                     parts = domain.split(".")
                     masked_domain = (parts[0][0] + "***") if parts and parts[0] else "***"
@@ -104,7 +78,6 @@ async def confirm_email_page(request: Request, db: AsyncSession = Depends(get_db
                         masked_domain = masked_domain + "." + parts[-1]
                     masked_email = f"{masked_local}@{masked_domain}"
         except Exception:
-            print(6, "except")
             masked_email = None
     else:
         return RedirectResponse(url="/users", status_code=status.HTTP_302_FOUND)

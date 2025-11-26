@@ -123,7 +123,6 @@ async def send_email(email: str, verification_code: str):
             </body>
         </html>
         """
-        # print("semd_email", email, html_body)
         message = MessageSchema(
             subject="Confirm your account",
             recipients=[email],
@@ -133,15 +132,12 @@ async def send_email(email: str, verification_code: str):
 
         # ssl_context = ssl.create_default_context(cafile=certifi.where())
         # Инициализируем FastMail с настройками SMTP
-        print("send_email", SMTP)
         fm = FastMail(SMTP)
 
-        # print("send_email", message)
         # Отправляем сообщение
         await fm.send_message(message)
-        print("send_email success")
     except Exception as e:
-        print("send_email error", e)
+        raise HTTPException(status_code=500, detail="Failed to send email")
 
 async def send_reset_password_email(email: str, reset_link: str):
     try:
@@ -166,6 +162,5 @@ async def send_reset_password_email(email: str, reset_link: str):
 
         fm = FastMail(SMTP)
         await fm.send_message(message)
-        print("send_reset_password_email success")
     except Exception as e:
-        print("send_reset_password_email error", e)
+        raise HTTPException(status_code=500, detail="Failed to send email")

@@ -6,7 +6,6 @@ import uuid
 from contextvars import ContextVar
 
 
-# Request-scoped ID storage
 REQUEST_ID_CTX: ContextVar[str] = ContextVar("request_id", default="-")
 
 
@@ -20,7 +19,6 @@ class RequestIdFilter(logging.Filter):
 
 class JsonFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
-        # Base fields
         log = {
             "ts": time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(record.created)) + f".{int(record.msecs):03d}Z",
             "level": record.levelname,
@@ -28,7 +26,6 @@ class JsonFormatter(logging.Formatter):
             "msg": record.getMessage(),
             "request_id": getattr(record, "request_id", "-"),
         }
-        # Optional extras
         if record.exc_info:
             log["exc_info"] = self.formatException(record.exc_info)
         return json.dumps(log, ensure_ascii=False)

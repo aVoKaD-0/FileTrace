@@ -27,7 +27,6 @@ def wait_for_postgres(timeout=60, delay=2):
 import uvicorn
 
 if __name__ == "__main__":
-    # wait_for_postgres()
     uvicorn.run(
         "main:app",
         host="0.0.0.0",

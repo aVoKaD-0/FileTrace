@@ -94,8 +94,6 @@ def detect_threat(event_name, user_data):
     return None
 
 def main():
-    print(f"[*] ЗАПУСК АНАЛИЗАТОРА (v9 NoDeath) ДЛЯ {TARGET_EXE}...")
-    
     tracked_pids = set()
     rows_to_keep = []
     threats_log = []
@@ -127,7 +125,6 @@ def main():
                     if is_start and TARGET_EXE.lower() in full_row_str:
                         pid = hex_to_int(pid_raw)
                         if pid > 0 and pid != 0xFFFFFFFF:
-                            print(f"\n[+] ЗАПУСК ОБНАРУЖЕН: PID {pid}")
                             tracked_pids.add(pid)
                             start_found = True
                             # Сохраняем строку запуска (это всегда безопасно показать)
@@ -146,7 +143,6 @@ def main():
                     threat_msg = detect_threat(event_name, user_data_full)
                     if threat_msg:
                         line_idx = len(rows_to_keep) + 1
-                        print(f"   [!] Угроза (стр. {line_idx}): {threat_msg}")
                         threats_log.append({
                             "line_number": line_idx,
                             "event": event_name,
@@ -163,31 +159,23 @@ def main():
                             potential_childs = get_pids_from_row(row[10:])
                             for child in potential_childs:
                                 if child not in tracked_pids and child != current_pid:
-                                    print(f"[+] Новый процесс в дереве: {child}")
                                     tracked_pids.add(child)
 
     except FileNotFoundError:
-        print("[-] trace.csv не найден.")
-        return
+        raise HTTPException(status_code=500, detail="trace.csv не найден")
 
     if not tracked_pids:
-        print(f"[-] Не найден запуск {TARGET_EXE}.")
-        return
-
-    # --- 2. СОХРАНЕНИЕ ---
-    print(f"\n[*] Итого событий: {len(rows_to_keep)}")
+        raise HTTPException(status_code=500, detail=f"Не найден запуск {TARGET_EXE}")
     
     # CSV
     with open(CSV_OUTPUT, 'w', encoding='utf-8', newline='') as f:
         writer = csv.writer(f)
         if headers: writer.writerow(headers)
         writer.writerows(rows_to_keep)
-    print(f"[OK] CSV: {CSV_OUTPUT}")
 
     # THREAT REPORT
     with open(REPORT_OUTPUT, 'w', encoding='utf-8') as f:
         json.dump(threats_log, f, indent=4, ensure_ascii=False)
-    print(f"[OK] Threats: {REPORT_OUTPUT}")
 
     # JSON LOG (Clean)
     try:
@@ -213,8 +201,8 @@ def main():
                         
             with open(JSON_OUTPUT, 'w', encoding='utf-8') as f:
                 json.dump(json_kept, f, indent=4, ensure_ascii=False)
-            print(f"[OK] JSON: {JSON_OUTPUT}")
-    except: pass
+    except: 
+        raise HTTPException(status_code=500, detail="Failed to process JSON")
 
 def run_cleaner(target_exe, base_dir):
     global TARGET_EXE, CSV_INPUT, JSON_INPUT, CSV_OUTPUT, JSON_OUTPUT, REPORT_OUTPUT

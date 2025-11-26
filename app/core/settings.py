@@ -23,7 +23,6 @@ def _get_int(name: str, default: int) -> int:
 
 @dataclass
 class Settings:
-    # Security
     SECRET_KEY: str = os.getenv("SECRET_KEY", "change_me")
     ALGORITHM: str = os.getenv("ALGORITHM", "HS256")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = _get_int("ACCESS_TOKEN_EXPIRE_MINUTES", 30)
@@ -31,10 +30,8 @@ class Settings:
     ENCRYPTION_KEY: Optional[str] = os.getenv("ENCRYPTION_KEY")
     HMAC_KEY: Optional[str] = os.getenv("HMAC_KEY")
 
-    # Database
     DATABASE_URL: str = os.getenv("DATABASE_URL")
 
-    # SMTP
     MAIL_USERNAME: Optional[str] = os.getenv("MAIL_USERNAME")
     MAIL_PASSWORD: Optional[str] = os.getenv("MAIL_PASSWORD")
     MAIL_FROM: Optional[str] = os.getenv("MAIL_FROM")
