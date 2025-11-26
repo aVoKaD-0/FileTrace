@@ -1,6 +1,8 @@
 import requests
+import json
 from loguru import logger
 from app.services.db_service import AnalysisDbService
+from app.utils.websocket_manager import manager
 
 class Logger:
     # Добавляем лог в файл только один раз при старте
@@ -22,6 +24,13 @@ class Logger:
                     await db.commit()
             finally:
                 await db.close()
+            try:
+                await manager.send_message(analysis_id, json.dumps({
+                    "event": "docker_log",
+                    "message": msg
+                }))
+            except Exception as ws_err:
+                Logger.log(f"Ошибка отправки docker_log по WebSocket: {str(ws_err)}")
         except Exception as e:
             Logger.log(f"Ошибка в analysis_log: {str(e)}")
         return

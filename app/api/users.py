@@ -107,7 +107,7 @@ async def confirm_email_page(request: Request, db: AsyncSession = Depends(get_db
             print(6, "except")
             masked_email = None
     else:
-        return RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+        return RedirectResponse(url="/users", status_code=status.HTTP_302_FOUND)
     return templates.TemplateResponse("confirm_email.html", {"request": request, "masked_email": masked_email, "user_id": user_id})
 
 @router.post("/confirm")

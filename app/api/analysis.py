@@ -3,6 +3,8 @@ import json
 import uuid
 import asyncio
 import subprocess
+import csv
+import re
 from app.utils.logging import Logger
 from app.auth.auth import uuid_by_token
 from datetime import datetime, timezone
@@ -49,7 +51,7 @@ async def get_analysis_page(request: Request, analysis_id: uuid.UUID, db: AsyncS
 
         analysis_data = await userservice.get_result_data(str(analysis_id))
         if not analysis_data:
-            return RedirectResponse(url="/")
+            return RedirectResponse(url="/main")
 
         # Проверяем наличие JSON файла с ETL данными
         etl_output = ""
@@ -96,7 +98,7 @@ async def get_analysis_page(request: Request, analysis_id: uuid.UUID, db: AsyncS
         )
     except Exception as e:
         Logger.log(f"Ошибка при получении страницы анализа: {str(e)}")
-        return RedirectResponse(url="/")
+        return RedirectResponse(url="/main")
 
 @router.post("/analyze")
 async def analyze_file(request: Request, file: UploadFile = File(...), db: AsyncSession = Depends(get_db)):
@@ -437,4 +439,199 @@ async def convert_etl(analysis_id: str, db: AsyncSession = Depends(get_db)):
         return JSONResponse(
             status_code=500, 
             content={"error": f"Ошибка при запуске конвертации ETL: {str(e)}"}
+        )
+
+@router.get("/clean-tree/{analysis_id}")
+async def get_clean_tree(analysis_id: str, db: AsyncSession = Depends(get_db)):
+    try:
+        base_dir = f"{docker}\\analysis\\{analysis_id}"
+        clean_csv_path = os.path.join(base_dir, "clean_tree.csv")
+        threat_report_path = os.path.join(base_dir, "threat_report.json")
+
+        if not os.path.exists(clean_csv_path):
+            return JSONResponse(
+                status_code=404,
+                content={"error": "Файл clean_tree.csv не найден"}
+            )
+
+        threats_map = {}
+        if os.path.exists(threat_report_path):
+            try:
+                with open(threat_report_path, "r", encoding="utf-8") as f:
+                    threats = json.load(f)
+                    for item in threats:
+                        line_number = item.get("line_number")
+                        if isinstance(line_number, int):
+                            threats_map[line_number] = item
+            except Exception as e:
+                Logger.log(f"Ошибка при чтении threat_report.json: {str(e)}")
+
+        rows = []
+        columns = ["time", "event", "type", "pid", "tid", "details", "threat_level", "threat_msg"]
+
+        with open(clean_csv_path, "r", encoding="utf-8", errors="ignore") as f:
+            reader = csv.DictReader(f)
+            for idx, row in enumerate(reader, start=1):
+                threat = threats_map.get(idx)
+
+                # В trace/clean_tree пути лежат не только в колонке "User Data",
+                # но и в дополнительных полях после неё. DictReader складывает
+                # лишние колонки в ключ None, поэтому собираем всё вместе.
+                base_user_data = row.get("User Data", "")
+                extra_fields = row.get(None, [])
+                parts = []
+
+                if base_user_data not in (None, ""):
+                    parts.append(str(base_user_data))
+
+                if isinstance(extra_fields, list):
+                    for val in extra_fields:
+                        if val not in (None, ""):
+                            parts.append(str(val))
+
+                user_data_combined = " ".join(p.strip() for p in parts if str(p).strip())
+                user_data_combined = user_data_combined.replace('"', "")
+
+                details_value = ""
+
+                if isinstance(user_data_combined, str) and user_data_combined:
+                    # Сначала пытаемся вытащить путь вида "\\Device\\..."
+                    path_match = re.search(r'(\\Device\\[^\s,\"]+.*)', user_data_combined)
+                    if path_match:
+                        details_value = path_match.group(1)
+                    else:
+                        # Если такого пути нет, пробуем найти путь с буквой диска ("C:\\...")
+                        drive_match = re.search(r'([A-Za-z]:\\[^\s,\"]+.*)', user_data_combined)
+                        if drive_match:
+                            details_value = drive_match.group(1)
+
+                if not details_value:
+                    details_value = user_data_combined
+
+                rows.append({
+                    "index": idx,
+                    "time": row.get("Clock-Time", ""),
+                    "event": row.get("Event Name", ""),
+                    "type": row.get("Type", ""),
+                    "pid": row.get("PID", ""),
+                    "tid": row.get("TID", ""),
+                    "details": details_value,
+                    "threat_level": threat.get("level") if threat else None,
+                    "threat_msg": threat.get("msg") if threat else None,
+                })
+
+        await AuditService(db).log(
+            request=None,
+            event_type="analysis.clean_tree_viewed",
+            metadata={"analysis_id": analysis_id, "rows": len(rows)}
+        )
+
+        return JSONResponse({
+            "columns": columns,
+            "rows": rows
+        })
+    except Exception as e:
+        Logger.log(f"Ошибка при получении clean_tree: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Ошибка при получении clean_tree: {str(e)}"}
+        )
+
+@router.get("/download-trace-csv/{analysis_id}")
+async def download_trace_csv(analysis_id: str, db: AsyncSession = Depends(get_db)):
+    try:
+        csv_file_path = f"{docker}\\analysis\\{analysis_id}\\trace.csv"
+
+        if not os.path.exists(csv_file_path):
+            return JSONResponse(
+                status_code=404,
+                content={"error": "trace.csv не найден"}
+            )
+
+        await AuditService(db).log(request=None, event_type="analysis.trace_csv_downloaded", metadata={"analysis_id": analysis_id})
+        return FileResponse(
+            path=str(csv_file_path),
+            filename=f"analysis_{analysis_id}_trace.csv",
+            media_type="text/csv"
+        )
+    except Exception as e:
+        Logger.log(f"Ошибка при скачивании trace.csv: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Ошибка при скачивании trace.csv: {str(e)}"}
+        )
+
+@router.get("/download-clean-tree-csv/{analysis_id}")
+async def download_clean_tree_csv(analysis_id: str, db: AsyncSession = Depends(get_db)):
+    try:
+        base_dir = f"{docker}\\analysis\\{analysis_id}"
+        csv_file_path = os.path.join(base_dir, "clean_tree.csv")
+
+        if not os.path.exists(csv_file_path):
+            return JSONResponse(
+                status_code=404,
+                content={"error": "clean_tree.csv не найден"}
+            )
+
+        await AuditService(db).log(request=None, event_type="analysis.clean_tree_csv_downloaded", metadata={"analysis_id": analysis_id})
+        return FileResponse(
+            path=str(csv_file_path),
+            filename=f"analysis_{analysis_id}_clean_tree.csv",
+            media_type="text/csv"
+        )
+    except Exception as e:
+        Logger.log(f"Ошибка при скачивании clean_tree.csv: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Ошибка при скачивании clean_tree.csv: {str(e)}"}
+        )
+
+@router.get("/download-clean-tree-json/{analysis_id}")
+async def download_clean_tree_json(analysis_id: str, db: AsyncSession = Depends(get_db)):
+    try:
+        base_dir = f"{docker}\\analysis\\{analysis_id}"
+        json_file_path = os.path.join(base_dir, "clean_tree.json")
+
+        if not os.path.exists(json_file_path):
+            return JSONResponse(
+                status_code=404,
+                content={"error": "clean_tree.json не найден"}
+            )
+
+        await AuditService(db).log(request=None, event_type="analysis.clean_tree_json_downloaded", metadata={"analysis_id": analysis_id})
+        return FileResponse(
+            path=str(json_file_path),
+            filename=f"analysis_{analysis_id}_clean_tree.json",
+            media_type="application/json"
+        )
+    except Exception as e:
+        Logger.log(f"Ошибка при скачивании clean_tree.json: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Ошибка при скачивании clean_tree.json: {str(e)}"}
+        )
+
+@router.get("/download-threat-report/{analysis_id}")
+async def download_threat_report(analysis_id: str, db: AsyncSession = Depends(get_db)):
+    try:
+        base_dir = f"{docker}\\analysis\\{analysis_id}"
+        json_file_path = os.path.join(base_dir, "threat_report.json")
+
+        if not os.path.exists(json_file_path):
+            return JSONResponse(
+                status_code=404,
+                content={"error": "threat_report.json не найден"}
+            )
+
+        await AuditService(db).log(request=None, event_type="analysis.threat_report_downloaded", metadata={"analysis_id": analysis_id})
+        return FileResponse(
+            path=str(json_file_path),
+            filename=f"analysis_{analysis_id}_threat_report.json",
+            media_type="application/json"
+        )
+    except Exception as e:
+        Logger.log(f"Ошибка при скачивании threat_report.json: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Ошибка при скачивании threat_report.json: {str(e)}"}
         )

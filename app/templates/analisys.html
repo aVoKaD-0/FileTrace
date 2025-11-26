@@ -40,10 +40,15 @@
     <div class="container mt-4">
         <h1 class="text-center mb-4">FileTrace</h1>
 
-        <div class="profile-icon-container">
-            <img src="/static/profile-icon.svg" alt="Profile" class="profile-icon" id="profileIcon">
-            <button id="changePasswordBtn" class="btn btn-primary" style="display: none;"><i class="bi bi-key"></i> Сменить пароль</button>
-            <button id="logoutBtnProfile" class="btn btn-danger" style="display: none;"><i class="bi bi-box-arrow-right"></i> Выйти</button>
+        <div class="profile-icon-container dropdown">
+            <button class="btn btn-link p-0 border-0 profile-icon-dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-circle profile-icon" aria-hidden="true"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                <li><button class="dropdown-item" id="profileChangePassword"><i class="bi bi-key"></i> Сменить пароль</button></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><button class="dropdown-item text-danger" id="profileLogout"><i class="bi bi-box-arrow-right"></i> Выйти</button></li>
+            </ul>
         </div>
 
         <div class="mb-4 text-center">
@@ -129,15 +134,32 @@
                     <div class="tab-pane fade" id="etlOutput">
                         <div id="etlOutputLoader" class="text-center mt-2">
                             <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Загрузка ETL результатов...</span>
+                                <span class="visually-hidden">Загрузка таблицы активности...</span>
                             </div>
-                            <p>Загрузка ETL результатов...</p>
+                            <p>Загрузка таблицы активности...</p>
                         </div>
                         <div class="alert alert-info mt-2 mb-2" role="alert">
-                            <strong>Внимание!</strong> ETL результаты могут быть очень большими. Для удобства отображаются первые 500 строк.
-                            Вы можете загружать данные постепенно или скачать полный JSON файл или оригинальный ETL файл.
+                            <strong>Внимание!</strong> Отображается отфильтрованный лог файловой активности (clean_tree.csv). Подозрительные строки подсвечиваются.
+                            Полные файлы trace.csv, trace.json, clean_tree.csv, clean_tree.json и threat_report.json можно скачать внизу.
                         </div>
-                        <pre id="etlOutputContent" class="result-content" style="max-height: 600px; overflow-y: auto;">{% if etl_output %}{{ etl_output | truncate(500) }}{% else %}Нет данных ETL результатов.{% endif %}</pre>
+                        <div id="etlOutputContent" class="result-content" style="max-height: 600px; overflow-y: auto;">
+                            <div class="table-responsive">
+                                <table id="cleanTreeTable" class="table table-sm table-striped table-hover clean-tree-table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Событие</th>
+                                            <th>Тип</th>
+                                            <th>User Data</th>
+                                            <th>Опасность</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div id="etlButtonArea"></div>
                     </div>
                 </div>
             </div>

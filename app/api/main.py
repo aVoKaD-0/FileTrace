@@ -10,4 +10,4 @@ templates = Jinja2Templates(directory="app/templates")
 
 @router.get("/", response_class=HTMLResponse)
 async def root(request: Request):
-    return RedirectResponse(url="/users")
+    return templates.TemplateResponse("main.html", {"request": request})

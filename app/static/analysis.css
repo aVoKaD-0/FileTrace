@@ -180,25 +180,29 @@
 }
 
 .profile-icon {
-    width: 40px;
-    height: 40px;
+    font-size: 32px;
     cursor: pointer;
+    color: #495057;
+}
+
+.profile-icon-dropdown-toggle {
+    line-height: 0;
+}
+
+.dropdown-menu[aria-labelledby="profileDropdown"] {
+    min-width: 180px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: 10px;
 }
 
 #logoutBtnProfile, #changePasswordBtn {
-    position: absolute;
-    right: 0;
-    display: none;
-    z-index: 10;
-    margin-top: 10px; /* Отступ между кнопками */
-}
-
-#logoutBtn {
-    top: 50px; /* Расположение кнопки "Выйти" */
-}
-
-#changePasswordBtn {
-    top: 120px; /* Расположение кнопки "Сменить пароль" */
+    position: relative;
+    display: block;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
 }
 
 /* Стили для блоков JSON */
@@ -246,4 +250,42 @@
 .mb-4.text-center .btn {
     margin: 0 5px;
     min-width: 150px;
-} 
+}
+
+.clean-tree-table {
+    font-size: 0.85rem;
+}
+
+.clean-tree-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa;
+    z-index: 1;
+}
+
+.clean-tree-table tbody tr.threat-row {
+    background-color: rgba(220, 53, 69, 0.15);
+    transition: background-color 0.2s ease;
+}
+
+.clean-tree-table tbody tr.threat-critical,
+.clean-tree-table tbody tr.threat-high,
+.clean-tree-table tbody tr.threat-warning {
+    background-color: rgba(220, 53, 69, 0.15);
+}
+
+.clean-tree-table tbody tr.threat-row:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.clean-tree-table td.details-cell {
+    max-width: 600px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.clean-tree-table td.danger-cell {
+    font-weight: bold;
+    color: #dc3545;
+}

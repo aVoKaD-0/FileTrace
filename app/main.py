@@ -27,6 +27,8 @@ def create_app() -> FastAPI:
 
     # Подключаем статические файлы (CSS, JavaScript, изображения)
     app.mount("/static", StaticFiles(directory="app/static"), name="static")
+    # Медиафайлы презентации (PNG, SVG) для главной страницы
+    app.mount("/media", StaticFiles(directory="media"), name="media")
     # Инициализация шаблонизатора Jinja2 для рендеринга HTML страниц
     templates = Jinja2Templates(directory="app/templates")
 
@@ -62,13 +64,17 @@ def create_app() -> FastAPI:
     async def not_found_handler(request: Request, exc):
         # Обработчик для страниц, которые не найдены (404)
         # Перенаправляет пользователя на главную страницу вместо показа ошибки
-        return RedirectResponse(url="/")
+        return RedirectResponse(url="/main")
 
-    @app.get("/", response_class=HTMLResponse)
+    @app.get("/main", response_class=HTMLResponse)
     async def root(request: Request):
         # Обработчик главной страницы "/"
         # Отображает основную страницу приложения
         return templates.TemplateResponse("main.html", {"request": request})
+    
+    @app.get("/", response_class=HTMLResponse)
+    async def old_root(request: Request):
+        return RedirectResponse(url="/main")
     
     @app.get("/protected-route")
     async def protected_route(username: str = Depends(verify_token)):
@@ -81,66 +87,101 @@ def create_app() -> FastAPI:
         # Middleware для проверки JWT токенов и управления аутентификацией
         # Выполняется для каждого запроса перед вызовом обработчика маршрута
         
+        path = request.url.path
+        access_token = request.cookies.get("access_token")
+        refresh_token = request.cookies.get("refresh_token")
+        is_authenticated = bool(access_token or refresh_token)
+        
         # Если пользователь авторизован и пытается зайти на страницу логина,
-        # перенаправляем его на страницу анализов
-        if (request.url.path == "/users/" and request.cookies.get("access_token") and request.cookies.get("refresh_token")):
-            return RedirectResponse(url="/analysis/")
+        # перенаправляем его на главную страницу
+        if path == "/users/" and is_authenticated:
+            return RedirectResponse(url="/main")
             
         # Разрешаем доступ к страницам пользователей, статическим файлам и главной
         # страницы даже без авторизации
-        if (request.url.path.startswith("/users/") and not request.cookies.get("access_token") and not request.cookies.get("refresh_token")) or request.url.path.startswith("/static/") or request.url.path == "/":
+        if path.startswith("/static/") or path.startswith("/media/") or path == "/main" or path == "/":
+            return await call_next(request)
+        if not is_authenticated and path.startswith("/users/"):
             return await call_next(request)
             
         # Если пользователь не авторизован и пытается получить доступ к защищенным
         # страницам, перенаправляем его на страницу входа
-        if not request.cookies.get("access_token") and not request.cookies.get("refresh_token") and not request.url.path.startswith("/users/") and not request.url.path.startswith("/static/") and request.url.path != "/":
+        if not is_authenticated:
             return RedirectResponse(url="/users/")
             
         try:
             # Получаем токены из cookies
             access_token = request.cookies.get("access_token")
             refresh_token = request.cookies.get("refresh_token")
-            
+
             # Если нет ни одного токена, перенаправляем на страницу входа
             if not access_token and not refresh_token:
                 return RedirectResponse(url="/users/")
-                
-            # Если есть только refresh_token, создаем новый access_token
-            elif refresh_token and not access_token:
+
+            # Если есть refresh_token, всегда проверяем его первым
+            if refresh_token:
                 async with AsyncSessionLocal() as db2:
-                    # Проверяем, действителен ли refresh_token
                     user_service = UserService(db2)
                     user = await user_service.get_refresh_token(refresh_token=refresh_token)
                     if user is None:
-                        # Если refresh_token недействителен, удаляем его и перенаправляем
-                        response.cookies.delete("refresh_token")
-                        return RedirectResponse(url="/users/")
-                        
-                    # Создаем новый access_token на основе данных из refresh_token
-                    access_token = create_access_token({"sub": jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM]).get("sub")})
-                    response = await call_next(request)
-                    
-                    # Устанавливаем новый access_token в cookies
-                    response.set_cookie(
-                        key="access_token",
-                        value=access_token,
-                        httponly=True,
-                        samesite="Lax",
-                        max_age=30*60,
-                        secure=True
-                    )
-                    return response
-                    
+                        # Если refresh_token отсутствует в базе, очищаем куки и перенаправляем на страницу входа
+                        response = RedirectResponse(url="/users/")
+                        response.delete_cookie(key="refresh_token")
+                        response.delete_cookie(key="access_token")
+                        return response
+
+                    # Проверяем валидность самого refresh_token как JWT
+                    try:
+                        payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+                        user_id = payload.get("sub")
+                        if not user_id:
+                            response = RedirectResponse(url="/users/")
+                            response.delete_cookie(key="refresh_token")
+                            response.delete_cookie(key="access_token")
+                            return response
+                    except JWTError:
+                        response = RedirectResponse(url="/users/")
+                        response.delete_cookie(key="refresh_token")
+                        response.delete_cookie(key="access_token")
+                        return response
+
+                    # На этом этапе refresh_token валиден, пользователь существует
+                    # Проверяем access_token и при необходимости создаём новый
+                    needs_new_access = False
+                    if not access_token:
+                        needs_new_access = True
+                    else:
+                        try:
+                            jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
+                        except JWTError:
+                            needs_new_access = True
+
+                    if needs_new_access:
+                        new_access_token = create_access_token({"sub": user_id})
+                        response = await call_next(request)
+                        response.set_cookie(
+                            key="access_token",
+                            value=new_access_token,
+                            httponly=True,
+                            samesite="Lax",
+                            max_age=30*60,
+                            secure=True
+                        )
+                        return response
+
+                    # refresh_token и access_token валидны, просто пропускаем запрос дальше
+                    return await call_next(request)
+
+            # Если refresh_token нет, но есть access_token, проверяем только его
             try:
-                # Декодируем и проверяем access_token
-                payload = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
-                username = payload.get("sub")
-                if not username:
-                    return RedirectResponse(url="/users/")
-            except JWTError as e:
-                # Если токен недействителен, перенаправляем на страницу входа
-                return RedirectResponse(url="/users/")
-                
+                jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
+            except JWTError:
+                response = RedirectResponse(url="/users/")
+                response.delete_cookie(key="access_token")
+                return response
+
+            return await call_next(request)
+
         except Exception as e:
             # В случае любой ошибки при проверке токенов, перенаправляем на страницу входа
             return RedirectResponse(url="/users/")

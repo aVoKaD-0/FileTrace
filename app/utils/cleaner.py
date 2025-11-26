@@ -2,6 +2,7 @@ import csv
 import json
 import re
 import sys
+import os
 
 # === НАСТРОЙКИ ===
 TARGET_EXE = "mc1.exe"        
@@ -214,6 +215,30 @@ def main():
                 json.dump(json_kept, f, indent=4, ensure_ascii=False)
             print(f"[OK] JSON: {JSON_OUTPUT}")
     except: pass
+
+def run_cleaner(target_exe, base_dir):
+    global TARGET_EXE, CSV_INPUT, JSON_INPUT, CSV_OUTPUT, JSON_OUTPUT, REPORT_OUTPUT
+    original_target_exe = TARGET_EXE
+    original_csv_input = CSV_INPUT
+    original_json_input = JSON_INPUT
+    original_csv_output = CSV_OUTPUT
+    original_json_output = JSON_OUTPUT
+    original_report_output = REPORT_OUTPUT
+    try:
+        TARGET_EXE = target_exe
+        CSV_INPUT = os.path.join(base_dir, "trace.csv")
+        JSON_INPUT = os.path.join(base_dir, "trace.json")
+        CSV_OUTPUT = os.path.join(base_dir, "clean_tree.csv")
+        JSON_OUTPUT = os.path.join(base_dir, "clean_tree.json")
+        REPORT_OUTPUT = os.path.join(base_dir, "threat_report.json")
+        main()
+    finally:
+        TARGET_EXE = original_target_exe
+        CSV_INPUT = original_csv_input
+        JSON_INPUT = original_json_input
+        CSV_OUTPUT = original_csv_output
+        JSON_OUTPUT = original_json_output
+        REPORT_OUTPUT = original_report_output
 
 if __name__ == "__main__":
     main()

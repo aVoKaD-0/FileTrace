@@ -6,6 +6,7 @@ from app.utils.logging import Logger
 from app.utils.websocket_manager import manager
 from concurrent.futures import ThreadPoolExecutor
 from app.repositories.analysis import docker
+from app.utils.cleaner import run_cleaner
 
 username = "docker"
 password = "docker"
@@ -25,7 +26,7 @@ class AnalysisService:
 WORKDIR C:\\\\sandbox
 COPY {self.filename} .
 RUN powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force"
-CMD ["powershell", "-command", "Start-Process -FilePath 'C:\\\\sandbox\\\\{self.filename}' -NoNewWindow -PassThru; Start-Sleep -Seconds 60"]
+CMD ["powershell", "-command", "Start-Process -FilePath 'C:\\\\sandbox\\\\{self.filename}' -NoNewWindow -PassThru; Start-Sleep -Seconds 180"]
 """
         
         if not os.path.exists(f"{docker}\\analysis\\{self.analysis_id}"):
@@ -164,6 +165,16 @@ procmon /Backingfile D:\\programming\\GIt\\gitlab\\antivirus\\dockerer\\1\\docke
         await self.run_in_executor(["powershell", "-command", f"docker rm analysis_{self.analysis_id}"])
         await self.run_in_executor(["powershell", "-command", f"docker rmi analysis_{self.analysis_id}"])
 
+        try:
+            await Logger.analysis_log("Запуск очистки логов файловой активности...", self.analysis_id)
+            loop = asyncio.get_event_loop()
+            base_dir = f"{docker}\\analysis\\{self.analysis_id}"
+            target_exe = self.filename
+            await loop.run_in_executor(None, lambda: run_cleaner(target_exe, base_dir))
+            await Logger.analysis_log("Очистка логов завершена. Созданы clean_tree.csv, clean_tree.json, threat_report.json.", self.analysis_id)
+        except Exception as e:
+            await Logger.analysis_log(f"Ошибка при очистке логов: {str(e)}", self.analysis_id)
+
         if changes:
             await Logger.analysis_log("🔍 Обнаружены изменения в файлах:\n", self.analysis_id)
             changes_list = changes.splitlines()
@@ -202,8 +213,8 @@ procmon /Backingfile D:\\programming\\GIt\\gitlab\\antivirus\\dockerer\\1\\docke
             await self.build_docker()
             
             # Создаем задачи для асинхронного выполнения
-            run_docker_task = asyncio.create_task(self.run_docker())
             run_etw_task = asyncio.create_task(self.run_etw())
+            run_docker_task = asyncio.create_task(self.run_docker())
             
             # Ожидаем завершения задач
             await asyncio.gather(run_docker_task, run_etw_task)

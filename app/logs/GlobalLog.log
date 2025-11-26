@@ -225,3 +225,136 @@ DETAIL:  Failing row contains (null, 8e2a135e-c9d1-4a01-be9b-5723f5373321, postg
 2025-10-21 14:46:57.942 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-16
 2025-10-21 14:51:28.923 | INFO     | app.utils.logging:log:11 - disconnect websocket 64bc452e-aa06-45e7-92d5-311be892f300, 127.0.0.1
 2025-10-21 14:51:31.296 | INFO     | app.utils.logging:log:11 - Ошибка при анализе: type object 'Logger' has no attribute 'update_analysis_status'
+2025-11-24 23:06:26.513 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: c86ba90b-ce79-4967-8f62-a5a6e3c50355
+2025-11-24 23:06:27.022 | INFO     | app.utils.logging:log:11 - connect websocket c86ba90b-ce79-4967-8f62-a5a6e3c50355, 127.0.0.1
+2025-11-24 23:08:25.507 | INFO     | app.utils.logging:log:11 - Ошибка при анализе: type object 'Logger' has no attribute 'update_analysis_status'
+2025-11-24 23:08:25.960 | INFO     | app.utils.logging:log:11 - disconnect websocket c86ba90b-ce79-4967-8f62-a5a6e3c50355, 127.0.0.1
+2025-11-24 23:08:26.402 | INFO     | app.utils.logging:log:11 - connect websocket c86ba90b-ce79-4967-8f62-a5a6e3c50355, 127.0.0.1
+2025-11-24 23:17:50.386 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-16
+2025-11-24 23:22:40.258 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-16
+2025-11-24 23:24:19.701 | INFO     | app.utils.logging:log:11 - connect websocket c86ba90b-ce79-4967-8f62-a5a6e3c50355, 127.0.0.1
+2025-11-24 23:24:20.223 | INFO     | app.utils.logging:log:11 - disconnect websocket c86ba90b-ce79-4967-8f62-a5a6e3c50355, 127.0.0.1
+2025-11-24 23:24:23.135 | INFO     | app.utils.logging:log:11 - connect websocket c86ba90b-ce79-4967-8f62-a5a6e3c50355, 127.0.0.1
+2025-11-24 23:24:26.822 | INFO     | app.utils.logging:log:11 - disconnect websocket c86ba90b-ce79-4967-8f62-a5a6e3c50355, 127.0.0.1
+2025-11-24 23:46:53.830 | INFO     | app.utils.logging:log:11 - connect websocket c86ba90b-ce79-4967-8f62-a5a6e3c50355, 127.0.0.1
+2025-11-24 23:46:54.952 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-16
+2025-11-24 23:52:08.332 | INFO     | app.utils.logging:log:11 - disconnect websocket c86ba90b-ce79-4967-8f62-a5a6e3c50355, 127.0.0.1
+2025-11-25 18:21:35.035 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c
+2025-11-25 18:21:35.206 | INFO     | app.utils.logging:log:11 - connect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 18:23:42.716 | INFO     | app.utils.logging:log:11 - Ошибка при анализе: type object 'Logger' has no attribute 'update_analysis_status'
+2025-11-25 18:23:42.877 | INFO     | app.utils.logging:log:11 - disconnect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 18:23:43.015 | INFO     | app.utils.logging:log:11 - connect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 18:23:52.517 | INFO     | app.utils.logging:log:11 - Определена кодировка файла: utf-16
+2025-11-25 18:24:20.969 | INFO     | app.utils.logging:log:11 - disconnect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 18:24:21.197 | INFO     | app.utils.logging:log:11 - connect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 19:06:03.036 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: a79f355c-6483-4de6-8579-aacb26c697dd
+2025-11-25 19:06:03.861 | INFO     | app.utils.logging:log:11 - connect websocket a79f355c-6483-4de6-8579-aacb26c697dd, 127.0.0.1
+2025-11-25 19:06:57.764 | INFO     | app.utils.logging:log:11 - disconnect websocket a79f355c-6483-4de6-8579-aacb26c697dd, 127.0.0.1
+2025-11-25 19:08:34.655 | INFO     | app.utils.logging:log:11 - connect websocket a79f355c-6483-4de6-8579-aacb26c697dd, 127.0.0.1
+2025-11-25 19:08:57.609 | INFO     | app.utils.logging:log:11 - disconnect websocket a79f355c-6483-4de6-8579-aacb26c697dd, 127.0.0.1
+2025-11-25 19:08:57.741 | INFO     | app.utils.logging:log:11 - connect websocket a79f355c-6483-4de6-8579-aacb26c697dd, 127.0.0.1
+2025-11-25 19:09:43.072 | INFO     | app.utils.logging:log:11 - disconnect websocket a79f355c-6483-4de6-8579-aacb26c697dd, 127.0.0.1
+2025-11-25 19:09:43.410 | INFO     | app.utils.logging:log:11 - connect websocket a79f355c-6483-4de6-8579-aacb26c697dd, 127.0.0.1
+2025-11-25 19:10:16.521 | INFO     | app.utils.logging:log:11 - disconnect websocket a79f355c-6483-4de6-8579-aacb26c697dd, 127.0.0.1
+2025-11-25 19:10:16.831 | INFO     | app.utils.logging:log:11 - connect websocket a79f355c-6483-4de6-8579-aacb26c697dd, 127.0.0.1
+2025-11-25 19:10:54.052 | INFO     | app.utils.logging:log:11 - disconnect websocket a79f355c-6483-4de6-8579-aacb26c697dd, 127.0.0.1
+2025-11-25 19:11:04.141 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: 225b210d-960d-4afe-88a7-ed9d31b678ba
+2025-11-25 19:11:04.353 | INFO     | app.utils.logging:log:11 - connect websocket 225b210d-960d-4afe-88a7-ed9d31b678ba, 127.0.0.1
+2025-11-25 19:11:31.717 | INFO     | app.utils.logging:log:11 - disconnect websocket 225b210d-960d-4afe-88a7-ed9d31b678ba, 127.0.0.1
+2025-11-25 19:11:31.851 | INFO     | app.utils.logging:log:11 - connect websocket 225b210d-960d-4afe-88a7-ed9d31b678ba, 127.0.0.1
+2025-11-25 19:11:36.142 | INFO     | app.utils.logging:log:11 - disconnect websocket 225b210d-960d-4afe-88a7-ed9d31b678ba, 127.0.0.1
+2025-11-25 19:11:36.285 | INFO     | app.utils.logging:log:11 - connect websocket 225b210d-960d-4afe-88a7-ed9d31b678ba, 127.0.0.1
+2025-11-25 19:15:15.264 | INFO     | app.utils.logging:log:11 - Ошибка при анализе: type object 'Logger' has no attribute 'update_analysis_status'
+2025-11-25 19:15:15.524 | INFO     | app.utils.logging:log:11 - disconnect websocket 225b210d-960d-4afe-88a7-ed9d31b678ba, 127.0.0.1
+2025-11-25 19:15:26.625 | INFO     | app.utils.logging:log:11 - connect websocket 225b210d-960d-4afe-88a7-ed9d31b678ba, 127.0.0.1
+2025-11-25 19:16:29.959 | INFO     | app.utils.logging:log:11 - disconnect websocket 225b210d-960d-4afe-88a7-ed9d31b678ba, 127.0.0.1
+2025-11-25 19:16:30.106 | INFO     | app.utils.logging:log:11 - connect websocket 225b210d-960d-4afe-88a7-ed9d31b678ba, 127.0.0.1
+2025-11-25 19:16:37.659 | INFO     | app.utils.logging:log:11 - disconnect websocket 225b210d-960d-4afe-88a7-ed9d31b678ba, 127.0.0.1
+2025-11-25 19:16:37.791 | INFO     | app.utils.logging:log:11 - connect websocket 225b210d-960d-4afe-88a7-ed9d31b678ba, 127.0.0.1
+2025-11-25 19:18:35.077 | INFO     | app.utils.logging:log:11 - disconnect websocket 225b210d-960d-4afe-88a7-ed9d31b678ba, 127.0.0.1
+2025-11-25 19:18:35.271 | INFO     | app.utils.logging:log:11 - connect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 19:23:39.434 | INFO     | app.utils.logging:log:11 - disconnect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 19:23:39.596 | INFO     | app.utils.logging:log:11 - connect websocket 225b210d-960d-4afe-88a7-ed9d31b678ba, 127.0.0.1
+2025-11-25 19:23:47.415 | INFO     | app.utils.logging:log:11 - disconnect websocket 225b210d-960d-4afe-88a7-ed9d31b678ba, 127.0.0.1
+2025-11-25 19:23:49.219 | INFO     | app.utils.logging:log:11 - connect websocket 225b210d-960d-4afe-88a7-ed9d31b678ba, 127.0.0.1
+2025-11-25 19:23:52.896 | INFO     | app.utils.logging:log:11 - disconnect websocket 225b210d-960d-4afe-88a7-ed9d31b678ba, 127.0.0.1
+2025-11-25 19:24:00.076 | INFO     | app.utils.logging:log:11 - Файл загружен и анализ запущен. ID анализа: b29d4606-9e2e-4ab6-b170-b668b45b5858
+2025-11-25 19:24:00.274 | INFO     | app.utils.logging:log:11 - connect websocket b29d4606-9e2e-4ab6-b170-b668b45b5858, 127.0.0.1
+2025-11-25 19:26:43.956 | INFO     | app.utils.logging:log:11 - disconnect websocket b29d4606-9e2e-4ab6-b170-b668b45b5858, 127.0.0.1
+2025-11-25 19:26:55.353 | INFO     | app.utils.logging:log:11 - connect websocket b29d4606-9e2e-4ab6-b170-b668b45b5858, 127.0.0.1
+2025-11-25 19:26:59.419 | INFO     | app.utils.logging:log:11 - disconnect websocket b29d4606-9e2e-4ab6-b170-b668b45b5858, 127.0.0.1
+2025-11-25 19:26:59.532 | INFO     | app.utils.logging:log:11 - connect websocket b29d4606-9e2e-4ab6-b170-b668b45b5858, 127.0.0.1
+2025-11-25 19:28:09.641 | INFO     | app.utils.logging:log:11 - Ошибка при анализе: type object 'Logger' has no attribute 'update_analysis_status'
+2025-11-25 19:28:09.827 | INFO     | app.utils.logging:log:11 - disconnect websocket b29d4606-9e2e-4ab6-b170-b668b45b5858, 127.0.0.1
+2025-11-25 19:28:10.047 | INFO     | app.utils.logging:log:11 - connect websocket b29d4606-9e2e-4ab6-b170-b668b45b5858, 127.0.0.1
+2025-11-25 19:35:24.497 | INFO     | app.utils.logging:log:11 - disconnect websocket b29d4606-9e2e-4ab6-b170-b668b45b5858, 127.0.0.1
+2025-11-25 19:51:01.294 | INFO     | app.utils.logging:log:13 - connect websocket b29d4606-9e2e-4ab6-b170-b668b45b5858, 127.0.0.1
+2025-11-25 19:51:01.315 | INFO     | app.utils.logging:log:13 - connect websocket b29d4606-9e2e-4ab6-b170-b668b45b5858, 127.0.0.1
+2025-11-25 19:51:32.522 | INFO     | app.utils.logging:log:13 - disconnect websocket b29d4606-9e2e-4ab6-b170-b668b45b5858, 127.0.0.1
+2025-11-25 19:51:32.523 | INFO     | app.utils.logging:log:13 - disconnect websocket b29d4606-9e2e-4ab6-b170-b668b45b5858, 127.0.0.1
+2025-11-25 19:51:35.422 | INFO     | app.utils.logging:log:13 - Файл загружен и анализ запущен. ID анализа: 8973bdd0-f53f-4179-bdec-b105ab7f2344
+2025-11-25 19:51:35.584 | INFO     | app.utils.logging:log:13 - connect websocket 8973bdd0-f53f-4179-bdec-b105ab7f2344, 127.0.0.1
+2025-11-25 19:51:35.607 | INFO     | app.utils.logging:log:13 - connect websocket 8973bdd0-f53f-4179-bdec-b105ab7f2344, 127.0.0.1
+2025-11-25 19:55:59.680 | INFO     | app.utils.logging:log:13 - Ошибка при анализе: type object 'Logger' has no attribute 'update_analysis_status'
+2025-11-25 19:55:59.916 | INFO     | app.utils.logging:log:13 - disconnect websocket 8973bdd0-f53f-4179-bdec-b105ab7f2344, 127.0.0.1
+2025-11-25 19:55:59.917 | INFO     | app.utils.logging:log:13 - disconnect websocket 8973bdd0-f53f-4179-bdec-b105ab7f2344, 127.0.0.1
+2025-11-25 19:56:00.055 | INFO     | app.utils.logging:log:13 - connect websocket 8973bdd0-f53f-4179-bdec-b105ab7f2344, 127.0.0.1
+2025-11-25 19:56:00.073 | INFO     | app.utils.logging:log:13 - connect websocket 8973bdd0-f53f-4179-bdec-b105ab7f2344, 127.0.0.1
+2025-11-25 19:57:33.213 | INFO     | app.utils.logging:log:13 - disconnect websocket 8973bdd0-f53f-4179-bdec-b105ab7f2344, 127.0.0.1
+2025-11-25 19:57:33.215 | INFO     | app.utils.logging:log:13 - disconnect websocket 8973bdd0-f53f-4179-bdec-b105ab7f2344, 127.0.0.1
+2025-11-25 20:27:08.325 | INFO     | app.utils.logging:log:13 - Файл загружен и анализ запущен. ID анализа: f40a4016-4d65-4d11-8dab-7210c0c64465
+2025-11-25 20:27:08.755 | INFO     | app.utils.logging:log:13 - connect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:27:08.781 | INFO     | app.utils.logging:log:13 - connect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:31:18.064 | INFO     | app.utils.logging:log:13 - Ошибка при анализе: type object 'Logger' has no attribute 'update_analysis_status'
+2025-11-25 20:31:18.249 | INFO     | app.utils.logging:log:13 - disconnect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:31:18.250 | INFO     | app.utils.logging:log:13 - disconnect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:31:18.374 | INFO     | app.utils.logging:log:13 - connect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:31:18.403 | INFO     | app.utils.logging:log:13 - connect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:53:49.320 | INFO     | app.utils.logging:log:13 - connect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:53:49.338 | INFO     | app.utils.logging:log:13 - connect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:54:10.461 | INFO     | app.utils.logging:log:13 - disconnect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:54:10.462 | INFO     | app.utils.logging:log:13 - disconnect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:54:10.606 | INFO     | app.utils.logging:log:13 - connect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:54:10.629 | INFO     | app.utils.logging:log:13 - connect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:54:16.487 | INFO     | app.utils.logging:log:13 - disconnect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:54:16.502 | INFO     | app.utils.logging:log:13 - disconnect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:54:16.921 | INFO     | app.utils.logging:log:13 - connect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:54:16.938 | INFO     | app.utils.logging:log:13 - connect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:54:23.036 | INFO     | app.utils.logging:log:13 - disconnect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:54:23.037 | INFO     | app.utils.logging:log:13 - disconnect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:54:28.491 | INFO     | app.utils.logging:log:13 - connect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:54:28.510 | INFO     | app.utils.logging:log:13 - connect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:56:19.530 | INFO     | app.utils.logging:log:13 - disconnect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:56:19.535 | INFO     | app.utils.logging:log:13 - disconnect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 20:58:05.491 | INFO     | app.utils.logging:log:13 - connect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 20:58:05.512 | INFO     | app.utils.logging:log:13 - connect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 20:59:56.530 | INFO     | app.utils.logging:log:13 - disconnect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 20:59:56.531 | INFO     | app.utils.logging:log:13 - disconnect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 21:26:59.639 | INFO     | app.utils.logging:log:13 - connect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 21:26:59.656 | INFO     | app.utils.logging:log:13 - connect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 21:27:22.428 | INFO     | app.utils.logging:log:13 - disconnect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 21:27:22.430 | INFO     | app.utils.logging:log:13 - disconnect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 21:27:23.998 | INFO     | app.utils.logging:log:13 - connect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 21:27:24.031 | INFO     | app.utils.logging:log:13 - connect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 21:27:29.887 | INFO     | app.utils.logging:log:13 - disconnect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 21:27:29.890 | INFO     | app.utils.logging:log:13 - disconnect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 21:27:30.030 | INFO     | app.utils.logging:log:13 - connect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 21:27:30.050 | INFO     | app.utils.logging:log:13 - connect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 21:28:14.509 | INFO     | app.utils.logging:log:13 - disconnect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 21:28:14.510 | INFO     | app.utils.logging:log:13 - disconnect websocket 69cf43a8-d81c-4b0f-bc63-b9389cab3e9c, 127.0.0.1
+2025-11-25 21:32:43.094 | INFO     | app.utils.logging:log:13 - connect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 21:32:43.122 | INFO     | app.utils.logging:log:13 - connect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 21:43:17.224 | INFO     | app.utils.logging:log:13 - disconnect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-25 21:43:17.261 | INFO     | app.utils.logging:log:13 - disconnect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-26 09:58:28.165 | INFO     | app.utils.logging:log:13 - connect websocket c86ba90b-ce79-4967-8f62-a5a6e3c50355, 127.0.0.1
+2025-11-26 09:58:28.191 | INFO     | app.utils.logging:log:13 - connect websocket c86ba90b-ce79-4967-8f62-a5a6e3c50355, 127.0.0.1
+2025-11-26 09:58:33.621 | INFO     | app.utils.logging:log:13 - disconnect websocket c86ba90b-ce79-4967-8f62-a5a6e3c50355, 127.0.0.1
+2025-11-26 09:58:33.623 | INFO     | app.utils.logging:log:13 - disconnect websocket c86ba90b-ce79-4967-8f62-a5a6e3c50355, 127.0.0.1
+2025-11-26 10:01:52.985 | INFO     | app.utils.logging:log:13 - connect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-26 10:01:53.012 | INFO     | app.utils.logging:log:13 - connect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-26 10:01:59.364 | INFO     | app.utils.logging:log:13 - disconnect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-26 10:01:59.366 | INFO     | app.utils.logging:log:13 - disconnect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-26 10:02:50.950 | INFO     | app.utils.logging:log:13 - connect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-26 10:02:50.977 | INFO     | app.utils.logging:log:13 - connect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-26 10:04:50.267 | INFO     | app.utils.logging:log:13 - disconnect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1
+2025-11-26 10:04:50.269 | INFO     | app.utils.logging:log:13 - disconnect websocket f40a4016-4d65-4d11-8dab-7210c0c64465, 127.0.0.1

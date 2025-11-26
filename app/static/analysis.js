@@ -22,6 +22,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let etlOffset = 0;
     const ETL_CHUNK_LIMIT = 200;
     let etlTotal = 0;
+    let cleanTreeLoaded = false;
+    let cleanTreeRowCount = 0;
 
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
@@ -325,87 +327,166 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Функция для загрузки ETL данных
     async function loadEtlChunk(analysisId, initialLoad = false) {
-        console.log(`Загрузка ETL чанка: offset=${etlOffset}, limit=${ETL_CHUNK_LIMIT}`);
+        console.log(`Загрузка clean_tree для анализа ${analysisId}`);
+        const loader = document.getElementById('etlOutputLoader');
+        const tableBody = document.querySelector('#cleanTreeTable tbody');
+        if (!tableBody) {
+            console.warn('Таблица cleanTreeTable не найдена');
+            return null;
+        }
+
         try {
             // Показываем индикатор загрузки только при первой загрузке
-            if (initialLoad) {
-                document.getElementById('etlOutputLoader').style.display = 'block';
+            if (initialLoad && loader) {
+                loader.style.display = 'block';
             }
-            
-            const response = await fetch(`/analysis/etl-chunk/${analysisId}?offset=${etlOffset}&limit=${ETL_CHUNK_LIMIT}`);
+
+            const response = await fetch(`/analysis/clean-tree/${analysisId}`);
+
+            // Для 404 показываем понятное сообщение "Данных нет.", без технической ошибки
+            if (response.status === 404) {
+                cleanTreeLoaded = true;
+                cleanTreeRowCount = 0;
+                tableBody.innerHTML = '';
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = 5;
+                cell.textContent = 'Данных нет.';
+                row.appendChild(cell);
+                tableBody.appendChild(row);
+                updateEtlLoadButtons(analysisId, cleanTreeRowCount, 0, 'Вердикт: данных для анализа нет.');
+                return null;
+            }
+
             if (!response.ok) {
                 throw new Error(`Ошибка HTTP! status: ${response.status}`);
             }
-            
+
             const data = await response.json();
-            console.log("Получены ETL данные:", data);
-            
-            const etlContent = document.getElementById('etlOutputContent');
-            
-            // При первой загрузке очищаем контент
-            if (initialLoad) {
-                etlContent.innerHTML = '';
-            }
-            
-            // Добавляем полученные строки с форматированием JSON
-            if (data.chunk && data.chunk.length > 0) {
-                // Обрабатываем каждую строку отдельно
-                let formattedHtml = '';
-                
-                data.chunk.forEach(line => {
-                    try {
-                        // Пытаемся распарсить строку как JSON
-                        const jsonObj = JSON.parse(line);
-                        // Преобразуем в отформатированный JSON с отступами
-                        const formattedJson = JSON.stringify(jsonObj, null, 2);
-                        // Создаем блок кода с подсветкой синтаксиса
-                        const codeBlock = document.createElement('code');
-                        codeBlock.className = 'language-json';
-                        codeBlock.textContent = formattedJson;
-                        // Применяем подсветку синтаксиса
-                        hljs.highlightElement(codeBlock);
-                        // Добавляем к итоговому HTML
-                        formattedHtml += `<div class="json-block">${codeBlock.outerHTML}</div>`;
-                    } catch (e) {
-                        // Если не JSON, просто добавляем строку
-                        formattedHtml += `<div>${line}</div>`;
+            console.log('Получены данные clean_tree:', data);
+
+            cleanTreeLoaded = true;
+            const rows = Array.isArray(data.rows) ? data.rows : [];
+            cleanTreeRowCount = rows.length;
+
+            let dangerCount = 0;
+            let benignOnly = true;
+
+            tableBody.innerHTML = '';
+
+            if (rows.length === 0) {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = 5;
+                cell.textContent = 'Нет данных очищенного лога.';
+                row.appendChild(cell);
+                tableBody.appendChild(row);
+            } else {
+                rows.forEach(row => {
+                    const tr = document.createElement('tr');
+
+                    if (row.threat_level || row.threat_msg) {
+                        tr.classList.add('threat-row');
+                        const level = String(row.threat_level || '').toLowerCase();
+                        if (level.includes('critical')) {
+                            tr.classList.add('threat-critical');
+                        } else if (level.includes('high')) {
+                            tr.classList.add('threat-high');
+                        } else if (level.includes('warning')) {
+                            tr.classList.add('threat-warning');
+                        }
                     }
+
+                    let dangerText = '';
+                    if (row.threat_msg) {
+                        const parts = String(row.threat_msg).split(':');
+                        if (parts.length > 1) {
+                            dangerText = parts.slice(1).join(':').trim();
+                        } else {
+                            dangerText = row.threat_msg;
+                        }
+                    } else if (row.threat_level) {
+                        dangerText = row.threat_level;
+                    }
+
+                    const isDanger = !!(row.threat_level || row.threat_msg);
+                    if (isDanger) {
+                        dangerCount++;
+                        const desc = dangerText || '';
+                        const isBenign = desc.includes('Использование PowerShell') || desc.includes('Сетевая активность');
+                        if (!isBenign) {
+                            benignOnly = false;
+                        }
+                    }
+
+                    const cells = [
+                        row.index,
+                        row.event,
+                        row.type,
+                        row.details,
+                        dangerText
+                    ];
+
+                    cells.forEach((value, idx) => {
+                        const td = document.createElement('td');
+                        if (idx === 3) {
+                            td.classList.add('details-cell');
+                        }
+                        if (idx === 4 && dangerText) {
+                            td.classList.add('danger-cell');
+                        }
+                        td.textContent = value !== undefined && value !== null ? value : '';
+                        tr.appendChild(td);
+                    });
+
+                    if (row.threat_msg) {
+                        tr.title = row.threat_msg;
+                    }
+
+                    tableBody.appendChild(tr);
                 });
-                
-                if (initialLoad || etlContent.innerHTML === 'Нет данных ETL результатов.') {
-                    etlContent.innerHTML = formattedHtml;
-                } else {
-                    etlContent.innerHTML += formattedHtml;
-                }
-                
-                etlOffset += data.chunk.length;
-                etlTotal = data.total;
-            } else if (initialLoad) {
-                etlContent.textContent = 'Нет данных ETL результатов.';
             }
-            
-            // Скрываем индикатор загрузки
-            document.getElementById('etlOutputLoader').style.display = 'none';
-            
-            // Обновляем интерфейс для загрузки следующих порций
-            updateEtlLoadButtons(analysisId);
-            
+
+            let verdictText = '';
+            if (dangerCount === 0) {
+                verdictText = 'Вердикт: опасных действий не обнаружено.';
+            } else if (dangerCount > 1 && !benignOnly) {
+                verdictText = `Вердикт: программа может быть вирусом (обнаружено ${dangerCount} опасных действий).`;
+            } else {
+                verdictText = 'Вердикт: обнаружены подозрительные действия, но это не обязательно вирус. Запуск PowerShell и сетевая активность могут использоваться и обычными приложениями.';
+            }
+
+            // Обновляем интерфейс (кнопки скачивания и информация о количестве строк)
+            updateEtlLoadButtons(analysisId, cleanTreeRowCount, dangerCount, verdictText);
+
             return data;
         } catch (error) {
-            console.error('Ошибка при загрузке ETL данных:', error);
-            document.getElementById('etlOutputLoader').style.display = 'none';
-            
-            const etlContent = document.getElementById('etlOutputContent');
-            if (initialLoad) {
-                etlContent.textContent = `Ошибка при загрузке ETL данных: ${error.message}`;
+            console.error('Ошибка при загрузке clean_tree:', error);
+            if (initialLoad && tableBody) {
+                tableBody.innerHTML = '';
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = 5;
+                if (error.message && error.message.includes('status: 404')) {
+                    cell.textContent = 'Данных нет.';
+                    updateEtlLoadButtons(analysisId, 0, 0, 'Вердикт: данных для анализа нет.');
+                } else {
+                    cell.textContent = `Ошибка при загрузке данных: ${error.message}`;
+                    updateEtlLoadButtons(analysisId, 0, 0, 'Вердикт: не удалось получить данные для анализа.');
+                }
+                row.appendChild(cell);
+                tableBody.appendChild(row);
             }
-            
             return null;
+        } finally {
+            if (loader) {
+                loader.style.display = 'none';
+            }
         }
     }
 
     // Функция для обновления кнопок загрузки ETL данных
-    function updateEtlLoadButtons(analysisId) {
+    function updateEtlLoadButtons(analysisId, rowCount, dangerCount, verdictText) {
         const container = document.getElementById('etlOutput');
         let buttonArea = document.getElementById('etlButtonArea');
         
@@ -424,13 +505,26 @@ document.addEventListener('DOMContentLoaded', function() {
         
         buttonArea.innerHTML = "";
         
-        // Отображаем информацию об оставшихся строках
+        // Отображаем информацию о количестве строк и опасных действий
         const remainingCount = document.createElement('div');
         remainingCount.id = 'etlRemainingCount';
         remainingCount.style.marginBottom = '10px';
         remainingCount.style.fontWeight = 'bold';
-        remainingCount.textContent = `Загружено строк: ${etlOffset} из ${etlTotal}`;
+        remainingCount.textContent = `Строк в таблице: ${rowCount}`;
         buttonArea.appendChild(remainingCount);
+
+        const dangerInfo = document.createElement('div');
+        dangerInfo.id = 'etlDangerCount';
+        dangerInfo.style.marginBottom = '10px';
+        dangerInfo.textContent = `Опасных действий: ${dangerCount}`;
+        buttonArea.appendChild(dangerInfo);
+
+        if (verdictText) {
+            const verdictDiv = document.createElement('div');
+            verdictDiv.id = 'etlVerdict';
+            verdictDiv.textContent = verdictText;
+            buttonArea.appendChild(verdictDiv);
+        }
         
         // Создаем контейнер для кнопок, чтобы можно было их выровнять в ряд
         const buttonsContainer = document.createElement('div');
@@ -438,41 +532,127 @@ document.addEventListener('DOMContentLoaded', function() {
         buttonsContainer.style.gap = '10px';
         buttonsContainer.style.flexWrap = 'wrap';
         buttonArea.appendChild(buttonsContainer);
-        
-        // Добавляем кнопки только если есть еще данные для загрузки
-        if (etlTotal > etlOffset) {
-            const loadMoreBtn = document.createElement('button');
-            loadMoreBtn.id = 'loadMoreEtlBtn';
-            loadMoreBtn.textContent = 'Загрузить ещё 200 строк';
-            loadMoreBtn.className = 'btn btn-secondary';
-            loadMoreBtn.style.minWidth = '200px';
-            loadMoreBtn.addEventListener('click', function() {
-                loadEtlChunk(analysisId, false);
-            });
-            buttonsContainer.appendChild(loadMoreBtn);
-        }
-        
-        // Добавляем кнопку скачивания полного JSON файла
+
+        // Кнопка скачивания исходного trace.csv
+        const downloadTraceCsvBtn = document.createElement('button');
+        downloadTraceCsvBtn.id = 'downloadTraceCsvBtn';
+        downloadTraceCsvBtn.textContent = 'Скачать trace.csv';
+        downloadTraceCsvBtn.className = 'btn btn-secondary';
+        downloadTraceCsvBtn.style.minWidth = '180px';
+        downloadTraceCsvBtn.addEventListener('click', function() {
+            window.location.href = `/analysis/download-trace-csv/${analysisId}`;
+        });
+        buttonsContainer.appendChild(downloadTraceCsvBtn);
+
+        // Кнопка скачивания полного trace.json
         const downloadJsonBtn = document.createElement('button');
         downloadJsonBtn.id = 'downloadJsonBtn';
-        downloadJsonBtn.textContent = 'Скачать полный JSON файл';
+        downloadJsonBtn.textContent = 'Скачать trace.json';
         downloadJsonBtn.className = 'btn btn-primary';
-        downloadJsonBtn.style.minWidth = '200px';
+        downloadJsonBtn.style.minWidth = '180px';
         downloadJsonBtn.addEventListener('click', function() {
             window.location.href = `/analysis/download-json/${analysisId}`;
         });
         buttonsContainer.appendChild(downloadJsonBtn);
-        
-        // Добавляем кнопку скачивания оригинального ETL файла
+
+        // Кнопка скачивания очищенного clean_tree.csv
+        const downloadCleanCsvBtn = document.createElement('button');
+        downloadCleanCsvBtn.id = 'downloadCleanTreeCsvBtn';
+        downloadCleanCsvBtn.textContent = 'Скачать clean_tree.csv';
+        downloadCleanCsvBtn.className = 'btn btn-success';
+        downloadCleanCsvBtn.style.minWidth = '200px';
+        downloadCleanCsvBtn.addEventListener('click', function() {
+            window.location.href = `/analysis/download-clean-tree-csv/${analysisId}`;
+        });
+        buttonsContainer.appendChild(downloadCleanCsvBtn);
+
+        // Кнопка скачивания clean_tree.json
+        const downloadCleanJsonBtn = document.createElement('button');
+        downloadCleanJsonBtn.id = 'downloadCleanTreeJsonBtn';
+        downloadCleanJsonBtn.textContent = 'Скачать clean_tree.json';
+        downloadCleanJsonBtn.className = 'btn btn-outline-success';
+        downloadCleanJsonBtn.style.minWidth = '200px';
+        downloadCleanJsonBtn.addEventListener('click', function() {
+            window.location.href = `/analysis/download-clean-tree-json/${analysisId}`;
+        });
+        buttonsContainer.appendChild(downloadCleanJsonBtn);
+
+        // Кнопка скачивания threat_report.json
+        const downloadThreatReportBtn = document.createElement('button');
+        downloadThreatReportBtn.id = 'downloadThreatReportBtn';
+        downloadThreatReportBtn.textContent = 'Скачать threat_report.json';
+        downloadThreatReportBtn.className = 'btn btn-outline-danger';
+        downloadThreatReportBtn.style.minWidth = '220px';
+        downloadThreatReportBtn.addEventListener('click', function() {
+            window.location.href = `/analysis/download-threat-report/${analysisId}`;
+        });
+        buttonsContainer.appendChild(downloadThreatReportBtn);
+
+        // Кнопка скачивания оригинального ETL файла
         const downloadEtlBtn = document.createElement('button');
         downloadEtlBtn.id = 'downloadEtlBtn';
         downloadEtlBtn.textContent = 'Скачать оригинальный ETL файл';
         downloadEtlBtn.className = 'btn btn-info';
-        downloadEtlBtn.style.minWidth = '200px';
+        downloadEtlBtn.style.minWidth = '220px';
         downloadEtlBtn.addEventListener('click', function() {
             window.location.href = `/analysis/download-etl/${analysisId}?format=etl`;
         });
         buttonsContainer.appendChild(downloadEtlBtn);
+    }
+
+    // WebSocket для получения событий анализа (docker_log, etl_converted и т.п.)
+    function setupAnalysisWebSocket(analysisId) {
+        if (!analysisId) return;
+
+        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+
+        if (window.analysisWs && (window.analysisWs.readyState === WebSocket.OPEN || window.analysisWs.readyState === WebSocket.CONNECTING)) {
+            return;
+        }
+
+        window.analysisWs = new WebSocket(`${protocol}://${window.location.host}/analysis/ws/${analysisId}`);
+
+        window.analysisWs.onmessage = function(event) {
+            let data;
+            try {
+                data = JSON.parse(event.data);
+            } catch (e) {
+                console.error('Некорректное сообщение WebSocket:', event.data);
+                return;
+            }
+
+            if (data.event === 'docker_log') {
+                if (dockerOutputContent) {
+                    const prefix = dockerOutputContent.textContent && !dockerOutputContent.textContent.endsWith('\n') ? '\n' : '';
+                    dockerOutputContent.textContent += prefix + data.message;
+                }
+            } else if (data.event === 'etl_converted') {
+                const etlLoader = document.getElementById('etlOutputLoader');
+                if (etlLoader) etlLoader.style.display = 'none';
+                loadEtlChunk(analysisId, true);
+            } else if (data.event === 'etl_conversion_error') {
+                const etlLoader = document.getElementById('etlOutputLoader');
+                if (etlLoader) etlLoader.style.display = 'none';
+                const etlContent = document.getElementById('etlOutputContent');
+                if (etlContent) {
+                    etlContent.textContent = `Ошибка при конвертации ETL: ${data.message || ''}`;
+                }
+            } else if (data.status) {
+                updateStatus(data.status);
+            }
+        };
+
+        window.analysisWs.onopen = function() {
+            console.log('WebSocket анализа открыт');
+        };
+
+        window.analysisWs.onclose = function() {
+            console.log('WebSocket анализа закрыт');
+        };
+
+        window.analysisWs.onerror = function(error) {
+            console.error('Ошибка WebSocket анализа:', error);
+        };
     }
 
     // Функция для проверки статуса конвертации ETL и запуска процесса при необходимости
@@ -611,18 +791,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Функция инициализации загрузки ETL данных
     async function initEtlDataLoad(analysisId) {
-        // Сбрасываем смещение при первой загрузке
-        etlOffset = 0;
-        etlTotal = 0;
-        
-        // Проверяем статус конвертации ETL и при необходимости запускаем процесс
-        const isReady = await checkEtlConversionStatus(analysisId);
-        
-        // Если ETL готов, загружаем данные
-        if (isReady) {
-            // Загружаем первую порцию данных
-            loadEtlChunk(analysisId, true);
-        }
+        // Для таблицы clean_tree просто загружаем данные один раз
+        await loadEtlChunk(analysisId, true);
     }
 
     // Функция обработки клика по табу ETL данных
@@ -630,9 +800,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const etlTab = document.querySelector('a[href="#etlOutput"]');
         if (etlTab) {
             etlTab.addEventListener('click', function() {
-                // Если данные еще не загружены, инициируем загрузку
-                const etlContent = document.getElementById('etlOutputContent');
-                if (etlContent.textContent === 'Нет данных ETL результатов.' || etlTotal === 0) {
+                // Если таблица ещё не загружена, инициируем загрузку
+                const tableBody = document.querySelector('#cleanTreeTable tbody');
+                if (tableBody && tableBody.children.length === 0 && !cleanTreeLoaded) {
                     initEtlDataLoad(analysisId);
                 }
             });
@@ -644,14 +814,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Настраиваем обработчик событий для табов
         setupEtlTabClickHandler(analysisId);
         
-        // Если текущий статус "completed", автоматически загружаем ETL данные
+        // Если текущий статус "completed", автоматически загружаем таблицу при активной вкладке
         if (window.analysisStatus === 'completed') {
-            // Проверяем, активен ли таб ETL результатов
             const etlTab = document.querySelector('a[href="#etlOutput"]');
             const isEtlTabActive = etlTab?.classList.contains('active');
-            
-            // Если таб ETL активен или это первая загрузка, инициируем загрузку ETL данных
-            if (isEtlTabActive || document.getElementById('etlOutputContent').textContent === '') {
+            if (isEtlTabActive) {
                 initEtlDataLoad(analysisId);
             }
         }
@@ -661,6 +828,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log("Загружаем результаты анализа:", analysisId);
         showResults(analysisId);
         loadInitialData(analysisId);
+        setupAnalysisWebSocket(analysisId);
         // setInterval(() => {
         //     updateDockerLogs(analysisId);
         // }, 5000);
@@ -709,31 +877,25 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
 
-    document.getElementById('profileIcon').addEventListener('click', function() {
-        const logoutBtn = document.getElementById('logoutBtnProfile');
-        const changePasswordBtn = document.getElementById('changePasswordBtn');
-        if (logoutBtn.style.display === 'none') {
-            logoutBtn.style.display = 'block';
-            changePasswordBtn.style.display = 'block';
-        } else {
-            logoutBtn.style.display = 'none';
-            changePasswordBtn.style.display = 'none';
-        }
-    });
-
-    document.getElementById('logoutBtnProfile').addEventListener('click', function() {
-        console.log('Выход из аккаунта');
-        fetch('/users/logout', {
-            method: 'POST',
-            credentials: 'include'
-        }).then(response => {
-            if (response.ok) {
-                window.location.href = '/'; 
-            }
+    const profileLogoutBtn = document.getElementById('profileLogout');
+    if (profileLogoutBtn) {
+        profileLogoutBtn.addEventListener('click', function() {
+            console.log('Выход из аккаунта');
+            fetch('/users/logout', {
+                method: 'POST',
+                credentials: 'include'
+            }).then(response => {
+                if (response.ok) {
+                    window.location.href = '/';
+                }
+            });
         });
-    });
+    }
 
-    document.getElementById('changePasswordBtn').addEventListener('click', function() {
-        window.location.href = '/users/reset-password';
-    });
+    const profileChangePasswordBtn = document.getElementById('profileChangePassword');
+    if (profileChangePasswordBtn) {
+        profileChangePasswordBtn.addEventListener('click', function() {
+            window.location.href = '/users/reset-password';
+        });
+    }
 });
