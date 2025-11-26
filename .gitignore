@@ -3,3 +3,5 @@
 __pycache__
 dockerer
 .log
+trace.csv
+trace.json
