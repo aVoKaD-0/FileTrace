@@ -205,7 +205,6 @@
     border: 1px solid #dee2e6;
 }
 
-/* Стили для блоков JSON */
 .json-block {
     margin-bottom: 10px;
     border-bottom: 1px solid #eee;
@@ -222,14 +221,12 @@
     word-break: break-word;
 }
 
-/* Увеличиваем максимальную высоту блока с ETL данными на мобильных устройствах */
 @media (max-width: 768px) {
     #etlOutputContent {
         max-height: 400px;
     }
 }
 
-/* Стили для кнопок в блоке ETL */
 #etlButtonArea {
     background-color: #f8f9fa;
     border-radius: 5px;

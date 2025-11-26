@@ -7,7 +7,6 @@ body {
         linear-gradient(to bottom, #0b1630 0, #0b1630 260px, #e1ecff 650px, #ffffff 100%);
 }
 
-/* более крупные мини-блоки только в hero */
 .hero-pills .feature-pill {
     padding: 1rem 1.5rem;
 }
