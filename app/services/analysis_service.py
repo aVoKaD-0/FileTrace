@@ -2,14 +2,12 @@ import os
 import json
 import asyncio
 import subprocess
+from fastapi import HTTPException
 from app.utils.logging import Logger
 from app.utils.websocket_manager import manager
 from concurrent.futures import ThreadPoolExecutor
 from app.repositories.analysis import docker
 from app.utils.cleaner import run_cleaner
-
-username = "docker"
-password = "docker"
 
 class AnalysisService:
     def __init__(self, filename: str, analysis_id: str, uuid: str):
@@ -68,7 +66,6 @@ CMD ["powershell", "-command", "Start-Process -FilePath 'C:\\\\sandbox\\\\{self.
 
     async def run_etw(self):
         await Logger.analysis_log("Запуск ETW для мониторинга файлов...", self.analysis_id)
-        await asyncio.sleep(7)
         etw_command = ["powershell", "-command", f"xperf -on PROC_THREAD+LOADER+FILE_IO -f {docker}\\analysis\\{self.analysis_id}\\trace.etl"]
         result = await self.run_in_executor(etw_command)
         await Logger.analysis_log("ETW успешно запущен.", self.analysis_id)
@@ -153,7 +150,7 @@ procmon /Backingfile D:\\programming\\GIt\\gitlab\\antivirus\\dockerer\\1\\docke
 
 
     async def get_file_changes(self):
-        await Logger.analysis_log(f"📄 Отслеживание изменений файлов в контейнере analysis_{self.analysis_id}...", self.analysis_id)
+        await Logger.analysis_log(f"📄 Отслеживание изменений файлов в контейнере Docker.", self.analysis_id)
         command = ["powershell", "-command", f"docker diff analysis_{self.analysis_id}"]
         result = await self.run_in_executor(command)
         changes = result.stdout.strip()
@@ -164,13 +161,19 @@ procmon /Backingfile D:\\programming\\GIt\\gitlab\\antivirus\\dockerer\\1\\docke
 
         try:
             await Logger.analysis_log("Запуск очистки логов файловой активности...", self.analysis_id)
+            print("11")
             loop = asyncio.get_event_loop()
+            print("1")
             base_dir = f"{docker}\\analysis\\{self.analysis_id}"
+            print("2")
             target_exe = self.filename
-            await loop.run_in_executor(None, lambda: run_cleaner(target_exe, base_dir))
+            print("3")
+            result = await loop.run_in_executor(None, run_cleaner, target_exe, base_dir)
+            print("4")
             await Logger.analysis_log("Очистка логов завершена. Созданы clean_tree.csv, clean_tree.json, threat_report.json.", self.analysis_id)
         except Exception as e:
             await Logger.analysis_log(f"Ошибка при очистке логов: {str(e)}", self.analysis_id)
+            raise HTTPException(status_code=500, detail=str(e))
 
         if changes:
             await Logger.analysis_log("🔍 Обнаружены изменения в файлах:\n", self.analysis_id)

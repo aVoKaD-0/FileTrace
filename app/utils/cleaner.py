@@ -3,6 +3,7 @@ import json
 import re
 import sys
 import os
+from fastapi import HTTPException
 
 TARGET_EXE = "mc1.exe"        
 CSV_INPUT = "trace.csv"       
