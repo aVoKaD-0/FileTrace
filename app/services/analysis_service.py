@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import asyncio
 import subprocess
 from fastapi import HTTPException
@@ -48,6 +49,7 @@ CMD ["powershell", "-command", "Start-Process -FilePath 'C:\\\\sandbox\\\\{self.
 
     async def run_docker(self):
         await Logger.analysis_log("Запуск контейнера...", self.analysis_id)
+        await asyncio.sleep(7)
         command = ["powershell", "-command", f"docker run -it --isolation=process --name analysis_{self.analysis_id} analysis_{self.analysis_id}"]
         result = await self.run_in_executor(command)
         await Logger.analysis_log("Контейнер успешно завершил работу.", self.analysis_id)
@@ -111,42 +113,42 @@ CMD ["powershell", "-command", "Start-Process -FilePath 'C:\\\\sandbox\\\\{self.
             "message": "ETL данные успешно конвертированы"
         }))
 
-    async def run_procmon(self):
-        await Logger.analysis_log("Запуск Procmon...", self.analysis_id)
-        procmon_command = f"""$container_pid = docker ps -q --filter 'ancestor=analysis_1'
-procmon /Backingfile D:\\programming\\GIt\\gitlab\\antivirus\\dockerer\\1\\docker_log.pml /Filter 'PID is $container_pid Include'
-"""
-        process = await asyncio.create_subprocess_exec(
-            "powershell", "-command", procmon_command,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        stdout, stderr = await process.communicate()
-        await Logger.analysis_log("Procmon успешно запущен.", self.analysis_id)
+#     async def run_procmon(self):
+#         await Logger.analysis_log("Запуск Procmon...", self.analysis_id)
+#         procmon_command = f"""$container_pid = docker ps -q --filter 'ancestor=analysis_1'
+# procmon /Backingfile D:\\programming\\GIt\\gitlab\\antivirus\\dockerer\\1\\docker_log.pml /Filter 'PID is $container_pid Include'
+# """
+#         process = await asyncio.create_subprocess_exec(
+#             "powershell", "-command", procmon_command,
+#             stdout=asyncio.subprocess.PIPE,
+#             stderr=asyncio.subprocess.PIPE
+#         )
+#         stdout, stderr = await process.communicate()
+#         await Logger.analysis_log("Procmon успешно запущен.", self.analysis_id)
 
-    async def stop_procmon(self):
-        try:
-            await Logger.analysis_log("Остановка Procmon...", self.analysis_id)
-            process = await asyncio.create_subprocess_exec(
-                "powershell", "-command", "procmon /Terminate",
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
-            stdout, stderr = await process.communicate()
-            await Logger.analysis_log("Procmon успешно остановлен.", self.analysis_id)
-            await self.export_procmon()
-        except Exception as e:
-            await Logger.analysis_log(f"Ошибка при остановке Procmon: {str(e)}", self.analysis_id)
+#     async def stop_procmon(self):
+#         try:
+#             await Logger.analysis_log("Остановка Procmon...", self.analysis_id)
+#             process = await asyncio.create_subprocess_exec(
+#                 "powershell", "-command", "procmon /Terminate",
+#                 stdout=asyncio.subprocess.PIPE,
+#                 stderr=asyncio.subprocess.PIPE
+#             )
+#             stdout, stderr = await process.communicate()
+#             await Logger.analysis_log("Procmon успешно остановлен.", self.analysis_id)
+#             await self.export_procmon()
+#         except Exception as e:
+#             await Logger.analysis_log(f"Ошибка при остановке Procmon: {str(e)}", self.analysis_id)
 
-    async def export_procmon(self):
-        await Logger.analysis_log("Экспорт логов Procmon...", self.analysis_id)
-        process = await asyncio.create_subprocess_exec(
-            "powershell", "-command", "procmon /OpenLog D:\\programming\\GIt\\gitlab\\antivirus\\dockerer\\1\\docker_log.pml /SaveAs D:\\programming\\GIt\\gitlab\\antivirus\\dockerer\\1\\docker_log.csv",
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE
-        )
-        stdout, stderr = await process.communicate()
-        await Logger.analysis_log("Логи Procmon успешно экспортированы.", self.analysis_id)
+#     async def export_procmon(self):
+#         await Logger.analysis_log("Экспорт логов Procmon...", self.analysis_id)
+#         process = await asyncio.create_subprocess_exec(
+#             "powershell", "-command", "procmon /OpenLog D:\\programming\\GIt\\gitlab\\antivirus\\dockerer\\1\\docker_log.pml /SaveAs D:\\programming\\GIt\\gitlab\\antivirus\\dockerer\\1\\docker_log.csv",
+#             stdout=asyncio.subprocess.PIPE,
+#             stderr=asyncio.subprocess.PIPE
+#         )
+#         stdout, stderr = await process.communicate()
+#         await Logger.analysis_log("Логи Procmon успешно экспортированы.", self.analysis_id)
 
 
     async def get_file_changes(self):
@@ -161,33 +163,28 @@ procmon /Backingfile D:\\programming\\GIt\\gitlab\\antivirus\\dockerer\\1\\docke
 
         try:
             await Logger.analysis_log("Запуск очистки логов файловой активности...", self.analysis_id)
-            print("11")
             loop = asyncio.get_event_loop()
-            print("1")
             base_dir = f"{docker}\\analysis\\{self.analysis_id}"
-            print("2")
             target_exe = self.filename
-            print("3")
             result = await loop.run_in_executor(None, run_cleaner, target_exe, base_dir)
-            print("4")
             await Logger.analysis_log("Очистка логов завершена. Созданы clean_tree.csv, clean_tree.json, threat_report.json.", self.analysis_id)
         except Exception as e:
             await Logger.analysis_log(f"Ошибка при очистке логов: {str(e)}", self.analysis_id)
             raise HTTPException(status_code=500, detail=str(e))
 
         if changes:
-            await Logger.analysis_log("🔍 Обнаружены изменения в файлах:\n", self.analysis_id)
-            changes_list = changes.splitlines()
-            changes_output = []
-            for change in changes_list:
-                change_type = change[0]
-                file_path = change[1:].strip()
-                if change_type == 'C':
-                    changes_output.append(f"Изменен: {file_path}")
-                elif change_type == 'A':
-                    changes_output.append(f"Добавлен: {file_path}")
-                elif change_type == 'D':
-                    changes_output.append(f"Удален: {file_path}")
+            # await Logger.analysis_log("🔍 Обнаружены изменения в файлах:\n", self.analysis_id)
+            # changes_list = changes.splitlines()
+            # changes_output = []
+            # for change in changes_list:
+            #     change_type = change[0]
+            #     file_path = change[1:].strip()
+            #     if change_type == 'C':
+            #         changes_output.append(f"Изменен: {file_path}")
+            #     elif change_type == 'A':
+            #         changes_output.append(f"Добавлен: {file_path}")
+            #     elif change_type == 'D':
+            #         changes_output.append(f"Удален: {file_path}")
             await self.lock.acquire()
             await Logger.save_file_activity(self.analysis_id, changes)
             await Logger.analysis_log("Анализ завершен успешно", self.analysis_id)
