@@ -113,44 +113,6 @@ CMD ["powershell", "-command", "Start-Process -FilePath 'C:\\\\sandbox\\\\{self.
             "message": "ETL данные успешно конвертированы"
         }))
 
-#     async def run_procmon(self):
-#         await Logger.analysis_log("Запуск Procmon...", self.analysis_id)
-#         procmon_command = f"""$container_pid = docker ps -q --filter 'ancestor=analysis_1'
-# procmon /Backingfile D:\\programming\\GIt\\gitlab\\antivirus\\dockerer\\1\\docker_log.pml /Filter 'PID is $container_pid Include'
-# """
-#         process = await asyncio.create_subprocess_exec(
-#             "powershell", "-command", procmon_command,
-#             stdout=asyncio.subprocess.PIPE,
-#             stderr=asyncio.subprocess.PIPE
-#         )
-#         stdout, stderr = await process.communicate()
-#         await Logger.analysis_log("Procmon успешно запущен.", self.analysis_id)
-
-#     async def stop_procmon(self):
-#         try:
-#             await Logger.analysis_log("Остановка Procmon...", self.analysis_id)
-#             process = await asyncio.create_subprocess_exec(
-#                 "powershell", "-command", "procmon /Terminate",
-#                 stdout=asyncio.subprocess.PIPE,
-#                 stderr=asyncio.subprocess.PIPE
-#             )
-#             stdout, stderr = await process.communicate()
-#             await Logger.analysis_log("Procmon успешно остановлен.", self.analysis_id)
-#             await self.export_procmon()
-#         except Exception as e:
-#             await Logger.analysis_log(f"Ошибка при остановке Procmon: {str(e)}", self.analysis_id)
-
-#     async def export_procmon(self):
-#         await Logger.analysis_log("Экспорт логов Procmon...", self.analysis_id)
-#         process = await asyncio.create_subprocess_exec(
-#             "powershell", "-command", "procmon /OpenLog D:\\programming\\GIt\\gitlab\\antivirus\\dockerer\\1\\docker_log.pml /SaveAs D:\\programming\\GIt\\gitlab\\antivirus\\dockerer\\1\\docker_log.csv",
-#             stdout=asyncio.subprocess.PIPE,
-#             stderr=asyncio.subprocess.PIPE
-#         )
-#         stdout, stderr = await process.communicate()
-#         await Logger.analysis_log("Логи Procmon успешно экспортированы.", self.analysis_id)
-
-
     async def get_file_changes(self):
         await Logger.analysis_log(f"📄 Отслеживание изменений файлов в контейнере Docker.", self.analysis_id)
         command = ["powershell", "-command", f"docker diff analysis_{self.analysis_id}"]
@@ -172,39 +134,14 @@ CMD ["powershell", "-command", "Start-Process -FilePath 'C:\\\\sandbox\\\\{self.
             await Logger.analysis_log(f"Ошибка при очистке логов: {str(e)}", self.analysis_id)
             raise HTTPException(status_code=500, detail=str(e))
 
-        if changes:
-            # await Logger.analysis_log("🔍 Обнаружены изменения в файлах:\n", self.analysis_id)
-            # changes_list = changes.splitlines()
-            # changes_output = []
-            # for change in changes_list:
-            #     change_type = change[0]
-            #     file_path = change[1:].strip()
-            #     if change_type == 'C':
-            #         changes_output.append(f"Изменен: {file_path}")
-            #     elif change_type == 'A':
-            #         changes_output.append(f"Добавлен: {file_path}")
-            #     elif change_type == 'D':
-            #         changes_output.append(f"Удален: {file_path}")
-            await self.lock.acquire()
-            await Logger.save_file_activity(self.analysis_id, changes)
-            await Logger.analysis_log("Анализ завершен успешно", self.analysis_id)
-            self.lock.release()
-            await manager.send_message(self.analysis_id, json.dumps({"status": "completed", "message": "🔍 Обнаружены изменения в файлах"}))
-            return changes_output
-        else:
-            await Logger.analysis_log("✅ Файлы не изменялись.", self.analysis_id)
-            await self.lock.acquire()
-            await Logger.save_file_activity(self.analysis_id, "Файлы не изменялись.")
-            await Logger.analysis_log("Анализ завершен успешно", self.analysis_id)
-            self.lock.release()
-            await manager.send_message(self.analysis_id, json.dumps({"status": "completed", "message": "✅ Файлы не изменялись"}))
-            return "Файлы не изменялись."
+        await Logger.save_file_activity(self.analysis_id, changes)
+        return changes
 
     async def analyze(self):
-        try:  
-            await self.lock.acquire()
-            await Logger.analysis_log("Анализ запущен", self.analysis_id)
-            self.lock.release()
+        status_to_send = None
+        try:
+            async with self.lock:
+                await Logger.analysis_log("Анализ запущен", self.analysis_id)
             
             self.update_dockerfile()
             await self.build_docker()
@@ -214,23 +151,28 @@ CMD ["powershell", "-command", "Start-Process -FilePath 'C:\\\\sandbox\\\\{self.
             
             await asyncio.gather(run_docker_task, run_etw_task)
 
-            await self.lock.acquire()
-            await Logger.update_analysis_status(self.analysis_id, "completed")
-            self.lock.release()
-            
+            status_to_send = "completed"
             return "Анализ завершен"
         except Exception as e:
             Logger.log(f"Ошибка при анализе: {str(e)}")
             try:
-                await self.lock.acquire()
-                await Logger.update_history_on_error(self.analysis_id, "Анализ завершен с ошибкой")
-                self.lock.release()
+                async with self.lock:
+                    await Logger.update_history_on_error(self.analysis_id, "Анализ завершен с ошибкой")
                 await self.stop_etw()
                 result = await self.get_file_changes()
+                status_to_send = "error"
                 return result
             except Exception as inner_e:
                 Logger.log(f"Внутренняя ошибка при обработке исключения: {str(inner_e)}")
-                await self.lock.acquire() 
-                await Logger.update_history_on_error(self.analysis_id, str(e))
-                self.lock.release()
+                async with self.lock:
+                    await Logger.update_history_on_error(self.analysis_id, str(e))
+                status_to_send = "error"
                 return f"Ошибка анализа: {str(e)}"
+        finally:
+            if status_to_send:
+                try:
+                    await manager.send_message(self.analysis_id, json.dumps({
+                        "status": status_to_send
+                    }))
+                except Exception as ws_err:
+                    Logger.log(f"Ошибка отправки статуса анализа по WebSocket: {str(ws_err)}")

@@ -865,7 +865,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         ws.onmessage = function(event) {
             const data = JSON.parse(event.data);
-            if (data.status === 'completed') {
+            if (data.status === 'completed' || data.status === 'error') {
                 location.reload();  
             }
         };
