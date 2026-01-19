@@ -99,13 +99,13 @@ def create_app() -> FastAPI:
                         user = await user_service.get_refresh_token(refresh_token=refresh_token)
                         if user is None:
                             response = RedirectResponse(url="/users/")
-                            response.delete_cookie(key="refresh_token")
-                            response.delete_cookie(key="access_token")
+                            response.delete_cookie(key="refresh_token", path="/")
+                            response.delete_cookie(key="access_token", path="/")
                             return response
                     except:
                         response = await call_next(request)
-                        response.delete_cookie(key="refresh_token")
-                        response.delete_cookie(key="access_token")
+                        response.delete_cookie(key="refresh_token", path="/")
+                        response.delete_cookie(key="access_token", path="/")
                         return response
 
                     try:
@@ -113,13 +113,13 @@ def create_app() -> FastAPI:
                         user_id = payload.get("sub")
                         if not user_id:
                             response = RedirectResponse(url="/users/")
-                            response.delete_cookie(key="refresh_token")
-                            response.delete_cookie(key="access_token")
+                            response.delete_cookie(key="refresh_token", path="/")
+                            response.delete_cookie(key="access_token", path="/")
                             return response
                     except JWTError:
                         response = RedirectResponse(url="/users/")
-                        response.delete_cookie(key="refresh_token")
-                        response.delete_cookie(key="access_token")
+                        response.delete_cookie(key="refresh_token", path="/")
+                        response.delete_cookie(key="access_token", path="/")
                         return response
 
                     needs_new_access = False
@@ -140,7 +140,8 @@ def create_app() -> FastAPI:
                             httponly=True,
                             samesite="Lax",
                             max_age=30*60,
-                            secure=True
+                            secure=(request.url.scheme == "https"),
+                            path="/",
                         )
                         return response
 
@@ -150,7 +151,7 @@ def create_app() -> FastAPI:
                 jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
             except JWTError:
                 response = RedirectResponse(url="/users/")
-                response.delete_cookie(key="access_token")
+                response.delete_cookie(key="access_token", path="/")
                 return response
 
             return await call_next(request)

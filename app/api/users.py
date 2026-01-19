@@ -6,7 +6,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.security import OAuth2PasswordBearer
 from app.services.user_service import UserService
-from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi import APIRouter, HTTPException, Depends, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 import uuid
 from app.auth.auth import send_email, create_access_token, create_refresh_token, generate_code, send_reset_password_email, uuid_by_token
@@ -48,8 +48,17 @@ async def register_user(request: Request, response: Response, user_data: UserReg
         user_id, confirm_code = await user_service.create_user(user_data.email, user_data.password)
         await send_email(email=user_data.email, verification_code=f"{confirm_code}")
         await AuditService(db).log(request=request, event_type="user.registered", user_id=str(user_id), metadata={"email": user_data.email})
-        response.set_cookie(key="user_id", value=str(user_id), httponly=True, max_age=30*60, samesite="Lax", secure=True)
-        return {"message": "Пользователь успешно зарегистрирован"}
+        resp = JSONResponse(status_code=200, content={"detail": "Пользователь успешно зарегистрирован"})
+        resp.set_cookie(
+            key="user_id",
+            value=str(user_id),
+            httponly=True,
+            max_age=30 * 60,
+            samesite="Lax",
+            secure=(request.url.scheme == "https"),
+            path="/",
+        )
+        return resp
     except Exception as e:
         return JSONResponse(
             status_code=500,
@@ -93,11 +102,28 @@ async def confirm_email(request: Request, response: Response, data: EmailConfirm
         refresh_token = create_refresh_token({"sub": str(user.id)})
         
         await userservice.update_refresh_token_by_user_id(user.id, refresh_token)
-        response.set_cookie(key="access_token", value=access_token, httponly=True, max_age=30*60, samesite="Lax", secure=True)
-        response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, max_age=7*24*60*60, samesite="Lax", secure=True)
+        resp = JSONResponse(status_code=200, content={"message": "Email confirmed"})
+        resp.set_cookie(
+            key="access_token",
+            value=access_token,
+            httponly=True,
+            max_age=30 * 60,
+            samesite="Lax",
+            secure=(request.url.scheme == "https"),
+            path="/",
+        )
+        resp.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,
+            max_age=7 * 24 * 60 * 60,
+            samesite="Lax",
+            secure=(request.url.scheme == "https"),
+            path="/",
+        )
         await userservice.__commit__()
         await AuditService(db).log(request=request, event_type="user.email_confirmed", user_id=str(user.id))
-        return {"message": "Email confirmed"}
+        return resp
     
     await AuditService(db).log(request=request, event_type="user.email_confirm_failed", user_id=str(data.user_id))
     raise HTTPException(status_code=400, detail="Invalid code")
@@ -167,11 +193,27 @@ async def login(request: Request, response: Response, user_data: UserLogin, db: 
         
         await user_service.update_refresh_token_by_user_id(user.id, refresh_token)
         
-        response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, max_age=30*60)
-        response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=True, max_age=7*24*60*60)
-        
         await AuditService(db).log(request=request, event_type="auth.login_success", user_id=str(user.id), metadata={"email": user_data.email})
-        return {"message": "Вход выполнен успешно"}
+        resp = JSONResponse(status_code=200, content={"message": "Вход выполнен успешно"})
+        resp.set_cookie(
+            key="access_token",
+            value=access_token,
+            httponly=True,
+            secure=(request.url.scheme == "https"),
+            max_age=30 * 60,
+            samesite="Lax",
+            path="/",
+        )
+        resp.set_cookie(
+            key="refresh_token",
+            value=refresh_token,
+            httponly=True,
+            secure=(request.url.scheme == "https"),
+            max_age=7 * 24 * 60 * 60,
+            samesite="Lax",
+            path="/",
+        )
+        return resp
     except Exception as e:
         await AuditService(db).log(request=request, event_type="error.app_exception", metadata={"route": "users.login", "error": str(e)})
         return JSONResponse(
@@ -194,17 +236,19 @@ async def logout(response: Response, request: Request, db: AsyncSession = Depend
         user = await user_service.get_refresh_token(refresh_token=refresh_token)
         
         if user is None:
-            return {"message": "Logout successful"}
+            resp = JSONResponse(content={"message": "Logout successful"})
+            resp.delete_cookie(key="access_token", path="/")
+            resp.delete_cookie(key="refresh_token", path="/")
+            return resp
             
         await user_service.update_refresh_token_by_user_id(user.id, None)
-        
-        if access_token:
-            response.delete_cookie(key="access_token", httponly=True)
-        response.delete_cookie(key="refresh_token", httponly=True)
+
+        resp = JSONResponse(content={"message": "Logout successful"})
+        resp.delete_cookie(key="access_token", path="/")
+        resp.delete_cookie(key="refresh_token", path="/")
+        return resp
     else:
         return RedirectResponse(url="/users/")
-        
-    return {"message": "Logout successful"}
 
 @router.post("/resend-code")
 async def reset_code_page(request: Request, db: AsyncSession = Depends(get_db)):
