@@ -20,11 +20,24 @@ Create Table IF NOT EXISTS Analysis(
     id SERIAL PRIMARY KEY,
     user_id uuid,
     filename TEXT,
+    file_hash VARCHAR(64),
+    pipeline_version VARCHAR(32),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status TEXT,
     analysis_id uuid UNIQUE,
     FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
 );
+
+Create Table IF NOT EXISTS Analysis_Subscribers(
+    id SERIAL PRIMARY KEY,
+    analysis_id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (analysis_id) REFERENCES Analysis(analysis_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE,
+    UNIQUE (analysis_id, user_id)
+);
+
 
 Create Table IF NOT EXISTS Results(
     analysis_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),

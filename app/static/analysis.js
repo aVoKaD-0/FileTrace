@@ -99,44 +99,56 @@ document.addEventListener('DOMContentLoaded', function() {
         progress.style.width = `${percent}%`;
     }
 
-    async function updateHistory() {
-        try {
-            const response = await fetch('/history');
-            if (!response.ok) {
-                throw new Error('Ошибка при получении истории');
-            }
-            const data = await response.json();
-            const historyContainer = document.querySelector('.history-container');
-            if (data.history && data.history.length) {
-                historyContainer.innerHTML = '';
-                data.history.forEach(item => {
-                    const historyItem = document.createElement('div');
-                    historyItem.classList.add('history-item');
-                    if (item.status === 'running') {
-                        historyItem.classList.add('running');
-                    }
-                    historyItem.setAttribute('data-analysis-id', item.analysis_id);
-                    historyItem.innerHTML = `
+    function renderHistoryItems(history) {
+        const historyContainer = document.querySelector('.history-container');
+        if (!historyContainer) return;
+
+        if (history && history.length) {
+            historyContainer.innerHTML = '';
+            history.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.classList.add('history-item');
+                if (item.status === 'running') {
+                    historyItem.classList.add('running');
+                }
+                historyItem.setAttribute('data-analysis-id', item.analysis_id);
+
+                const queueInfo = (item.status === 'queued' && item.active_position && item.active_total)
+                    ? `Очередь: ${item.active_position} из ${item.active_total} (ожидание ~${item.eta_minutes || 0} мин)`
+                    : '';
+
+                historyItem.innerHTML = `
                         <div class="history-item-header">
                             <span class="filename">${item.filename}</span>
                             <span class="timestamp">${item.timestamp}</span>
                         </div>
                         <div class="history-item-details">
                             <div class="status-indicator ${item.status}">${item.status}</div>
+                            <div class="queue-info">${queueInfo}</div>
                             <button class="btn btn-sm btn-outline-secondary view-results-btn">Просмотреть результаты</button>
                         </div>
                     `;
-                    historyContainer.appendChild(historyItem);
+                historyContainer.appendChild(historyItem);
+            });
+            document.querySelectorAll('.view-results-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    const analysisId = e.target.closest('.history-item').dataset.analysisId;
+                    window.location.href = '/analysis/analysis/' + analysisId;
                 });
-                document.querySelectorAll('.view-results-btn').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        const analysisId = e.target.closest('.history-item').dataset.analysisId;
-                        window.location.href = '/analysis/analysis/' + analysisId;
-                    });
-                });
-            } else {
-                historyContainer.innerHTML = '<p>История анализов пуста</p>';
+            });
+        } else {
+            historyContainer.innerHTML = '<p>История анализов пуста</p>';
+        }
+    }
+
+    async function updateHistory() {
+        try {
+            const response = await fetch('/analysis/history');
+            if (!response.ok) {
+                throw new Error('Ошибка при получении истории');
             }
+            const data = await response.json();
+            renderHistoryItems(data.history);
         } catch (error) {
             console.error('Ошибка обновления истории:', error);
         }
@@ -146,12 +158,96 @@ document.addEventListener('DOMContentLoaded', function() {
         refreshHistoryBtn.addEventListener('click', updateHistory);
     }
 
-    document.querySelectorAll('.view-results-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            const analysisId = e.target.closest('.history-item').dataset.analysisId;
-            window.location.href = '/analysis/analysis/' + analysisId;
-        });
-    });
+    function setupHistoryWebSocket() {
+        if (!document.querySelector('.history-container')) return;
+
+        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        const wsUrl = `${protocol}://${window.location.host}/analysis/ws-history`;
+        let socket;
+
+        function connect() {
+            socket = new WebSocket(wsUrl);
+            socket.onmessage = function(event) {
+                try {
+                    const payload = JSON.parse(event.data);
+                    if (payload && payload.event === 'history' && payload.history) {
+                        renderHistoryItems(payload.history);
+                        if (typeof window.analysisId !== 'undefined' && window.analysisId) {
+                            updateCurrentAnalysisQueue(payload.history, window.analysisId);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Ошибка обработки ws-history:', e);
+                }
+            };
+            socket.onclose = function() {
+                setTimeout(connect, 1000);
+            };
+        }
+
+        connect();
+    }
+
+    setupHistoryWebSocket();
+
+    function updateCurrentAnalysisQueue(history, analysisId) {
+        const el = document.getElementById('metaQueueInfo');
+        if (!el) return;
+
+        const item = (history || []).find(x => String(x.analysis_id) === String(analysisId));
+        if (!item) {
+            el.textContent = '';
+            return;
+        }
+
+        if (item.status === 'queued' && item.active_position && item.active_total) {
+            el.textContent = `Очередь: ${item.active_position} из ${item.active_total}. Примерное ожидание: ~${item.eta_minutes || 0} мин.`;
+        } else if (item.status === 'running' && item.active_position && item.active_total) {
+            el.textContent = `Выполняется: слот ${item.active_position} из ${item.active_total}.`;
+        } else {
+            el.textContent = '';
+        }
+    }
+
+    async function loadAnalysisMeta(analysisId) {
+        const card = document.getElementById('analysisMetaCard');
+        if (!card) return;
+
+        try {
+            const res = await fetch(`/analysis/meta/${analysisId}`);
+            if (!res.ok) return;
+            const data = await res.json();
+
+            const setText = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = (value !== undefined && value !== null && value !== '') ? String(value) : '—';
+            };
+
+            setText('metaFilename', data.filename);
+            setText('metaTimestamp', data.timestamp);
+            setText('metaSha256', data.sha256);
+            setText('metaPipeline', data.pipeline_version);
+            setText('metaDangerCount', Number.isFinite(Number(data.danger_count)) ? Number(data.danger_count) : 0);
+
+            let verdict = '—';
+            if (data.status === 'completed' || data.status === 'error') {
+                verdict = data.is_threat ? 'Угроза' : 'Не угроза';
+            } else if (data.status === 'running') {
+                verdict = 'Анализ выполняется';
+            } else if (data.status === 'queued') {
+                verdict = 'В очереди';
+            }
+            setText('metaVerdict', verdict);
+
+            card.style.display = 'block';
+        } catch (e) {
+            console.error('Ошибка загрузки метаданных анализа:', e);
+        }
+    }
+
+    if (typeof window.analysisId !== 'undefined' && window.analysisId) {
+        loadAnalysisMeta(window.analysisId);
+    }
 
     async function showResults(analysisId) {
         console.log("Показываем результаты анализа:", analysisId);
@@ -186,7 +282,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             console.log("Получены результаты:", data);
 
-            updateStatus(window.analysisStatus);
+            window.analysisStatus = data.status;
+            updateStatus(data.status);
     
             console.log("Обработка file_activity как строки");
             console.log(data.file_activity);
@@ -237,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (status === 'completed') {
             statusElement.style.color = 'var(--success-color)';
             statusSpinner.style.display = 'none';
-        } else if (status === 'running') {
+        } else if (status === 'running' || status === 'queued') {
             statusElement.style.color = 'var(--warning-color)';
             statusSpinner.style.display = 'inline-block';
         } else {
@@ -336,14 +433,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         try {
-            // Показываем индикатор загрузки только при первой загрузке
             if (initialLoad && loader) {
                 loader.style.display = 'block';
             }
 
             const response = await fetch(`/analysis/clean-tree/${analysisId}`);
 
-            // Для 404 показываем понятное сообщение "Данных нет.", без технической ошибки
             if (response.status === 404) {
                 cleanTreeLoaded = true;
                 cleanTreeRowCount = 0;
@@ -354,7 +449,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 cell.textContent = 'Данных нет.';
                 row.appendChild(cell);
                 tableBody.appendChild(row);
-                updateEtlLoadButtons(analysisId, cleanTreeRowCount, 0, 'Вердикт: данных для анализа нет.');
+                updateEtlLoadButtons(analysisId, 0, 0, 'Вердикт: данных для анализа нет.', 0);
                 return null;
             }
 
@@ -363,15 +458,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             const data = await response.json();
-            console.log('Получены данные clean_tree:', data);
 
             cleanTreeLoaded = true;
             const rows = Array.isArray(data.rows) ? data.rows : [];
             cleanTreeRowCount = rows.length;
 
-            let dangerCount = 0;
-            let benignOnly = true;
+            const totalRows = Number.isFinite(Number(data.total_rows)) ? Number(data.total_rows) : cleanTreeRowCount;
+            const dangerCountTotal = Number.isFinite(Number(data.danger_count)) ? Number(data.danger_count) : 0;
 
+            let benignOnly = true;
             tableBody.innerHTML = '';
 
             if (rows.length === 0) {
@@ -382,12 +477,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 row.appendChild(cell);
                 tableBody.appendChild(row);
             } else {
-                rows.forEach(row => {
+                rows.forEach(r => {
                     const tr = document.createElement('tr');
 
-                    if (row.threat_level || row.threat_msg) {
+                    if (r.threat_level || r.threat_msg) {
                         tr.classList.add('threat-row');
-                        const level = String(row.threat_level || '').toLowerCase();
+                        const level = String(r.threat_level || '').toLowerCase();
                         if (level.includes('critical')) {
                             tr.classList.add('threat-critical');
                         } else if (level.includes('high')) {
@@ -398,20 +493,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
 
                     let dangerText = '';
-                    if (row.threat_msg) {
-                        const parts = String(row.threat_msg).split(':');
+                    if (r.threat_msg) {
+                        const parts = String(r.threat_msg).split(':');
                         if (parts.length > 1) {
                             dangerText = parts.slice(1).join(':').trim();
                         } else {
-                            dangerText = row.threat_msg;
+                            dangerText = r.threat_msg;
                         }
-                    } else if (row.threat_level) {
-                        dangerText = row.threat_level;
+                    } else if (r.threat_level) {
+                        dangerText = r.threat_level;
                     }
 
-                    const isDanger = !!(row.threat_level || row.threat_msg);
+                    const isDanger = !!(r.threat_level || r.threat_msg);
                     if (isDanger) {
-                        dangerCount++;
                         const desc = dangerText || '';
                         const isBenign = desc.includes('Использование PowerShell') || desc.includes('Сетевая активность');
                         if (!isBenign) {
@@ -420,10 +514,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
 
                     const cells = [
-                        row.index,
-                        row.event,
-                        row.type,
-                        row.details,
+                        r.index,
+                        r.event,
+                        r.type,
+                        r.details,
                         dangerText
                     ];
 
@@ -439,26 +533,24 @@ document.addEventListener('DOMContentLoaded', function() {
                         tr.appendChild(td);
                     });
 
-                    if (row.threat_msg) {
-                        tr.title = row.threat_msg;
+                    if (r.threat_msg) {
+                        tr.title = r.threat_msg;
                     }
 
                     tableBody.appendChild(tr);
                 });
             }
 
-            let verdictText = '';
-            if (dangerCount === 0) {
-                verdictText = 'Вердикт: опасных действий не обнаружено.';
-            } else if (dangerCount > 1 && !benignOnly) {
-                verdictText = `Вердикт: программа может быть вирусом (обнаружено ${dangerCount} опасных действий).`;
+            let verdict = 'Вердикт: анализ завершён.';
+            if (dangerCountTotal === 0) {
+                verdict = benignOnly ? 'Вердикт: явных опасных действий не обнаружено.' : 'Вердикт: опасных действий не обнаружено (но есть подозрительные признаки).';
+            } else if (benignOnly) {
+                verdict = `Вердикт: найдено ${dangerCountTotal} подозрительных действий (в основном benign).`;
             } else {
-                verdictText = 'Вердикт: обнаружены подозрительные действия, но это не обязательно вирус. Запуск PowerShell и сетевая активность могут использоваться и обычными приложениями.';
+                verdict = `Вердикт: найдено ${dangerCountTotal} опасных действий.`;
             }
 
-            // Обновляем интерфейс (кнопки скачивания и информация о количестве строк)
-            updateEtlLoadButtons(analysisId, cleanTreeRowCount, dangerCount, verdictText);
-
+            updateEtlLoadButtons(analysisId, cleanTreeRowCount, dangerCountTotal, verdict, totalRows);
             return data;
         } catch (error) {
             console.error('Ошибка при загрузке clean_tree:', error);
@@ -467,16 +559,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const row = document.createElement('tr');
                 const cell = document.createElement('td');
                 cell.colSpan = 5;
-                if (error.message && error.message.includes('status: 404')) {
-                    cell.textContent = 'Данных нет.';
-                    updateEtlLoadButtons(analysisId, 0, 0, 'Вердикт: данных для анализа нет.');
-                } else {
-                    cell.textContent = `Ошибка при загрузке данных: ${error.message}`;
-                    updateEtlLoadButtons(analysisId, 0, 0, 'Вердикт: не удалось получить данные для анализа.');
-                }
+                cell.textContent = error.message && error.message.includes('status: 404')
+                    ? 'Данных нет.'
+                    : `Ошибка при загрузке данных: ${error.message}`;
                 row.appendChild(cell);
                 tableBody.appendChild(row);
             }
+            updateEtlLoadButtons(analysisId, 0, 0, 'Вердикт: не удалось получить данные для анализа.', 0);
             return null;
         } finally {
             if (loader) {
@@ -486,7 +575,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Функция для обновления кнопок загрузки ETL данных
-    function updateEtlLoadButtons(analysisId, rowCount, dangerCount, verdictText) {
+    function updateEtlLoadButtons(analysisId, rowCount, dangerCount, verdictText, totalRowCount) {
         const container = document.getElementById('etlOutput');
         let buttonArea = document.getElementById('etlButtonArea');
         
@@ -510,7 +599,10 @@ document.addEventListener('DOMContentLoaded', function() {
         remainingCount.id = 'etlRemainingCount';
         remainingCount.style.marginBottom = '10px';
         remainingCount.style.fontWeight = 'bold';
-        remainingCount.textContent = `Строк в таблице: ${rowCount}`;
+        const totalInfo = (Number.isFinite(Number(totalRowCount)) && Number(totalRowCount) > rowCount)
+            ? ` (показано ${rowCount} из ${totalRowCount})`
+            : '';
+        remainingCount.textContent = `Строк в таблице: ${rowCount}${totalInfo}`;
         buttonArea.appendChild(remainingCount);
 
         const dangerInfo = document.createElement('div');
@@ -544,39 +636,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         buttonsContainer.appendChild(downloadTraceCsvBtn);
 
-        // Кнопка скачивания полного trace.json
-        const downloadJsonBtn = document.createElement('button');
-        downloadJsonBtn.id = 'downloadJsonBtn';
-        downloadJsonBtn.textContent = 'Скачать trace.json';
-        downloadJsonBtn.className = 'btn btn-primary';
-        downloadJsonBtn.style.minWidth = '180px';
-        downloadJsonBtn.addEventListener('click', function() {
-            window.location.href = `/analysis/download-json/${analysisId}`;
-        });
-        buttonsContainer.appendChild(downloadJsonBtn);
-
-        // Кнопка скачивания очищенного clean_tree.csv
-        const downloadCleanCsvBtn = document.createElement('button');
-        downloadCleanCsvBtn.id = 'downloadCleanTreeCsvBtn';
-        downloadCleanCsvBtn.textContent = 'Скачать clean_tree.csv';
-        downloadCleanCsvBtn.className = 'btn btn-success';
-        downloadCleanCsvBtn.style.minWidth = '200px';
-        downloadCleanCsvBtn.addEventListener('click', function() {
-            window.location.href = `/analysis/download-clean-tree-csv/${analysisId}`;
-        });
-        buttonsContainer.appendChild(downloadCleanCsvBtn);
-
-        // Кнопка скачивания clean_tree.json
-        const downloadCleanJsonBtn = document.createElement('button');
-        downloadCleanJsonBtn.id = 'downloadCleanTreeJsonBtn';
-        downloadCleanJsonBtn.textContent = 'Скачать clean_tree.json';
-        downloadCleanJsonBtn.className = 'btn btn-outline-success';
-        downloadCleanJsonBtn.style.minWidth = '200px';
-        downloadCleanJsonBtn.addEventListener('click', function() {
-            window.location.href = `/analysis/download-clean-tree-json/${analysisId}`;
-        });
-        buttonsContainer.appendChild(downloadCleanJsonBtn);
-
         // Кнопка скачивания threat_report.json
         const downloadThreatReportBtn = document.createElement('button');
         downloadThreatReportBtn.id = 'downloadThreatReportBtn';
@@ -587,17 +646,6 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = `/analysis/download-threat-report/${analysisId}`;
         });
         buttonsContainer.appendChild(downloadThreatReportBtn);
-
-        // Кнопка скачивания оригинального ETL файла
-        const downloadEtlBtn = document.createElement('button');
-        downloadEtlBtn.id = 'downloadEtlBtn';
-        downloadEtlBtn.textContent = 'Скачать оригинальный ETL файл';
-        downloadEtlBtn.className = 'btn btn-info';
-        downloadEtlBtn.style.minWidth = '220px';
-        downloadEtlBtn.addEventListener('click', function() {
-            window.location.href = `/analysis/download-etl/${analysisId}?format=etl`;
-        });
-        buttonsContainer.appendChild(downloadEtlBtn);
     }
 
     // WebSocket для получения событий анализа (docker_log, etl_converted и т.п.)
@@ -623,8 +671,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (data.event === 'docker_log') {
                 if (dockerOutputContent) {
+                    const msg = String(data.message || '');
+
+                    const suppressedPrefixes = [
+                        'docker build stdout:',
+                        'docker build stderr:',
+                        'docker run stdout:',
+                        'docker run stderr:',
+                    ];
+
+                    const suppressedLoose = [
+                        'Step ',
+                        '--->',
+                        'Sending build context to Docker daemon',
+                        'Running in ',
+                        'Removed intermediate container ',
+                        'Successfully built ',
+                        'Successfully tagged ',
+                    ];
+
+                    const suppressedContains = [
+                        'Handles  NPM(K)',
+                        'ProcessName',
+                    ];
+
+                    const stripped = msg.trimStart();
+                    const isSuppressed = suppressedPrefixes.some(p => msg.startsWith(p)) ||
+                        suppressedLoose.some(p => stripped.startsWith(p)) ||
+                        suppressedContains.some(s => msg.includes(s));
+
+                    if (isSuppressed) {
+                        return;
+                    }
+
+                    let safe = msg;
+                    safe = safe.replace(/\boutput_dir\s*=\s*[^\s\)]+/ig, 'output_dir=<redacted>');
+                    safe = safe.replace(/\bbase_dir\s*=\s*[^\s\)]+/ig, 'base_dir=<redacted>');
+                    safe = safe.replace(/\b[A-Za-z]:\\[^\s"']+/g, '<redacted_path>');
+
                     const prefix = dockerOutputContent.textContent && !dockerOutputContent.textContent.endsWith('\n') ? '\n' : '';
-                    dockerOutputContent.textContent += prefix + data.message;
+                    dockerOutputContent.textContent += prefix + safe;
                 }
             } else if (data.event === 'etl_converted') {
                 const etlLoader = document.getElementById('etlOutputLoader');
@@ -638,7 +724,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     etlContent.textContent = `Ошибка при конвертации ETL: ${data.message || ''}`;
                 }
             } else if (data.status) {
+                const prevStatus = window.analysisStatus;
+                window.analysisStatus = data.status;
                 updateStatus(data.status);
+
+                if (prevStatus && prevStatus !== data.status) {
+                    const reloadKey = `ft_reloaded_${analysisId}_${data.status}`;
+                    if (!sessionStorage.getItem(reloadKey)) {
+                        sessionStorage.setItem(reloadKey, '1');
+                        window.location.reload();
+                    }
+                }
             }
         };
 
@@ -853,34 +949,13 @@ document.addEventListener('DOMContentLoaded', function() {
     //         const dockerLoader = document.getElementById('dockerOutputLoader');
     //         if (dockerLoader) dockerLoader.style.display = 'none';
     //     } catch (error) {
-    //         console.error("Ошибка при обновлении логов докера:", error);
+    //         console.error('Ошибка при обновлении логов Docker:', error);
     //     }
     // }
 
-
-    if (analysisId) {
-        const ws = new WebSocket(`ws://${window.location.host}/analysis/ws/${analysisId}`);
-        ws.onopen = function() {
-            console.log("WebSocket connection established");
-        };
-        ws.onmessage = function(event) {
-            const data = JSON.parse(event.data);
-            if (data.status === 'completed' || data.status === 'error') {
-                location.reload();  
-            }
-        };
-        ws.onclose = function() {
-            console.log("WebSocket connection closed");
-        };
-        ws.onerror = function(error) {
-            console.error("WebSocket Error:", error);
-        };
-    }
-
-    const profileLogoutBtn = document.getElementById('profileLogout');
-    if (profileLogoutBtn) {
-        profileLogoutBtn.addEventListener('click', function() {
-            console.log('Выход из аккаунта');
+    const logoutButton = document.getElementById('logoutButton');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', function() {
             fetch('/users/logout', {
                 method: 'POST',
                 credentials: 'include'

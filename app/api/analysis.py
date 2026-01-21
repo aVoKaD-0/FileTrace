@@ -8,21 +8,28 @@ import re
 from app.utils.logging import Logger
 from app.auth.auth import uuid_by_token
 from datetime import datetime, timezone
+import math
 from fastapi.staticfiles import StaticFiles
-from app.core.db import get_db
+from app.core.db import get_db, AsyncSessionLocal
+from app.core.settings import settings
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from app.utils.websocket_manager import manager
 from app.utils.sse_operations import subscribers
 from sse_starlette.sse import EventSourceResponse
 from app.services.user_service import UserService
+from app.services.hash_cache_service import HashCacheService
 from concurrent.futures import ThreadPoolExecutor
 from app.utils.file_operations import FileOperations
 from app.services.analysis_service import AnalysisService
 from app.services.audit_service import AuditService
 from app.repositories.analysis import docker
-from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse, FileResponse
+from app.celery_app import analyze_file_task
+from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse, FileResponse, Response
 from fastapi import APIRouter, UploadFile, File, Request, HTTPException, Depends, WebSocket, WebSocketDisconnect
+from app.models.analysis import Analysis
+from app.models.analysis_subscriber import AnalysisSubscriber
 
 router = APIRouter(prefix="/analysis", tags=["analysis"])
 
@@ -39,6 +46,75 @@ async def root(request: Request, db: AsyncSession = Depends(get_db)):
     return templates.TemplateResponse(
         "analisys.html",
         {"request": request, "history": history}
+    )
+
+
+@router.get("/history")
+async def history_endpoint(request: Request, db: AsyncSession = Depends(get_db)):
+    userservice = UserService(db)
+    user_id = uuid_by_token(request.cookies.get("refresh_token"))
+    rows = await userservice.get_user_analyses(user_id)
+
+    history = []
+    for row in rows:
+        ts = getattr(row, "timestamp", None) or row[0]
+        history.append(
+            {
+                "timestamp": ts.isoformat() if ts else None,
+                "filename": getattr(row, "filename", None) or row[1],
+                "status": getattr(row, "status", None) or row[2],
+                "analysis_id": str(getattr(row, "analysis_id", None) or row[3]),
+            }
+        )
+
+    return JSONResponse({"history": history})
+
+
+@router.get("/meta/{analysis_id}")
+async def analysis_meta(request: Request, analysis_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+    user_id = uuid_by_token(request.cookies.get("refresh_token"))
+
+    row = (
+        await db.execute(
+            select(Analysis)
+            .outerjoin(AnalysisSubscriber, AnalysisSubscriber.analysis_id == Analysis.analysis_id)
+            .where(
+                (Analysis.analysis_id == analysis_id)
+                & ((Analysis.user_id == user_id) | (AnalysisSubscriber.user_id == user_id))
+            )
+            .limit(1)
+        )
+    ).scalars().first()
+
+    if not row:
+        raise HTTPException(status_code=404, detail="analysis not found")
+
+    base_dir = f"{docker}\\analysis\\{analysis_id}"
+    threat_report_path = os.path.join(base_dir, "threat_report.json")
+
+    danger_count = 0
+    is_threat = False
+    if os.path.exists(threat_report_path):
+        try:
+            with open(threat_report_path, "r", encoding="utf-8") as f:
+                threats = json.load(f)
+                if isinstance(threats, list):
+                    danger_count = len(threats)
+                    is_threat = danger_count > 0
+        except Exception as e:
+            Logger.log(f"Ошибка при чтении threat_report.json meta: {str(e)}")
+
+    return JSONResponse(
+        {
+            "analysis_id": str(row.analysis_id),
+            "status": row.status,
+            "filename": row.filename,
+            "timestamp": row.timestamp.isoformat() if getattr(row, "timestamp", None) else None,
+            "sha256": row.file_hash,
+            "pipeline_version": row.pipeline_version,
+            "danger_count": danger_count,
+            "is_threat": is_threat,
+        }
     )
 
 @router.get("/analysis/{analysis_id}")
@@ -100,20 +176,80 @@ async def analyze_file(request: Request, file: UploadFile = File(...), db: Async
         userservice = UserService(db)
         refresh_token = request.cookies.get("refresh_token")
         uuid = uuid_by_token(refresh_token)
+
+        content = await file.read()
+        file_hash = await HashCacheService.calculate_hash(content)
+        pipeline_version = settings.PIPELINE_VERSION
+
+        cached = await userservice.find_latest_completed_by_hash(file_hash=file_hash, pipeline_version=pipeline_version)
+        if cached:
+            await userservice.subscribe_user_to_analysis(analysis_id=cached.analysis_id, user_id=uuid)
+            await AuditService(db).log(
+                request=request,
+                event_type="analysis.cache_hit",
+                user_id=str(uuid),
+                metadata={"filename": file.filename, "analysis_id": str(cached.analysis_id), "file_hash": file_hash, "pipeline_version": pipeline_version},
+            )
+            return JSONResponse({
+                "status": "completed",
+                "cached": True,
+                "analysis_id": str(cached.analysis_id),
+                "file_hash": file_hash,
+            })
+
+        active = await userservice.find_active_by_hash(file_hash=file_hash, pipeline_version=pipeline_version)
+        if active:
+            await userservice.subscribe_user_to_analysis(analysis_id=active.analysis_id, user_id=uuid)
+            await AuditService(db).log(
+                request=request,
+                event_type="analysis.joined_existing",
+                user_id=str(uuid),
+                metadata={"filename": file.filename, "analysis_id": str(active.analysis_id), "file_hash": file_hash, "pipeline_version": pipeline_version},
+            )
+            return JSONResponse({
+                "status": active.status,
+                "cached": False,
+                "joined": True,
+                "analysis_id": str(active.analysis_id),
+                "file_hash": file_hash,
+            })
+
         run_id = FileOperations.run_ID()
+
+        await file.seek(0)
+        FileOperations.store_file_by_hash(file=file, file_hash=file_hash, pipeline_version=pipeline_version)
+        await file.seek(0)
+
         upload_folder = FileOperations.user_upload(str(run_id))
         if not upload_folder:
             raise HTTPException(status_code=500, detail="Не удалось создать директорию для загрузки")
         FileOperations.user_file_upload(file=file, user_upload_folder=upload_folder)
-        await userservice.create_analysis(user_id=uuid, filename=file.filename, status="running", analysis_id=run_id)
+
+        await userservice.create_hash_analysis(
+            user_id=uuid,
+            filename=file.filename,
+            status="queued",
+            analysis_id=run_id,
+            file_hash=file_hash,
+            pipeline_version=pipeline_version,
+        )
+        await userservice.subscribe_user_to_analysis(analysis_id=run_id, user_id=uuid)
         await userservice.create_result(run_id)
-        await AuditService(db).log(request=request, event_type="analysis.started", user_id=str(uuid), metadata={"filename": file.filename, "analysis_id": str(run_id)})
-        analysis_service = AnalysisService(file.filename, str(run_id), str(uuid))
-        asyncio.create_task(analysis_service.analyze())
-        Logger.log(f"Файл загружен и анализ запущен. ID анализа: {run_id}")
+
+        await AuditService(db).log(
+            request=request,
+            event_type="analysis.queued",
+            user_id=str(uuid),
+            metadata={"filename": file.filename, "analysis_id": str(run_id), "file_hash": file_hash, "pipeline_version": pipeline_version},
+        )
+
+        task = analyze_file_task.delay(file.filename, str(run_id), str(uuid), file_hash, pipeline_version)
+        Logger.log(f"Файл загружен и анализ поставлен в очередь. ID анализа: {run_id}, task_id: {task.id}")
         return JSONResponse({
-            "status": "running",
-            "analysis_id": str(run_id)
+            "status": "queued",
+            "analysis_id": str(run_id),
+            "task_id": task.id,
+            "file_hash": file_hash,
         })
     except Exception as e:
         Logger.log(f"Ошибка при анализе файла: {str(e)}")
@@ -191,10 +327,115 @@ async def websocket_endpoint(websocket: WebSocket, analysis_id: str):
     await manager.connect(analysis_id, websocket)
     try:
         Logger.log(f"connect websocket {analysis_id}, {websocket.client.host}")
-        await websocket.receive_text() 
+        last_status = None
+        last_docker_len = 0
+        while True:
+            try:
+                async with AsyncSessionLocal() as db_ws:
+                    userservice = UserService(db_ws)
+                    result_data = await userservice.get_result_data(str(analysis_id))
+
+                status = (result_data or {}).get("status")
+                if status and status != last_status:
+                    last_status = status
+                    Logger.log(f"ws push status {analysis_id}: {status}")
+                    await websocket.send_text(json.dumps({"status": status}))
+
+                docker_output = (result_data or {}).get("docker_output") or ""
+                if docker_output and len(docker_output) > last_docker_len:
+                    delta = docker_output[last_docker_len:]
+                    last_docker_len = len(docker_output)
+                    await websocket.send_text(json.dumps({"event": "docker_log", "message": delta}))
+            except Exception as loop_err:
+                Logger.log(f"ws loop error {analysis_id}: {str(loop_err)}")
+
+            await asyncio.sleep(1)
     except WebSocketDisconnect:
         Logger.log(f"disconnect websocket {analysis_id}, {websocket.client.host}")
         manager.disconnect(analysis_id, websocket)
+    except Exception as e:
+        Logger.log(f"websocket error {analysis_id}: {str(e)}")
+        manager.disconnect(analysis_id, websocket)
+
+
+@router.websocket("/ws-history")
+async def websocket_history_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    try:
+        refresh_token = websocket.cookies.get("refresh_token")
+        if not refresh_token:
+            await websocket.close(code=1008)
+            return
+        user_id = uuid_by_token(refresh_token)
+
+        last_payload = None
+        while True:
+            try:
+                async with AsyncSessionLocal() as db_ws:
+                    # Full history for UI
+                    userservice = UserService(db_ws)
+                    rows = await userservice.get_user_analyses(user_id)
+
+                    history = []
+                    for row in rows:
+                        ts = getattr(row, "timestamp", None) or row[0]
+                        history.append(
+                            {
+                                "timestamp": ts.isoformat() if ts else None,
+                                "filename": getattr(row, "filename", None) or row[1],
+                                "status": getattr(row, "status", None) or row[2],
+                                "analysis_id": str(getattr(row, "analysis_id", None) or row[3]),
+                            }
+                        )
+
+                    # Queue position/ETA based on global active queue (running/queued)
+                    # so the user can see realistic waiting time even if other users have queued analyses.
+                    global_active_rows = (
+                        await db_ws.execute(
+                            select(Analysis.analysis_id, Analysis.status, Analysis.timestamp)
+                            .where(Analysis.status.in_(["queued", "running"]))
+                            .order_by(Analysis.timestamp.asc())
+                        )
+                    ).all()
+
+                    active_total = len(global_active_rows)
+                    max_conc = max(int(getattr(settings, "MAX_CONCURRENT_ANALYSES", 1) or 1), 1)
+
+                    positions = {}
+                    for idx, (aid, st, ts) in enumerate(global_active_rows):
+                        ahead = idx
+                        eta_minutes = int(3 * math.ceil(ahead / max_conc)) if ahead > 0 else 0
+                        positions[str(aid)] = {
+                            "active_position": idx + 1,
+                            "active_total": active_total,
+                            "ahead": ahead,
+                            "eta_minutes": eta_minutes,
+                        }
+
+                    # Only attach queue info to analyses visible in user's history
+                    for item in history:
+                        if item.get("status") in ("queued", "running"):
+                            q = positions.get(item["analysis_id"])
+                            if q:
+                                item.update(q)
+
+                payload = {"event": "history", "history": history}
+                payload_str = json.dumps(payload, ensure_ascii=False)
+                if payload_str != last_payload:
+                    last_payload = payload_str
+                    await websocket.send_text(payload_str)
+            except Exception as loop_err:
+                Logger.log(f"ws-history loop error: {str(loop_err)}")
+
+            await asyncio.sleep(1)
+    except WebSocketDisconnect:
+        return
+    except Exception as e:
+        Logger.log(f"ws-history error: {str(e)}")
+        try:
+            await websocket.close()
+        except Exception:
+            pass
 
 @router.get("/download-etl/{analysis_id}")
 async def download_etl(analysis_id: str, format: str = "etl", db: AsyncSession = Depends(get_db)):
@@ -422,7 +663,7 @@ async def convert_etl(analysis_id: str, db: AsyncSession = Depends(get_db)):
         )
 
 @router.get("/clean-tree/{analysis_id}")
-async def get_clean_tree(analysis_id: str, db: AsyncSession = Depends(get_db)):
+async def get_clean_tree(analysis_id: str, limit: int = 200, db: AsyncSession = Depends(get_db)):
     try:
         base_dir = f"{docker}\\analysis\\{analysis_id}"
         clean_csv_path = os.path.join(base_dir, "clean_tree.csv")
@@ -435,10 +676,13 @@ async def get_clean_tree(analysis_id: str, db: AsyncSession = Depends(get_db)):
             )
 
         threats_map = {}
+        danger_count_total = 0
         if os.path.exists(threat_report_path):
             try:
                 with open(threat_report_path, "r", encoding="utf-8") as f:
                     threats = json.load(f)
+                    if isinstance(threats, list):
+                        danger_count_total = len(threats)
                     for item in threats:
                         line_number = item.get("line_number")
                         if isinstance(line_number, int):
@@ -449,9 +693,14 @@ async def get_clean_tree(analysis_id: str, db: AsyncSession = Depends(get_db)):
         rows = []
         columns = ["time", "event", "type", "pid", "tid", "details", "threat_level", "threat_msg"]
 
+        total_rows = 0
+
         with open(clean_csv_path, "r", encoding="utf-8", errors="ignore") as f:
             reader = csv.DictReader(f)
             for idx, row in enumerate(reader, start=1):
+                total_rows = idx
+                if limit and len(rows) >= limit:
+                    continue
                 threat = threats_map.get(idx)
 
                 base_user_data = row.get("User Data", "")
@@ -498,12 +747,15 @@ async def get_clean_tree(analysis_id: str, db: AsyncSession = Depends(get_db)):
         await AuditService(db).log(
             request=None,
             event_type="analysis.clean_tree_viewed",
-            metadata={"analysis_id": analysis_id, "rows": len(rows)}
+            metadata={"analysis_id": analysis_id, "rows": len(rows), "total_rows": total_rows, "danger_count": danger_count_total, "limit": limit}
         )
 
         return JSONResponse({
             "columns": columns,
-            "rows": rows
+            "rows": rows,
+            "total_rows": total_rows,
+            "danger_count": danger_count_total,
+            "limit": limit,
         })
     except Exception as e:
         Logger.log(f"Ошибка при получении clean_tree: {str(e)}")
@@ -523,11 +775,49 @@ async def download_trace_csv(analysis_id: str, db: AsyncSession = Depends(get_db
                 content={"error": "trace.csv не найден"}
             )
 
+        userservice = UserService(db)
+        result_data = await userservice.get_result_data(str(analysis_id))
+        target_exe = (result_data or {}).get("filename")
+        target_exe_lower = (target_exe or "").lower()
+        target_exe_lower_no_ext = target_exe_lower[:-4] if target_exe_lower.endswith(".exe") else target_exe_lower
+
+        filtered_lines = []
+        with open(csv_file_path, 'r', encoding='utf-8', errors='ignore') as f:
+            header = f.readline()
+            if header:
+                filtered_lines.append(header)
+
+            found = False
+            for line in f:
+                if not found and target_exe_lower:
+                    l = line.lower()
+                    if (
+                        ("," + target_exe_lower + ",") in l or
+                        ("\\" + target_exe_lower) in l or
+                        ("\\" + target_exe_lower_no_ext + ".exe") in l or
+                        (" " + target_exe_lower) in l or
+                        (" " + target_exe_lower_no_ext) in l
+                    ):
+                        found = True
+
+                if found or not target_exe_lower:
+                    filtered_lines.append(line)
+
+        if target_exe_lower and len(filtered_lines) <= 1:
+            filtered_lines = None
+
         await AuditService(db).log(request=None, event_type="analysis.trace_csv_downloaded", metadata={"analysis_id": analysis_id})
-        return FileResponse(
-            path=str(csv_file_path),
-            filename=f"analysis_{analysis_id}_trace.csv",
-            media_type="text/csv"
+        if filtered_lines is None:
+            return FileResponse(
+                path=str(csv_file_path),
+                filename=f"analysis_{analysis_id}_trace.csv",
+                media_type="text/csv"
+            )
+
+        return Response(
+            content="".join(filtered_lines),
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename=analysis_{analysis_id}_trace.csv"},
         )
     except Exception as e:
         Logger.log(f"Ошибка при скачивании trace.csv: {str(e)}")

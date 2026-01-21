@@ -89,6 +89,11 @@
     color: #fff;
 }
 
+.status-indicator.queued {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
 .status-indicator.stopped {
     background-color: var(--error-color);
     color: #fff;
@@ -142,6 +147,13 @@
     justify-content: space-between;
     align-items: center;
     margin-top: 0.5rem;
+}
+
+.queue-info {
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-left: 0.75rem;
+    flex: 1;
 }
 
 .view-results-btn {

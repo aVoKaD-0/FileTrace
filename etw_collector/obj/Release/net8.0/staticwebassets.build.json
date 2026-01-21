@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "TgpJMvhaq3i7609cpbqsuDKjz1u/qHF+HdFB+SVb1AU=",
+  "Source": "EtwCollector",
+  "BasePath": "_content/EtwCollector",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

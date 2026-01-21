@@ -1,10 +1,13 @@
 import requests
 import json
+import re
 from loguru import logger
+
 from app.services.db_service import AnalysisDbService
 from app.utils.websocket_manager import manager
 
 class Logger:
+
     logger.add("app/logs/GlobalLog.log", level="INFO", rotation="10 GB")
 
     @staticmethod
@@ -15,6 +18,39 @@ class Logger:
     @staticmethod
     async def analysis_log(msg, analysis_id):
         try:
+            msg = str(msg)
+
+            suppressed_prefixes = (
+                "docker build stdout:",
+                "docker build stderr:",
+                "docker run stdout:",
+                "docker run stderr:",
+            )
+
+            suppressed_prefixes_loose = (
+                "Step ",
+                "--->",
+                "Sending build context to Docker daemon",
+                "Running in ",
+                "Removed intermediate container ",
+                "Successfully built ",
+                "Successfully tagged ",
+            )
+
+            suppressed_contains = (
+                "Handles  NPM(K)",
+                "ProcessName",
+            )
+
+            stripped = msg.lstrip()
+            if stripped.startswith(suppressed_prefixes_loose) or msg.startswith(suppressed_prefixes) or any(x in msg for x in suppressed_contains):
+                Logger.log(f"[suppressed user log] [{analysis_id}] {msg}")
+                return
+
+            msg = re.sub(r"\boutput_dir\s*=\s*[^\s\)]+", "output_dir=<redacted>", msg, flags=re.IGNORECASE)
+            msg = re.sub(r"\bbase_dir\s*=\s*[^\s\)]+", "base_dir=<redacted>", msg, flags=re.IGNORECASE)
+            msg = re.sub(r"\b[A-Za-z]:\\[^\s\"\']+", "<redacted_path>", msg)
+
             db = await AnalysisDbService().get_database()
             try:
                 result = await AnalysisDbService().get_result(analysis_id, db)
@@ -64,6 +100,21 @@ class Logger:
                 await db.close()
         except Exception as e:
             Logger.log(f"Ошибка в save_file_activity: {str(e)}")
+        return
+
+    @staticmethod
+    async def update_analysis_status(analysis_id, status: str):
+        try:
+            db = await AnalysisDbService().get_database()
+            try:
+                analysis = await AnalysisDbService().get_analysis(analysis_id, db)
+                if analysis:
+                    analysis.status = status
+                    await db.commit()
+            finally:
+                await db.close()
+        except Exception as e:
+            Logger.log(f"Ошибка в update_analysis_status: {str(e)}")
         return
 
     @staticmethod

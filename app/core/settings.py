@@ -30,6 +30,11 @@ class Settings:
     ENCRYPTION_KEY: Optional[str] = os.getenv("ENCRYPTION_KEY")
     HMAC_KEY: Optional[str] = os.getenv("HMAC_KEY")
 
+    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+    PIPELINE_VERSION: str = os.getenv("PIPELINE_VERSION", "v1")
+
+    MAX_CONCURRENT_ANALYSES: int = _get_int("MAX_CONCURRENT_ANALYSES", 1)
+
     DATABASE_URL: str = os.getenv("DATABASE_URL")
 
     MAIL_USERNAME: Optional[str] = os.getenv("MAIL_USERNAME")

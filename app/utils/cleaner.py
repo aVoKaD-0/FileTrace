@@ -12,6 +12,8 @@ CSV_OUTPUT = "clean_tree.csv"
 JSON_OUTPUT = "clean_tree.json" 
 REPORT_OUTPUT = "threat_report.json" 
 
+MAX_ROWS = 200
+
 def hex_to_int(val):
     try:
         clean_val = str(val).strip().replace('"', '').replace("'", "")
@@ -134,6 +136,9 @@ def main():
                             "msg": threat_msg
                         })
 
+                    if len(rows_to_keep) >= MAX_ROWS and not threat_msg and not (event_name == "Process" and (event_type == "Start" or row[6] == "1")):
+                        continue
+
                     rows_to_keep.append(row)
                     
                     if event_name == "Process" and (event_type == "Start" or row[6] == "1"):
@@ -147,7 +152,26 @@ def main():
         raise HTTPException(status_code=500, detail="trace.csv не найден")
 
     if not tracked_pids:
-        raise HTTPException(status_code=500, detail=f"Не найден запуск {TARGET_EXE}")
+        with open(CSV_OUTPUT, 'w', encoding='utf-8', newline='') as f:
+            writer = csv.writer(f)
+            if headers:
+                writer.writerow(headers)
+
+        with open(REPORT_OUTPUT, 'w', encoding='utf-8') as f:
+            json.dump([
+                {
+                    "line_number": 0,
+                    "event": "Process",
+                    "details": TARGET_EXE,
+                    "level": "INFO",
+                    "msg": f"Не найден запуск {TARGET_EXE}"
+                }
+            ], f, indent=4, ensure_ascii=False)
+
+        with open(JSON_OUTPUT, 'w', encoding='utf-8') as f:
+            json.dump([], f, indent=4, ensure_ascii=False)
+
+        return
     
     with open(CSV_OUTPUT, 'w', encoding='utf-8', newline='') as f:
         writer = csv.writer(f)
@@ -176,6 +200,9 @@ def main():
                     evt_data = event.get("User Data", "")
                     
                     if not is_garbage(evt_name, evt_type, evt_data):
+                        threat_msg = detect_threat(evt_name, evt_data)
+                        if len(json_kept) >= MAX_ROWS and not threat_msg and not (evt_name == "Process" and (evt_type == "Start" or str(event.get("Flags", "")) == "1")):
+                            continue
                         json_kept.append(event)
                         
             with open(JSON_OUTPUT, 'w', encoding='utf-8') as f:

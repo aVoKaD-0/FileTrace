@@ -10,6 +10,7 @@ from app.config.auth import SECRET_KEY, ALGORITHM
 from app.services.user_service import UserService
 from app.api.analysis import router as analysis_router
 from app.services.cleanup_service import CleanupService
+from app.services.etw_collector_singleton import etw_collector
 from app.core.db import AsyncSessionLocal
 from app.core.logging import setup_logging, set_request_id, clear_request_id
 from app.auth.auth import verify_token, create_access_token
@@ -48,6 +49,7 @@ def create_app() -> FastAPI:
 
     @app.on_event("startup")
     async def startup_event():
+        etw_collector.start_process()
         await cleanup_service.start()
 
     @app.exception_handler(404)
@@ -169,5 +171,6 @@ def create_app() -> FastAPI:
     @app.on_event("shutdown")
     async def shutdown_event():
         await cleanup_service.stop()
+        etw_collector.stop_process()
 
     return app

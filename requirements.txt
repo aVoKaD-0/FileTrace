@@ -19,3 +19,5 @@ apscheduler
 etl-parser
 cryptography
 python-dotenv
+celery
+redis
