@@ -3044,3 +3044,4 @@ Step 3/5 : COPY v2RayTun_Setup (1).exe .
 2026-01-21 20:14:02.611 | INFO     | app.utils.logging:log:15 - connect websocket 5529ce34-eb7b-43ef-ba37-51102e9bec01, 127.0.0.1
 2026-01-21 20:14:02.841 | INFO     | app.utils.logging:log:15 - ws push status 5529ce34-eb7b-43ef-ba37-51102e9bec01: completed
 2026-01-21 20:14:04.406 | INFO     | app.utils.logging:log:15 - ws loop error 5529ce34-eb7b-43ef-ba37-51102e9bec01: Cannot call "send" once a close message has been sent.
+2026-01-21 20:59:10.160 | INFO     | app.utils.logging:log:15 - ws-history loop error: 

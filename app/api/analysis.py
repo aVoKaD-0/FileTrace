@@ -44,7 +44,7 @@ async def root(request: Request, db: AsyncSession = Depends(get_db)):
 
     await AuditService(db).log(request=request, event_type="analysis.list_viewed", user_id=str(uuid_by_token(request.cookies.get("refresh_token"))))
     return templates.TemplateResponse(
-        "analisys.html",
+        "analysis.html",
         {"request": request, "history": history}
     )
 
@@ -155,7 +155,7 @@ async def get_analysis_page(request: Request, analysis_id: uuid.UUID, db: AsyncS
 
         await AuditService(db).log(request=request, event_type="analysis.viewed", user_id=str(uuid_by_token(request.cookies.get("refresh_token"))), metadata={"analysis_id": str(analysis_id)})
         return templates.TemplateResponse(
-            "analisys.html",
+            "analysis.html",
             {
                 "request": request,
                 "analysis_id": str(analysis_id),
