@@ -99,6 +99,70 @@ sealed class EtwCollectorService : IDisposable
         }
     }
 
+    private static string RunProcess(string fileName, string arguments)
+    {
+        var psi = new ProcessStartInfo
+        {
+            FileName = fileName,
+            Arguments = arguments,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+        };
+
+        using var proc = Process.Start(psi);
+        if (proc == null)
+            return "";
+
+        var stdout = proc.StandardOutput.ReadToEnd();
+        var stderr = proc.StandardError.ReadToEnd();
+        proc.WaitForExit(5000);
+
+        return string.Join("\n", new[] { stdout, stderr }.Where(s => !string.IsNullOrWhiteSpace(s)));
+    }
+
+    private static void CleanupStaleSessions()
+    {
+        try
+        {
+            var output = RunProcess("logman", "query -ets");
+            if (string.IsNullOrWhiteSpace(output))
+                return;
+
+            var prefixes = new[] { "FileTraceKernelCollector" };
+            var lines = output.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var raw in lines)
+            {
+                var line = raw.Trim();
+                if (line.Length == 0)
+                    continue;
+
+                var name = line.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+                if (string.IsNullOrWhiteSpace(name))
+                    continue;
+
+                if (!prefixes.Any(p => name.StartsWith(p, StringComparison.OrdinalIgnoreCase)))
+                    continue;
+
+                try
+                {
+                    RunProcess("logman", $"stop \"{name}\" -ets");
+                    Diag($"CleanupStaleSessions(): stopped {name}");
+                }
+                catch (Exception ex)
+                {
+                    Diag($"CleanupStaleSessions(): stop failed {name}: {ex.Message}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Diag($"CleanupStaleSessions(): failed: {ex.Message}");
+        }
+    }
+
     public void Start()
     {
         lock (_lock)
@@ -109,7 +173,11 @@ sealed class EtwCollectorService : IDisposable
             if (TraceEventSession.IsElevated() != true)
                 throw new InvalidOperationException("EtwCollector must be run as Administrator to enable kernel providers.");
 
-            var sessionName = $"FileTraceKernelCollector-{Environment.ProcessId}-{Guid.NewGuid():N}";
+            // Use a stable session name to avoid leaking multiple kernel sessions on crashes/restarts.
+            // Kernel sessions are a limited system resource; if we generate unique names each time,
+            // orphaned sessions can accumulate and prevent new sessions from starting.
+            var sessionName = "FileTraceKernelCollector";
+            CleanupStaleSessions();
             Diag($"Start(): creating TraceEventSession name={sessionName}");
             _session = new TraceEventSession(sessionName);
             _session.StopOnDispose = true;
@@ -131,6 +199,25 @@ sealed class EtwCollectorService : IDisposable
             catch (Exception ex)
             {
                 Diag($"Start(): EnableKernelProvider FAILED: {ex}");
+                if (ex is System.Runtime.InteropServices.COMException comEx && comEx.HResult == unchecked((int)0x800705AA))
+                {
+                    try
+                    {
+                        CleanupStaleSessions();
+                    }
+                    catch
+                    {
+                    }
+                }
+                try
+                {
+                    _session.Dispose();
+                }
+                catch
+                {
+                    // ignore
+                }
+                _session = null;
                 throw;
             }
 
