@@ -35,6 +35,18 @@ class Settings:
 
     MAX_CONCURRENT_ANALYSES: int = _get_int("MAX_CONCURRENT_ANALYSES", 1)
 
+    MAX_UPLOAD_BYTES: int = _get_int("MAX_UPLOAD_BYTES", 50 * 1024 * 1024)
+
+    VT_API_KEY: Optional[str] = os.getenv("VT_API_KEY")
+    YANDEX_SB_API_KEY: Optional[str] = os.getenv("YANDEX_SB_API_KEY")
+
+    URL_META_TIMEOUT_SECONDS: int = _get_int("URL_META_TIMEOUT_SECONDS", 10)
+    URL_DOWNLOAD_TIMEOUT_SECONDS: int = _get_int("URL_DOWNLOAD_TIMEOUT_SECONDS", 30)
+    URL_MAX_DOWNLOAD_BYTES: int = _get_int("URL_MAX_DOWNLOAD_BYTES", 50 * 1024 * 1024)
+    URL_MAX_REDIRECTS: int = _get_int("URL_MAX_REDIRECTS", 5)
+
+    URL_RATE_LIMIT_PER_MINUTE: int = _get_int("URL_RATE_LIMIT_PER_MINUTE", 1)
+
     DATABASE_URL: str = os.getenv("DATABASE_URL")
 
     MAIL_USERNAME: Optional[str] = os.getenv("MAIL_USERNAME")

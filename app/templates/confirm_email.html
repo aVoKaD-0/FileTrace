@@ -181,9 +181,6 @@
         const resendElement = document.getElementById('resendCode');
         const userId = "{{ user_id or '' }}";
         
-        // Email приходит маскированным с сервера (без PII в куках)
-        // phoneInfo уже заполнен через шаблон
-        
         inputs.forEach((input, index) => {
             input.addEventListener("input", () => {
                 input.value = input.value.replace(/\D/g, "");
@@ -228,7 +225,7 @@
             codeInputsContainer.classList.add('shake');
             inputs.forEach(input => input.value = '');
             inputs[0].focus();
-            submitButton.disabled = true; // Деактивируем кнопку "Подтвердить"
+            submitButton.disabled = true; 
             
             errorProgress.style.animation = 'none';
             errorProgress.offsetHeight;
@@ -342,7 +339,6 @@
             });
         }
 
-        // Запускаем проверку таймера при загрузке страницы
         initializeTimer();
     </script>
 </body>

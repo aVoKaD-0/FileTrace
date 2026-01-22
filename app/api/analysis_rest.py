@@ -99,7 +99,25 @@ async def analyze_file(request: Request, file: UploadFile = File(...), db: Async
         refresh_token = request.cookies.get("refresh_token")
         uuid_user = uuid_by_token(refresh_token)
 
+        if not uuid_user:
+            raise HTTPException(status_code=401, detail="unauthorized")
+
         content = await file.read()
+
+        max_upload = int(getattr(settings, "MAX_UPLOAD_BYTES", 50 * 1024 * 1024) or 50 * 1024 * 1024)
+        if max_upload > 0 and len(content) > max_upload:
+            raise HTTPException(status_code=413, detail="Файл слишком большой")
+
+        filename = getattr(file, "filename", None) or ""
+        if not filename:
+            raise HTTPException(status_code=400, detail="Не удалось определить имя файла")
+
+        if not filename.lower().endswith(".exe"):
+            raise HTTPException(status_code=400, detail="Разрешены только .exe файлы")
+
+        if len(content) < 2 or content[:2] != b"MZ":
+            raise HTTPException(status_code=400, detail="Файл не похож на Windows PE (.exe)")
+
         file_hash = await HashCacheService.calculate_hash(content)
         pipeline_version = settings.PIPELINE_VERSION
 

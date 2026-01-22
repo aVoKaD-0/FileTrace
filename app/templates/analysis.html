@@ -69,6 +69,36 @@
             <div id="progressBar" class="progress mt-3" style="display: none;">
                 <div id="progress" class="progress-bar" role="progressbar" style="width: 0%"></div>
             </div>
+
+            <div class="mt-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-12">
+                                <label for="urlInput" class="form-label mb-1"><strong>Ссылка на файл</strong></label>
+                                <input id="urlInput" type="url" class="form-control" placeholder="https://example.com/file.exe">
+                                <div class="form-text">Поддерживаются только .exe. Ограничение по размеру применяется до скачивания.</div>
+                            </div>
+                            <div class="col-12 d-flex gap-2">
+                                <button id="urlCheckBtn" class="btn btn-outline-primary" type="button">Проверить</button>
+                                <button id="urlDownloadBtn" class="btn btn-primary" type="button" disabled>Скачать</button>
+                            </div>
+                        </div>
+                        <div id="urlMetaCard" class="card mt-3" style="display: none;">
+                            <div class="card-body">
+                                <div class="row g-2">
+                                    <div class="col-12"><strong>Итоговая ссылка:</strong> <span id="urlFinal">—</span></div>
+                                    <div class="col-md-6"><strong>Тип:</strong> <span id="urlContentType">—</span></div>
+                                    <div class="col-md-6"><strong>Размер:</strong> <span id="urlContentLength">—</span></div>
+                                    <div class="col-md-6"><strong>Last-Modified:</strong> <span id="urlLastModified">—</span></div>
+                                    <div class="col-md-6"><strong>Вердикт:</strong> <span id="urlVerdict">—</span></div>
+                                    <div class="col-12"><span id="urlHints" class="text-muted"></span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Секция результатов -->
@@ -212,6 +242,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.7.0/lib/highlight.min.js"></script>
     <script src="/static/analysis_upload.js?v=1.0"></script>
+    <script src="/static/analysis_url.js?v=1.0"></script>
     <script src="/static/analysis_history.js?v=1.0"></script>
     <script src="/static/analysis_meta.js?v=1.0"></script>
     <script src="/static/analysis_results.js?v=1.0"></script>

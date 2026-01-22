@@ -106,7 +106,7 @@ sealed class EtwCollectorService : IDisposable
         }
         catch
         {
-            // ignore
+            
         }
     }
 
@@ -184,9 +184,6 @@ sealed class EtwCollectorService : IDisposable
             if (TraceEventSession.IsElevated() != true)
                 throw new InvalidOperationException("EtwCollector must be run as Administrator to enable kernel providers.");
 
-            // Use a stable session name to avoid leaking multiple kernel sessions on crashes/restarts.
-            // Kernel sessions are a limited system resource; if we generate unique names each time,
-            // orphaned sessions can accumulate and prevent new sessions from starting.
             var sessionName = "FileTraceKernelCollector";
             CleanupStaleSessions();
             Diag($"Start(): creating TraceEventSession name={sessionName}");
@@ -226,7 +223,7 @@ sealed class EtwCollectorService : IDisposable
                 }
                 catch
                 {
-                    // ignore
+
                 }
                 _session = null;
                 throw;
@@ -264,7 +261,7 @@ sealed class EtwCollectorService : IDisposable
                 }
                 catch
                 {
-                    // ignore
+
                 }
                 _session = null;
                 Start();
@@ -282,7 +279,6 @@ sealed class EtwCollectorService : IDisposable
         if (!_captures.TryAdd(analysisId, capture))
             throw new InvalidOperationException($"Capture already exists for analysis_id={analysisId}");
 
-        // Marker row: helps to distinguish "capture started but no kernel events" vs "capture not started".
         capture.WriteMarker("Capture", "Start");
     }
 
@@ -424,7 +420,7 @@ sealed class EtwCollectorService : IDisposable
         }
         catch
         {
-            // ignore
+
         }
     }
 
@@ -563,8 +559,6 @@ sealed class Capture : IDisposable
                 return;
             }
 
-            // Discovery mode: until the target is detected, log all Process Start events.
-            // This prevents empty trace.csv when the container starts with a different image/process name.
             if (!_targetFound)
             {
                 WriteEvent(
@@ -605,7 +599,7 @@ sealed class Capture : IDisposable
         }
         catch
         {
-            // ignore
+
         }
     }
 
@@ -733,7 +727,7 @@ sealed class Capture : IDisposable
         }
         catch
         {
-            // ignore
+
         }
     }
 

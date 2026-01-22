@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "FileTrace",
+  "version": "0.1.0",
+  "action": {
+    "default_title": "FileTrace",
+    "default_popup": "popup.html"
+  },
+  "permissions": ["activeTab", "tabs", "storage", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  }
+}

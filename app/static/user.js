@@ -6,7 +6,6 @@ document.querySelector('#registerForm form').addEventListener('submit', async fu
 
     document.getElementById('loadingIcon').style.display = 'block';
     
-    // Скрываем предыдущие сообщения об ошибках CAPTCHA
     document.getElementById('registerCaptchaError').style.display = 'none';
 
     try {
@@ -37,7 +36,6 @@ document.querySelector('#registerForm form').addEventListener('submit', async fu
             return;
         }
 
-        // Добавляем данные CAPTCHA
         data.captcha_id = document.getElementById('registerCaptchaId').value;
         data.captcha_text = captchaText;
 
@@ -57,29 +55,24 @@ document.querySelector('#registerForm form').addEventListener('submit', async fu
             message.style.color = 'green';
             clearAfterDelay(message);
             this.reset();
-            refreshCaptcha('register'); // Обновляем капчу после успешной регистрации
+            refreshCaptcha('register'); 
             window.location.href = '/users/confirm-email';
         } else {
             console.log('Ошибка при регистрации:', responseData);
             
-            // Проверяем, связана ли ошибка с CAPTCHA
             if (responseData.detail && responseData.detail.includes('Неверный код с картинки')) {
-                // Показываем ошибку CAPTCHA прямо под полем
                 const captchaError = document.getElementById('registerCaptchaError');
                 captchaError.style.display = 'block';
                 clearAfterDelay(captchaError, 15000, true);
                 
-                // Очищаем поле ввода CAPTCHA
                 document.getElementById('captchaText').value = '';
                 
-                // Обновляем изображение CAPTCHA
                 refreshCaptcha('register');
             } else {
-                // Обычная ошибка - показываем общее сообщение
                 message.textContent = responseData.detail || 'Ошибка при регистрации';
                 message.style.color = 'red';
                 clearAfterDelay(message);
-                refreshCaptcha('register'); // Обновляем капчу после ошибки
+                refreshCaptcha('register'); 
             }
         }
     } catch (error) {
@@ -88,7 +81,7 @@ document.querySelector('#registerForm form').addEventListener('submit', async fu
         message.textContent = 'Произошла ошибка при отправке данных';
         message.style.color = 'red';
         clearAfterDelay(message);
-        refreshCaptcha('register'); // Обновляем капчу после ошибки
+        refreshCaptcha('register');
     } finally {
         document.getElementById('loadingIcon').style.display = 'none';
     }
@@ -108,14 +101,11 @@ document.querySelector('#loginForm form').addEventListener('submit', async funct
 
     document.getElementById('loadingIcon').style.display = 'block';
     
-    // Скрываем предыдущие сообщения об ошибках CAPTCHA
     document.getElementById('loginCaptchaError').style.display = 'none';
 
     try {
-        // Проверяем, показывается ли CAPTCHA для входа
         const loginCaptchaContainer = document.getElementById('loginCaptchaContainer');
         if (loginCaptchaContainer.style.display !== 'none') {
-            // Если CAPTCHA показывается, добавляем её данные в запрос
             data.captcha_id = document.getElementById('loginCaptchaId').value;
             data.captcha_text = document.getElementById('loginCaptchaText').value;
         }
@@ -133,28 +123,19 @@ document.querySelector('#loginForm form').addEventListener('submit', async funct
         } else {
             const error = await response.json();
             
-            // Если требуется CAPTCHA для следующей попытки
             if (error.require_captcha) {
-                // Показываем блок CAPTCHA
                 loginCaptchaContainer.style.display = 'block';
-                // Загружаем новую CAPTCHA
                 refreshCaptcha('login');
             }
             
-            // Проверяем, связана ли ошибка с CAPTCHA
             if (error.detail && error.detail.includes('Неверный код с картинки')) {
-                // Показываем ошибку CAPTCHA прямо под полем
                 const captchaError = document.getElementById('loginCaptchaError');
                 captchaError.style.display = 'block';
                 clearAfterDelay(captchaError, 15000, true);
                 
-                // Очищаем поле ввода CAPTCHA
                 document.getElementById('loginCaptchaText').value = '';
-                
-                // Обновляем изображение CAPTCHA
                 refreshCaptcha('login');
             } else if (loginMessage) {
-                // Обычная ошибка - показываем под формой
                 loginMessage.textContent = error.detail || 'Ошибка при входе. Попробуйте снова.';
                 loginMessage.style.color = 'red';
                 clearAfterDelay(loginMessage);
@@ -197,10 +178,10 @@ function togglePassword(fieldId, button) {
     const field = document.getElementById(fieldId);
     if (field.type === "password") {
         field.type = "text";
-        button.textContent = "🙈"; // Изменяем иконку на закрытый глаз
+        button.textContent = "🙈";
     } else {
         field.type = "password";
-        button.textContent = "👁"; // Изменяем иконку на открытый глаз
+        button.textContent = "👁";
     }
 }
 
@@ -220,7 +201,6 @@ function clearAfterDelay(element, delay = 15000, hideElement = false) {
     }, delay);
 }
 
-// Функция для получения и отображения новой CAPTCHA
 async function refreshCaptcha(formType) {
     try {
         const response = await fetch('/users/captcha');
@@ -242,12 +222,9 @@ async function refreshCaptcha(formType) {
     }
 }
 
-// Загрузка CAPTCHA при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
-    // Загружаем CAPTCHA для формы регистрации
     refreshCaptcha('register');
     
-    // Изменяем обработчики вкладок, чтобы загружать CAPTCHA при переключении
     document.getElementById('registerTab').addEventListener('click', function() {
         document.getElementById('registerForm').style.display = 'block';
         document.getElementById('loginForm').style.display = 'none';
@@ -259,7 +236,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('registerForm').style.display = 'none';
         document.getElementById('loginForm').style.display = 'block';
         changeTitle('Вход');
-        // Загружаем CAPTCHA для формы входа только если она видима
         if (document.getElementById('loginCaptchaContainer').style.display !== 'none') {
             refreshCaptcha('login');
         }

@@ -7,6 +7,16 @@ document.addEventListener('DOMContentLoaded', function() {
         analysisId,
         dropZone: document.getElementById('dropZone'),
         fileInput: document.getElementById('fileInput'),
+        urlInput: document.getElementById('urlInput'),
+        urlCheckBtn: document.getElementById('urlCheckBtn'),
+        urlDownloadBtn: document.getElementById('urlDownloadBtn'),
+        urlMetaCard: document.getElementById('urlMetaCard'),
+        urlFinalEl: document.getElementById('urlFinal'),
+        urlContentTypeEl: document.getElementById('urlContentType'),
+        urlContentLengthEl: document.getElementById('urlContentLength'),
+        urlLastModifiedEl: document.getElementById('urlLastModified'),
+        urlVerdictEl: document.getElementById('urlVerdict'),
+        urlHintsEl: document.getElementById('urlHints'),
         progressBar: document.getElementById('progressBar'),
         progress: document.getElementById('progress'),
         resultsSection: document.getElementById('resultsSection'),
@@ -29,6 +39,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (typeof window.ftAnalysisInitUpload === 'function') {
         window.ftAnalysisInitUpload(ctx);
+    }
+    if (typeof window.ftAnalysisInitUrl === 'function') {
+        window.ftAnalysisInitUrl(ctx);
     }
     if (typeof window.ftAnalysisInitHistory === 'function') {
         window.ftAnalysisInitHistory(ctx);
