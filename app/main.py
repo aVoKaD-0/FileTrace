@@ -3,7 +3,6 @@ from fastapi import Request
 from fastapi import FastAPI, Depends
 from jose.exceptions import JWTError
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from app.api.main import router as main_router
 from app.api.users import router as user_router
 from app.config.auth import SECRET_KEY, ALGORITHM
@@ -24,7 +23,6 @@ def create_app() -> FastAPI:
 
     app.mount("/static", StaticFiles(directory="app/static"), name="static")
     app.mount("/media", StaticFiles(directory="media"), name="media")
-    templates = Jinja2Templates(directory="app/templates")
 
     cleanup_service = CleanupService()
 
@@ -54,15 +52,11 @@ def create_app() -> FastAPI:
 
     @app.exception_handler(404)
     async def not_found_handler(request: Request, exc):
-        return RedirectResponse(url="/main")
-
-    @app.get("/main", response_class=HTMLResponse)
-    async def root(request: Request):
-        return templates.TemplateResponse("main.html", {"request": request})
+        return RedirectResponse(url="/main/")
     
     @app.get("/", response_class=HTMLResponse)
     async def old_root(request: Request):
-        return RedirectResponse(url="/main")
+        return RedirectResponse(url="/main/")
     
     @app.get("/protected-route")
     async def protected_route(username: str = Depends(verify_token)):

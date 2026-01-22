@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("EtwCollector")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8f0ddc672f7eea7ebe339b1b24e677715cc28219")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a8a07c976c0685aa102f853e13d124b296dffb73")]
 [assembly: System.Reflection.AssemblyProductAttribute("EtwCollector")]
 [assembly: System.Reflection.AssemblyTitleAttribute("EtwCollector")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

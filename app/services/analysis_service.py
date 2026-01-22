@@ -24,10 +24,10 @@ class AnalysisService:
     def update_dockerfile(self):
         file = self.filename[:-4]
         dockerfile_content = f"""FROM mcr.microsoft.com/windows/servercore:ltsc2022
-WORKDIR C:\\sandbox
+WORKDIR C:/sandbox
 COPY ["{self.filename}", "."]
 RUN powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force"
-CMD ["powershell", "-command", "Start-Process -FilePath 'C:\\sandbox\\{self.filename}' -NoNewWindow -PassThru; Start-Sleep -Seconds 180"]
+CMD ["powershell", "-command", "Start-Process -FilePath 'C:/sandbox/{self.filename}' -NoNewWindow -PassThru; Start-Sleep -Seconds 180"]
 """
         
         if not os.path.exists(f"{docker}\\analysis\\{self.analysis_id}"):

@@ -1,8 +1,10 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
@@ -20,7 +22,7 @@ var app = builder.Build();
 var collector = new EtwCollectorService();
 collector.Start();
 
-app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
+app.MapGet("/health", () => Results.Ok(new { status = "ok", diag = collector.GetDiag() }));
 
 app.MapPost("/start", (StartRequest req) =>
 {
@@ -76,6 +78,15 @@ sealed class EtwCollectorService : IDisposable
 {
     private readonly object _lock = new();
     private readonly ConcurrentDictionary<string, Capture> _captures = new();
+
+    private long _procStartEvents;
+    private long _fileIoEvents;
+    private long _imageLoadEvents;
+    private long _tcpEvents;
+    private DateTime _lastEventUtc;
+
+    private DateTime _loopStartedUtc;
+    private string? _lastLoopError;
 
     private TraceEventSession? _session;
     private Task? _processingTask;
@@ -225,21 +236,54 @@ sealed class EtwCollectorService : IDisposable
             _processingTask.ContinueWith(t =>
             {
                 if (t.IsFaulted)
+                {
+                    _lastLoopError = t.Exception?.ToString();
                     Diag($"ProcessLoop crashed: {t.Exception}");
+                }
                 else
                     Diag("ProcessLoop completed");
             });
         }
     }
 
+    private void EnsureRunning()
+    {
+        lock (_lock)
+        {
+            if (_session == null)
+            {
+                Start();
+                return;
+            }
+
+            if (_processingTask == null || _processingTask.IsCompleted || _processingTask.IsFaulted || _processingTask.IsCanceled)
+            {
+                try
+                {
+                    _session.Dispose();
+                }
+                catch
+                {
+                    // ignore
+                }
+                _session = null;
+                Start();
+            }
+        }
+    }
+
     public void StartCapture(string analysisId, string outputDir, string targetExe)
     {
+        EnsureRunning();
         Directory.CreateDirectory(outputDir);
 
         var capture = new Capture(analysisId, outputDir, targetExe);
 
         if (!_captures.TryAdd(analysisId, capture))
             throw new InvalidOperationException($"Capture already exists for analysis_id={analysisId}");
+
+        // Marker row: helps to distinguish "capture started but no kernel events" vs "capture not started".
+        capture.WriteMarker("Capture", "Start");
     }
 
     public void StopCapture(string analysisId)
@@ -271,60 +315,80 @@ sealed class EtwCollectorService : IDisposable
         try
         {
             Diag("ProcessLoop: started");
+            _loopStartedUtc = DateTime.UtcNow;
+            _lastLoopError = null;
 
             var source = session.Source;
             var kernel = source.Kernel;
 
         kernel.ProcessStart += data =>
         {
+            Interlocked.Increment(ref _procStartEvents);
+            _lastEventUtc = DateTime.UtcNow;
             foreach (var cap in _captures.Values)
                 cap.OnProcessStart(data);
         };
 
         kernel.FileIORead += data =>
         {
+            Interlocked.Increment(ref _fileIoEvents);
+            _lastEventUtc = DateTime.UtcNow;
             foreach (var cap in _captures.Values)
                 cap.OnFileIo("Read", data);
         };
 
         kernel.FileIOWrite += data =>
         {
+            Interlocked.Increment(ref _fileIoEvents);
+            _lastEventUtc = DateTime.UtcNow;
             foreach (var cap in _captures.Values)
                 cap.OnFileIo("Write", data);
         };
 
         kernel.FileIOCreate += data =>
         {
+            Interlocked.Increment(ref _fileIoEvents);
+            _lastEventUtc = DateTime.UtcNow;
             foreach (var cap in _captures.Values)
                 cap.OnFileIo("Create", data);
         };
 
         kernel.FileIODelete += data =>
         {
+            Interlocked.Increment(ref _fileIoEvents);
+            _lastEventUtc = DateTime.UtcNow;
             foreach (var cap in _captures.Values)
                 cap.OnFileIo("Delete", data);
         };
 
         kernel.ImageLoad += data =>
         {
+            Interlocked.Increment(ref _imageLoadEvents);
+            _lastEventUtc = DateTime.UtcNow;
             foreach (var cap in _captures.Values)
                 cap.OnImageLoad(data);
         };
 
         kernel.TcpIpConnect += data =>
         {
+            Interlocked.Increment(ref _tcpEvents);
+            _lastEventUtc = DateTime.UtcNow;
             foreach (var cap in _captures.Values)
                 cap.OnTcp("Connect", data);
         };
 
         kernel.TcpIpSend += data =>
         {
+            Interlocked.Increment(ref _tcpEvents);
+            _lastEventUtc = DateTime.UtcNow;
             foreach (var cap in _captures.Values)
                 cap.OnTcp("Send", data);
         };
 
         kernel.TcpIpRecv += data =>
         {
+            Interlocked.Increment(ref _tcpEvents);
+            _lastEventUtc = DateTime.UtcNow;
             foreach (var cap in _captures.Values)
                 cap.OnTcp("Recv", data);
         };
@@ -334,6 +398,7 @@ sealed class EtwCollectorService : IDisposable
         }
         catch (Exception ex)
         {
+            _lastLoopError = ex.ToString();
             Diag($"ProcessLoop exception: {ex}");
             throw;
         }
@@ -361,6 +426,32 @@ sealed class EtwCollectorService : IDisposable
         {
             // ignore
         }
+    }
+
+    public object GetDiag()
+    {
+        var taskState = _processingTask == null
+            ? "null"
+            : _processingTask.IsFaulted
+                ? "faulted"
+                : _processingTask.IsCanceled
+                    ? "canceled"
+                    : _processingTask.IsCompleted
+                        ? "completed"
+                        : "running";
+
+        return new
+        {
+            proc_start = Interlocked.Read(ref _procStartEvents),
+            fileio = Interlocked.Read(ref _fileIoEvents),
+            image_load = Interlocked.Read(ref _imageLoadEvents),
+            tcp = Interlocked.Read(ref _tcpEvents),
+            last_event_utc = _lastEventUtc == default ? null : _lastEventUtc.ToString("O"),
+            loop_started_utc = _loopStartedUtc == default ? null : _loopStartedUtc.ToString("O"),
+            loop_task_state = taskState,
+            last_loop_error = _lastLoopError,
+            active_captures = _captures.Count,
+        };
     }
 }
 
@@ -406,6 +497,22 @@ sealed class Capture : IDisposable
         _procLog = new StreamWriter(new FileStream(_procLogPath, FileMode.Create, FileAccess.Write, FileShare.Read), Encoding.UTF8);
         _procLog.WriteLine($"target_exe={_targetExeLower} target_exe_no_ext={_targetExeLowerNoExt}");
         _procLog.Flush();
+    }
+
+    public void WriteMarker(string eventName, string eventType)
+    {
+        WriteEvent(
+            eventName,
+            eventType,
+            DateTime.UtcNow,
+            0,
+            0,
+            "",
+            "",
+            "",
+            "",
+            $"analysis_id={_analysisId}"
+        );
     }
 
     public void OnProcessStart(ProcessTraceData data)
