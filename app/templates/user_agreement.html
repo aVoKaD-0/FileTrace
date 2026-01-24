@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пользовательское соглашение — FileTrace</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/user_agreement.css">
+</head>
+<body class="bg-light">
+    <header class="border-bottom bg-white sticky-top">
+        <nav class="navbar navbar-expand-lg navbar-light container py-2">
+            <a class="navbar-brand fw-bold" href="/main">FileTrace</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#docNav" aria-controls="docNav" aria-expanded="false" aria-label="Переключить навигацию">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="docNav">
+                <div class="d-flex gap-2">
+                    <a class="btn btn-outline-secondary btn-sm" href="/main">
+                        <i class="bi bi-house-door me-1"></i>На главную
+                    </a>
+                    <a class="btn btn-primary btn-sm" href="/analysis">
+                        <i class="bi bi-play-fill me-1"></i>Запустить анализ
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container py-4">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 col-xl-9">
+                <div class="ua-hero card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+                            <div>
+                                <h1 class="h3 fw-bold mb-2">Пользовательское соглашение</h1>
+                                <div class="text-muted">для веб‑сервиса динамического анализа исполняемых файлов <span class="fw-semibold">FileTrace</span></div>
+                            </div>
+                            <div class="ua-meta">
+                                <div class="ua-meta-item">
+                                    <div class="ua-meta-label">Версия</div>
+                                    <div class="ua-meta-value">1.0</div>
+                                </div>
+                                <div class="ua-meta-item">
+                                    <div class="ua-meta-label">Дата</div>
+                                    <div class="ua-meta-value">__.__.20__</div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="my-4">
+                        <p class="mb-0 text-muted">Пожалуйста, внимательно прочитайте это Соглашение перед использованием сервиса. Используя сервис, вы подтверждаете согласие с условиями ниже.</p>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <aside class="col-12 col-lg-4 order-lg-2">
+                        <div class="card shadow-sm border-0 ua-sticky">
+                            <div class="card-body p-3">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <div class="fw-semibold">Содержание</div>
+                                    <button class="btn btn-sm btn-outline-secondary" id="uaToggleAll" type="button">Свернуть</button>
+                                </div>
+                                <div class="ua-toc mt-2" id="uaToc">
+                                    <a class="ua-toc-link" href="#terms">1. Термины и определения</a>
+                                    <a class="ua-toc-link" href="#accept">2. Принятие условий</a>
+                                    <a class="ua-toc-link" href="#service">3. Описание сервиса</a>
+                                    <a class="ua-toc-link" href="#account">4. Регистрация и аккаунт</a>
+                                    <a class="ua-toc-link" href="#user-obligations">5. Обязанности пользователя</a>
+                                    <a class="ua-toc-link" href="#prohibited">6. Запрещённые действия</a>
+                                    <a class="ua-toc-link" href="#content">7. Загружаемые материалы</a>
+                                    <a class="ua-toc-link" href="#ip">8. Права на сервис</a>
+                                    <a class="ua-toc-link" href="#privacy">9. Данные и конфиденциальность</a>
+                                    <a class="ua-toc-link" href="#liability">10. Ответственность</a>
+                                    <a class="ua-toc-link" href="#changes">11. Изменение условий</a>
+                                    <a class="ua-toc-link" href="#contacts">12. Контакты</a>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <section class="col-12 col-lg-8 order-lg-1">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-body p-4 p-md-5">
+
+                                <div class="ua-section" id="terms">
+                                    <h2 class="h5 fw-bold">1. Термины и определения</h2>
+                                    <p>В настоящем Пользовательском соглашении используются следующие термины:</p>
+                                    <ul>
+                                        <li><span class="fw-semibold">Сервис</span> — веб‑приложение FileTrace, доступное через интерфейс сайта и API, предоставляющее инструменты динамического анализа файлов.</li>
+                                        <li><span class="fw-semibold">Пользователь</span> — физическое лицо, использующее Сервис.</li>
+                                        <li><span class="fw-semibold">Администрация</span> — правообладатель Сервиса и/или лица, уполномоченные управлять Сервисом.</li>
+                                        <li><span class="fw-semibold">Материалы</span> — файлы, данные, отчёты и иные объекты, которые Пользователь загружает, формирует или получает в Сервисе.</li>
+                                    </ul>
+                                </div>
+
+                                <div class="ua-section" id="accept">
+                                    <h2 class="h5 fw-bold">2. Принятие условий</h2>
+                                    <p>Используя Сервис любым способом (включая просмотр страниц, регистрацию, загрузку файлов, запуск анализа), Пользователь подтверждает, что:</p>
+                                    <ul>
+                                        <li>прочитал и понял условия настоящего Соглашения;</li>
+                                        <li>принимает условия Соглашения в полном объёме;</li>
+                                        <li>обязуется соблюдать ограничения и требования, описанные ниже.</li>
+                                    </ul>
+                                </div>
+
+                                <div class="ua-section" id="service">
+                                    <h2 class="h5 fw-bold">3. Описание сервиса</h2>
+                                    <p>FileTrace предназначен для анализа поведения исполняемых файлов и отображения результатов анализа (включая системные события, дерево процессов, отчёты и визуализации). Сервис может использовать изолированное окружение для выполнения исследуемых файлов.</p>
+                                    <p class="mb-0">Администрация вправе изменять функциональность Сервиса, включая добавление, изменение и удаление отдельных возможностей, не нарушая при этом обязательства по действующему законодательству.</p>
+                                </div>
+
+                                <div class="ua-section" id="account">
+                                    <h2 class="h5 fw-bold">4. Регистрация и аккаунт</h2>
+                                    <ul>
+                                        <li>Некоторые функции Сервиса могут быть доступны только зарегистрированным Пользователям.</li>
+                                        <li>Пользователь обязуется предоставлять корректные данные при регистрации и поддерживать их в актуальном состоянии.</li>
+                                        <li>Пользователь несёт ответственность за сохранность своих учётных данных и действия, совершённые в аккаунте.</li>
+                                    </ul>
+                                </div>
+
+                                <div class="ua-section" id="user-obligations">
+                                    <h2 class="h5 fw-bold">5. Обязанности пользователя</h2>
+                                    <p>Пользователь обязуется использовать Сервис добросовестно, с соблюдением требований законодательства и настоящего Соглашения, в частности:</p>
+                                    <ul>
+                                        <li>не нарушать права третьих лиц;</li>
+                                        <li>не пытаться вмешиваться в работу Сервиса и его инфраструктуры;</li>
+                                        <li>самостоятельно оценивать риски, связанные с загрузкой и анализом файлов.</li>
+                                    </ul>
+                                </div>
+
+                                <div class="ua-section" id="prohibited">
+                                    <h2 class="h5 fw-bold">6. Запрещённые действия</h2>
+                                    <p>Пользователю запрещается:</p>
+                                    <ul>
+                                        <li>использовать Сервис для распространения вредоносного ПО, проведения атак, сканирования, эксплуатации уязвимостей или иных действий, направленных на причинение вреда;</li>
+                                        <li>пытаться получить несанкционированный доступ к данным других пользователей, к серверной части, базе данных, внутренним API и т.п.;</li>
+                                        <li>обходить ограничения, лимиты и механизмы защиты;</li>
+                                        <li>нарушать работу Сервиса (DDoS/DoS, массовые запросы, автоматизированные злоупотребления);</li>
+                                        <li>использовать Сервис в коммерческих целях без согласия Администрации (если применимо).</li>
+                                    </ul>
+                                    <div class="ua-callout">
+                                        <div class="ua-callout-title"><i class="bi bi-shield-exclamation me-1"></i>Важно</div>
+                                        <div class="ua-callout-text">Сервис предназначен для анализа и обучения. Любое использование для атак и незаконной деятельности запрещено.</div>
+                                    </div>
+                                </div>
+
+                                <div class="ua-section" id="content">
+                                    <h2 class="h5 fw-bold">7. Загружаемые материалы</h2>
+                                    <ul>
+                                        <li>Пользователь подтверждает, что имеет законные основания загружать соответствующие Материалы и предоставлять их для обработки в Сервисе.</li>
+                                        <li>Пользователь понимает, что загружаемые файлы могут быть потенциально вредоносными, и соглашается с тем, что Сервис обрабатывает их в изолированном окружении по мере возможностей.</li>
+                                        <li>Администрация не гарантирует отсутствие ошибок в результатах анализа и не несёт ответственности за решения, принятые Пользователем на основе отчётов Сервиса.</li>
+                                    </ul>
+                                </div>
+
+                                <div class="ua-section" id="ip">
+                                    <h2 class="h5 fw-bold">8. Права на сервис</h2>
+                                    <p>Все права на Сервис, его программный код, интерфейс, дизайн, базу данных, а также любые связанные элементы принадлежат Администрации или используются на законных основаниях. Пользователь получает ограниченное, неисключительное, отзывное право использования Сервиса в рамках его функционала.</p>
+                                </div>
+
+                                <div class="ua-section" id="privacy">
+                                    <h2 class="h5 fw-bold">9. Данные и конфиденциальность</h2>
+                                    <p>Сервис может обрабатывать данные, необходимые для функционирования: технические логи, данные учетной записи, историю анализов и результаты (в объёме, предусмотренном функционалом).</p>
+                                    <ul>
+                                        <li>Администрация принимает разумные меры для защиты данных.</li>
+                                        <li>Пользователь понимает, что передача данных через интернет не может быть полностью безопасной, и принимает соответствующие риски.</li>
+                                        <li>Конкретные правила обработки данных могут быть дополнены отдельной Политикой конфиденциальности (если будет опубликована).</li>
+                                    </ul>
+                                </div>
+
+                                <div class="ua-section" id="liability">
+                                    <h2 class="h5 fw-bold">10. Ответственность</h2>
+                                    <ul>
+                                        <li>Сервис предоставляется на условиях «как есть» и «по мере доступности».</li>
+                                        <li>Администрация не гарантирует непрерывную и безошибочную работу Сервиса.</li>
+                                        <li>Пользователь несёт ответственность за законность своих действий и за последствия использования результатов анализа.</li>
+                                    </ul>
+                                </div>
+
+                                <div class="ua-section" id="changes">
+                                    <h2 class="h5 fw-bold">11. Изменение условий</h2>
+                                    <p>Администрация вправе изменять настоящее Соглашение. Новая редакция вступает в силу с момента публикации на странице Соглашения, если иное не указано дополнительно.</p>
+                                    <p class="mb-0">Продолжение использования Сервиса после изменения условий означает согласие Пользователя с новой редакцией.</p>
+                                </div>
+
+                                <div class="ua-section" id="contacts">
+                                    <h2 class="h5 fw-bold">12. Контакты</h2>
+                                    <p class="mb-2">Если у вас есть вопросы по Соглашению, вы можете связаться с Администрацией:</p>
+                                    <div class="ua-contacts">
+                                        <div class="ua-contact-item"><span class="ua-contact-label">Email:</span> <span class="ua-contact-value">support@your-domain.tld</span></div>
+                                        <div class="ua-contact-item"><span class="ua-contact-label">Сайт:</span> <span class="ua-contact-value">https://your-domain.tld</span></div>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+                                <div class="small text-muted">Этот шаблон соглашения является стартовой заготовкой и требует финальной юридической проверки и адаптации под вашу организацию и процессы.</div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="border-top bg-white">
+        <div class="container py-3">
+            <div class="text-muted small text-center">© 2025 FileTrace. Проект для Всероссийской олимпиады школьников по информационной безопасности.</div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/user_agreement.js"></script>
+</body>
+</html>

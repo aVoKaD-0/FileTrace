@@ -8,6 +8,7 @@ from app.api.users import router as user_router
 from app.config.auth import SECRET_KEY, ALGORITHM
 from app.services.user_service import UserService
 from app.api.analysis import router as analysis_router
+from app.api.documents import router as documents_router
 from app.services.cleanup_service import CleanupService
 from app.services.etw_collector_singleton import etw_collector
 from app.core.db import AsyncSessionLocal
@@ -71,9 +72,9 @@ def create_app() -> FastAPI:
         is_authenticated = bool(access_token or refresh_token)
         
         if path == "/users/" and is_authenticated:
-            return RedirectResponse(url="/main")
+            return RedirectResponse(url="/main/")
             
-        if path.startswith("/static/") or path.startswith("/media/") or path == "/main" or path == "/":
+        if path.startswith("/static/") or path.startswith("/media/") or path.startswith("/documents/") or path == "/main/" or path == "/":
             return await call_next(request)
         if not is_authenticated and path.startswith("/users/"):
             return await call_next(request)
@@ -160,6 +161,7 @@ def create_app() -> FastAPI:
 
     app.include_router(user_router)
     app.include_router(analysis_router)
+    app.include_router(documents_router)
     app.include_router(main_router)
 
     @app.on_event("shutdown")

@@ -1,0 +1,138 @@
+:root {
+    --ua-card-radius: 14px;
+    --ua-text: #1f2937;
+    --ua-muted: #6b7280;
+    --ua-accent: #0d6efd;
+    --ua-border: rgba(15, 23, 42, 0.10);
+}
+
+body {
+    color: var(--ua-text);
+}
+
+.ua-hero {
+    border-radius: var(--ua-card-radius);
+}
+
+.ua-meta {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(120px, auto);
+    gap: 12px;
+}
+
+.ua-meta-item {
+    border: 1px solid var(--ua-border);
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: #fff;
+}
+
+.ua-meta-label {
+    font-size: 12px;
+    color: var(--ua-muted);
+    line-height: 1.2;
+}
+
+.ua-meta-value {
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.ua-section {
+    scroll-margin-top: 90px;
+    padding-top: 6px;
+    margin-bottom: 22px;
+}
+
+.ua-section p,
+.ua-section li {
+    color: #111827;
+}
+
+.ua-section ul {
+    margin-bottom: 0;
+}
+
+.ua-toc {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ua-toc-link {
+    text-decoration: none;
+    color: #111827;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+}
+
+.ua-toc-link:hover {
+    border-color: var(--ua-border);
+    background: rgba(13, 110, 253, 0.06);
+    color: #0b5ed7;
+}
+
+.ua-toc-link.ua-active {
+    border-color: rgba(13, 110, 253, 0.35);
+    background: rgba(13, 110, 253, 0.10);
+    color: #0b5ed7;
+}
+
+.ua-sticky {
+    top: 92px;
+    position: sticky;
+    border-radius: var(--ua-card-radius);
+}
+
+.ua-callout {
+    border: 1px solid rgba(220, 53, 69, 0.25);
+    background: rgba(220, 53, 69, 0.06);
+    border-radius: 14px;
+    padding: 14px 14px;
+    margin-top: 12px;
+}
+
+.ua-callout-title {
+    font-weight: 800;
+    color: #b02a37;
+}
+
+.ua-callout-text {
+    color: #111827;
+}
+
+.ua-contacts {
+    border: 1px solid var(--ua-border);
+    border-radius: 14px;
+    padding: 12px 14px;
+    background: #fff;
+}
+
+.ua-contact-item {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ua-contact-label {
+    font-weight: 700;
+    color: var(--ua-muted);
+}
+
+.ua-contact-value {
+    font-weight: 600;
+}
+
+@media (max-width: 991.98px) {
+    .ua-sticky {
+        position: static;
+        top: auto;
+    }
+
+    .ua-meta {
+        grid-auto-flow: row;
+        grid-auto-columns: 1fr;
+    }
+}

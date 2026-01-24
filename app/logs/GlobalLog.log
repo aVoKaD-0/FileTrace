@@ -3723,3 +3723,540 @@ Step 2/5 : WORKDIR C:\sandbox
 2026-01-22 18:35:36.060 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
 2026-01-22 18:35:36.654 | INFO     | app.utils.logging:log:15 - connect websocket 676102f9-cd38-49b8-8321-604dd13adc56, 127.0.0.1
 2026-01-22 18:35:36.873 | INFO     | app.utils.logging:log:15 - ws push status 676102f9-cd38-49b8-8321-604dd13adc56: completed
+2026-01-23 09:23:11.964 | INFO     | app.utils.logging:log:15 - Ошибка при анализе файла: 400: Файл не похож на Windows PE (.exe)
+2026-01-23 09:23:36.867 | INFO     | app.utils.logging:log:15 - Ошибка при анализе файла: 400: Файл не похож на Windows PE (.exe)
+2026-01-23 09:23:36.874 | INFO     | app.utils.logging:log:15 - Ошибка при анализе файла: 400: Файл не похож на Windows PE (.exe)
+2026-01-23 09:25:44.058 | INFO     | app.utils.logging:log:15 - Ошибка при анализе файла: 400: Файл не похож на Windows PE (.exe)
+2026-01-23 09:26:00.899 | INFO     | app.utils.logging:log:15 - Ошибка при анализе файла: 400: Файл не похож на Windows PE (.exe)
+2026-01-23 09:26:16.467 | INFO     | app.utils.logging:log:15 - Ошибка при анализе файла: 400: Файл не похож на Windows PE (.exe)
+2026-01-23 09:26:16.472 | INFO     | app.utils.logging:log:15 - Ошибка при анализе файла: 400: Файл не похож на Windows PE (.exe)
+2026-01-23 09:26:18.123 | INFO     | app.utils.logging:log:15 - Ошибка при анализе файла: 400: Файл не похож на Windows PE (.exe)
+2026-01-23 09:26:18.125 | INFO     | app.utils.logging:log:15 - Ошибка при анализе файла: 400: Файл не похож на Windows PE (.exe)
+2026-01-23 09:26:18.132 | INFO     | app.utils.logging:log:15 - Ошибка при анализе файла: 400: Файл не похож на Windows PE (.exe)
+2026-01-23 09:26:24.962 | INFO     | app.utils.logging:log:15 - Ошибка при анализе файла: 400: Файл не похож на Windows PE (.exe)
+2026-01-23 09:26:24.969 | INFO     | app.utils.logging:log:15 - Ошибка при анализе файла: 400: Файл не похож на Windows PE (.exe)
+2026-01-23 09:26:24.972 | INFO     | app.utils.logging:log:15 - Ошибка при анализе файла: 400: Файл не похож на Windows PE (.exe)
+2026-01-23 09:26:24.980 | INFO     | app.utils.logging:log:15 - Ошибка при анализе файла: 400: Файл не похож на Windows PE (.exe)
+2026-01-23 09:36:26.145 | INFO     | app.utils.logging:log:15 - Ошибка при анализе файла: 400: Файл не похож на Windows PE (.exe)
+2026-01-23 09:36:35.059 | INFO     | app.utils.logging:log:15 - Ошибка при анализе файла: 400: Файл не похож на Windows PE (.exe)
+2026-01-23 09:37:21.690 | INFO     | app.utils.logging:log:15 - URL download queued. ID: 9bbba4a5-58c5-472e-bb90-a8dff984f3a4, task_id: d582b9b6-cd68-47fd-926e-1fb27d36256a
+2026-01-23 09:37:22.177 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 09:37:22.179 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 09:37:22.181 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 09:37:22.853 | INFO     | app.utils.logging:log:15 - connect websocket 9bbba4a5-58c5-472e-bb90-a8dff984f3a4, 127.0.0.1
+2026-01-23 09:37:23.365 | INFO     | app.utils.logging:log:15 - ws push status 9bbba4a5-58c5-472e-bb90-a8dff984f3a4: queued
+2026-01-23 09:37:35.144 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 09:37:35.144 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 09:37:35.146 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 09:37:35.656 | INFO     | app.utils.logging:log:15 - ws push status 9bbba4a5-58c5-472e-bb90-a8dff984f3a4: completed
+2026-01-23 09:37:37.036 | INFO     | app.utils.logging:log:15 - connect websocket 9bbba4a5-58c5-472e-bb90-a8dff984f3a4, 127.0.0.1
+2026-01-23 09:37:37.423 | INFO     | app.utils.logging:log:15 - ws push status 9bbba4a5-58c5-472e-bb90-a8dff984f3a4: completed
+2026-01-23 09:38:01.161 | INFO     | app.utils.logging:log:15 - Ошибка при анализе файла: 400: Файл не похож на Windows PE (.exe)
+2026-01-23 09:44:26.745 | INFO     | app.utils.logging:log:15 - connect websocket 9fdefa06-bb29-4af4-b525-deee73922708, 127.0.0.1
+2026-01-23 09:44:28.177 | INFO     | app.utils.logging:log:15 - ws push status 9fdefa06-bb29-4af4-b525-deee73922708: completed
+2026-01-23 09:58:07.966 | INFO     | app.utils.logging:log:15 - connect websocket 9fdefa06-bb29-4af4-b525-deee73922708, 127.0.0.1
+2026-01-23 09:58:08.494 | INFO     | app.utils.logging:log:15 - ws push status 9fdefa06-bb29-4af4-b525-deee73922708: completed
+2026-01-23 10:00:59.622 | INFO     | app.utils.logging:log:15 - URL download queued. ID: 3b4e8fae-f3d8-4e43-9de0-4f634a2a0bab, task_id: 7e12f588-8adb-4e30-a812-6b9948d99aa4
+2026-01-23 10:00:59.739 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 10:00:59.764 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 10:00:59.781 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 10:00:59.787 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 10:00:59.792 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 10:00:59.800 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 10:00:59.801 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 10:00:59.804 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 10:00:59.806 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 10:01:00.608 | INFO     | app.utils.logging:log:15 - connect websocket 3b4e8fae-f3d8-4e43-9de0-4f634a2a0bab, 127.0.0.1
+2026-01-23 10:01:01.222 | INFO     | app.utils.logging:log:15 - ws push status 3b4e8fae-f3d8-4e43-9de0-4f634a2a0bab: queued
+2026-01-23 10:02:44.456 | INFO     | app.utils.logging:log:15 - ws push status 3b4e8fae-f3d8-4e43-9de0-4f634a2a0bab: completed
+2026-01-23 10:02:44.557 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 10:02:44.560 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 10:02:44.562 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 10:02:44.565 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 10:02:44.576 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 10:02:44.580 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 10:02:44.581 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 10:02:44.584 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 10:02:44.585 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 10:02:44.587 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 10:02:45.489 | INFO     | app.utils.logging:log:15 - connect websocket 3b4e8fae-f3d8-4e43-9de0-4f634a2a0bab, 127.0.0.1
+2026-01-23 10:02:47.743 | INFO     | app.utils.logging:log:15 - ws push status 3b4e8fae-f3d8-4e43-9de0-4f634a2a0bab: completed
+2026-01-23 11:29:52.069 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 11:29:52.169 | INFO     | app.utils.logging:log:15 - ws loop error 9bbba4a5-58c5-472e-bb90-a8dff984f3a4: 
+2026-01-23 11:29:52.231 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 11:29:52.273 | INFO     | app.utils.logging:log:15 - ws loop error 9fdefa06-bb29-4af4-b525-deee73922708: 
+2026-01-23 11:29:52.282 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 11:29:52.306 | INFO     | app.utils.logging:log:15 - ws loop error 9bbba4a5-58c5-472e-bb90-a8dff984f3a4: 
+2026-01-23 11:29:52.326 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 11:29:52.396 | INFO     | app.utils.logging:log:15 - ws loop error 3b4e8fae-f3d8-4e43-9de0-4f634a2a0bab: 
+2026-01-23 11:29:52.499 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 11:29:52.543 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 11:29:52.604 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 11:29:52.665 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 11:29:52.716 | INFO     | app.utils.logging:log:15 - ws loop error 3b4e8fae-f3d8-4e43-9de0-4f634a2a0bab: 
+2026-01-23 11:29:52.826 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 11:29:52.949 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 11:29:53.026 | INFO     | app.utils.logging:log:15 - ws loop error 9fdefa06-bb29-4af4-b525-deee73922708: 
+2026-01-23 11:49:19.214 | INFO     | app.utils.logging:log:15 - connect websocket 9fdefa06-bb29-4af4-b525-deee73922708, 127.0.0.1
+2026-01-23 11:49:20.298 | INFO     | app.utils.logging:log:15 - ws push status 9fdefa06-bb29-4af4-b525-deee73922708: completed
+2026-01-23 11:55:59.458 | INFO     | app.utils.logging:log:15 - connect websocket 9fdefa06-bb29-4af4-b525-deee73922708, 127.0.0.1
+2026-01-23 11:55:59.712 | INFO     | app.utils.logging:log:15 - ws push status 9fdefa06-bb29-4af4-b525-deee73922708: completed
+2026-01-23 11:57:46.042 | INFO     | app.utils.logging:log:15 - connect websocket 91944d81-a67b-40a6-a667-2ce9b9ab4933, 127.0.0.1
+2026-01-23 11:57:46.289 | INFO     | app.utils.logging:log:15 - ws push status 91944d81-a67b-40a6-a667-2ce9b9ab4933: completed
+2026-01-23 12:00:25.647 | INFO     | app.utils.logging:log:15 - Файл загружен и анализ поставлен в очередь. ID анализа: d4bd9b24-0b1b-47e0-a09f-ead48242a33c, task_id: 072d500a-20cb-4a50-809e-de19f9fb0ae0
+2026-01-23 12:00:27.864 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:27.875 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:27.889 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:27.900 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:27.920 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:27.934 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:27.939 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:27.943 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:27.950 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:27.982 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:27.983 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:27.985 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:27.988 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:27.990 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:27.991 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:28.003 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:28.004 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:28.005 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:28.008 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:28.014 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:28.016 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:28.017 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:28.018 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:28.019 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:28.028 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:28.033 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:28.056 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:28.087 | INFO     | app.utils.logging:log:15 - connect websocket d4bd9b24-0b1b-47e0-a09f-ead48242a33c, 127.0.0.1
+2026-01-23 12:00:28.320 | INFO     | app.utils.logging:log:15 - ws push status d4bd9b24-0b1b-47e0-a09f-ead48242a33c: running
+2026-01-23 12:00:29.167 | INFO     | app.utils.logging:log:15 - connect websocket d4bd9b24-0b1b-47e0-a09f-ead48242a33c, 127.0.0.1
+2026-01-23 12:00:31.888 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.891 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.895 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.901 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.919 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.920 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.931 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.934 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.936 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.949 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.955 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.956 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.961 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.964 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.965 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.966 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.968 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.969 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.969 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.972 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.973 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.974 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.978 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.979 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.981 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.982 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.983 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:31.984 | INFO     | app.utils.logging:log:15 - ws push status d4bd9b24-0b1b-47e0-a09f-ead48242a33c: running
+2026-01-23 12:00:32.077 | INFO     | app.utils.logging:log:15 - ws loop error d4bd9b24-0b1b-47e0-a09f-ead48242a33c: 
+2026-01-23 12:00:35.206 | INFO     | app.utils.logging:log:15 - ws loop error d4bd9b24-0b1b-47e0-a09f-ead48242a33c: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.585 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.619 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.620 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.621 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.625 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.626 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.626 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.638 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.648 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.665 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.669 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.672 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.676 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.685 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.690 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.691 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.692 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.692 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:53.693 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.693 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.693 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.694 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.695 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.695 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:53.697 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.698 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.699 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.699 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.700 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:53.975 | INFO     | app.utils.logging:log:15 - Файл загружен и анализ поставлен в очередь. ID анализа: e931ac14-dc56-4c94-9786-6881586b3cd7, task_id: db0fa18e-f356-4c1f-890f-57f5f93cc8da
+2026-01-23 12:00:54.563 | INFO     | app.utils.logging:log:15 - connect websocket e931ac14-dc56-4c94-9786-6881586b3cd7, 127.0.0.1
+2026-01-23 12:00:57.013 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.014 | INFO     | app.utils.logging:log:15 - ws push status e931ac14-dc56-4c94-9786-6881586b3cd7: running
+2026-01-23 12:00:57.015 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.023 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.059 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.075 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.076 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.078 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.085 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.086 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.087 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.088 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.088 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.089 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.096 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.098 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.100 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.102 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.103 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.104 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.104 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.105 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.106 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.107 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:00:57.107 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.108 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:00:57.779 | INFO     | app.utils.logging:log:15 - connect websocket e931ac14-dc56-4c94-9786-6881586b3cd7, 127.0.0.1
+2026-01-23 12:00:58.462 | INFO     | app.utils.logging:log:15 - ws push status e931ac14-dc56-4c94-9786-6881586b3cd7: running
+2026-01-23 12:01:01.199 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:01.204 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:01.205 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:01:01.222 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:01.277 | INFO     | app.utils.logging:log:15 - ws loop error e931ac14-dc56-4c94-9786-6881586b3cd7: 
+2026-01-23 12:01:01.279 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:01.281 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:15.656 | INFO     | app.utils.logging:log:15 - ws loop error e931ac14-dc56-4c94-9786-6881586b3cd7: 
+2026-01-23 12:01:15.670 | INFO     | app.utils.logging:log:15 - ws loop error e931ac14-dc56-4c94-9786-6881586b3cd7: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:18.917 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:18.987 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.043 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.048 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.049 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.066 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.082 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.106 | INFO     | app.utils.logging:log:15 - Файл загружен и анализ поставлен в очередь. ID анализа: b9a01982-0e16-4995-b980-936be2ed5f5d, task_id: e26253aa-6b6d-4577-abca-d8c3c126c2c6
+2026-01-23 12:01:19.116 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.117 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.117 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.118 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.120 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.121 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:01:19.121 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.122 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.122 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.123 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.123 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.124 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.124 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.125 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.127 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.128 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.128 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.129 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.129 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.130 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.130 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.130 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.131 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.131 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.132 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:01:19.622 | INFO     | app.utils.logging:log:15 - connect websocket b9a01982-0e16-4995-b980-936be2ed5f5d, 127.0.0.1
+2026-01-23 12:01:19.842 | INFO     | app.utils.logging:log:15 - ws push status b9a01982-0e16-4995-b980-936be2ed5f5d: queued
+2026-01-23 12:03:56.418 | INFO     | app.utils.logging:log:15 - ws loop error d4bd9b24-0b1b-47e0-a09f-ead48242a33c: 
+2026-01-23 12:03:56.430 | INFO     | app.utils.logging:log:15 - ws loop error d4bd9b24-0b1b-47e0-a09f-ead48242a33c: Cannot call "send" once a close message has been sent.
+2026-01-23 12:03:59.955 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:03:59.968 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:03:59.983 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:03:59.992 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:03:59.993 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:03:59.994 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.004 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.006 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.032 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.034 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.034 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.046 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.056 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.063 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.068 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.077 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.080 | INFO     | app.utils.logging:log:15 - ws push status d4bd9b24-0b1b-47e0-a09f-ead48242a33c: completed
+2026-01-23 12:04:00.081 | INFO     | app.utils.logging:log:15 - ws loop error d4bd9b24-0b1b-47e0-a09f-ead48242a33c: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.082 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.082 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.083 | INFO     | app.utils.logging:log:15 - ws push status d4bd9b24-0b1b-47e0-a09f-ead48242a33c: completed
+2026-01-23 12:04:00.083 | INFO     | app.utils.logging:log:15 - ws loop error d4bd9b24-0b1b-47e0-a09f-ead48242a33c: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.084 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:04:00.085 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.086 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.087 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.088 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.090 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.090 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.091 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.092 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:04:00.092 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.093 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.094 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.094 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.095 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.095 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:00.095 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:03.822 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:03.833 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:03.857 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:03.860 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:03.868 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:03.871 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:03.872 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:03.873 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:03.876 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:03.879 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:03.880 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:03.881 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:03.885 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:03.959 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:03.963 | INFO     | app.utils.logging:log:15 - ws loop error d4bd9b24-0b1b-47e0-a09f-ead48242a33c: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:03.969 | INFO     | app.utils.logging:log:15 - ws loop error d4bd9b24-0b1b-47e0-a09f-ead48242a33c: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:03.982 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.009 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.031 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.037 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.039 | INFO     | app.utils.logging:log:15 - ws push status b9a01982-0e16-4995-b980-936be2ed5f5d: running
+2026-01-23 12:04:04.040 | INFO     | app.utils.logging:log:15 - ws loop error b9a01982-0e16-4995-b980-936be2ed5f5d: 
+2026-01-23 12:04:04.051 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.061 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.062 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.063 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.064 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.066 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.068 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.069 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.070 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.071 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.073 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.074 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.074 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.076 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.076 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:04.077 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:07.834 | INFO     | app.utils.logging:log:15 - ws loop error b9a01982-0e16-4995-b980-936be2ed5f5d: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:19.190 | INFO     | app.utils.logging:log:15 - ws loop error b9a01982-0e16-4995-b980-936be2ed5f5d: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:40.784 | INFO     | app.utils.logging:log:15 - ws loop error e931ac14-dc56-4c94-9786-6881586b3cd7: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:40.838 | INFO     | app.utils.logging:log:15 - ws loop error e931ac14-dc56-4c94-9786-6881586b3cd7: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.574 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.575 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.577 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.578 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.578 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.579 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.584 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.590 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.592 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.598 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.603 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.614 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.624 | INFO     | app.utils.logging:log:15 - ws push status e931ac14-dc56-4c94-9786-6881586b3cd7: completed
+2026-01-23 12:04:44.624 | INFO     | app.utils.logging:log:15 - ws loop error e931ac14-dc56-4c94-9786-6881586b3cd7: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.625 | INFO     | app.utils.logging:log:15 - ws push status e931ac14-dc56-4c94-9786-6881586b3cd7: completed
+2026-01-23 12:04:44.625 | INFO     | app.utils.logging:log:15 - ws loop error e931ac14-dc56-4c94-9786-6881586b3cd7: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.627 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.628 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.629 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.630 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.631 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.631 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.632 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.633 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.633 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.634 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.635 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.635 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.636 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.636 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.636 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.637 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.637 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.651 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.653 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.672 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.676 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:44.708 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:48.357 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:48.428 | INFO     | app.utils.logging:log:15 - ws loop error e931ac14-dc56-4c94-9786-6881586b3cd7: Cannot call "send" once a close message has been sent.
+2026-01-23 12:04:48.438 | INFO     | app.utils.logging:log:15 - ws loop error e931ac14-dc56-4c94-9786-6881586b3cd7: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.245 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.246 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.247 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.254 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.255 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.255 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.256 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.256 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.264 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.265 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.267 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.271 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.282 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.302 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.349 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.350 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.352 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.353 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.353 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.354 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.354 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.355 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.355 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.355 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.356 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.356 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.356 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.358 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.359 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.359 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.359 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.360 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.360 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.360 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:27.681 | INFO     | app.utils.logging:log:15 - URL download queued. ID: 61d503f2-dd1a-407b-8e62-f00ae2425101, task_id: 44b9f886-86c6-4a1b-90ba-d5f86b25afe6
+2026-01-23 12:05:30.989 | INFO     | app.utils.logging:log:15 - connect websocket 61d503f2-dd1a-407b-8e62-f00ae2425101, 127.0.0.1
+2026-01-23 12:05:31.139 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:31.140 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:31.180 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:31.326 | INFO     | app.utils.logging:log:15 - ws push status 61d503f2-dd1a-407b-8e62-f00ae2425101: queued
+2026-01-23 12:05:35.110 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.129 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.174 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.198 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.202 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.208 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.209 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.211 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.212 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.213 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.214 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.215 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.220 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.279 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.291 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.311 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.338 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.344 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.347 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.387 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.402 | INFO     | app.utils.logging:log:15 - ws push status 61d503f2-dd1a-407b-8e62-f00ae2425101: running
+2026-01-23 12:05:35.416 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.421 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.435 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.440 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.442 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.445 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.448 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.449 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.450 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.452 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.453 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.454 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:05:35.458 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.464 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:35.465 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:05:36.133 | INFO     | app.utils.logging:log:15 - connect websocket 61d503f2-dd1a-407b-8e62-f00ae2425101, 127.0.0.1
+2026-01-23 12:05:39.613 | INFO     | app.utils.logging:log:15 - ws push status 61d503f2-dd1a-407b-8e62-f00ae2425101: running
+2026-01-23 12:05:51.837 | INFO     | app.utils.logging:log:15 - ws loop error 61d503f2-dd1a-407b-8e62-f00ae2425101: 
+2026-01-23 12:06:50.408 | INFO     | app.utils.logging:log:15 - connect websocket d4bd9b24-0b1b-47e0-a09f-ead48242a33c, 127.0.0.1
+2026-01-23 12:06:50.660 | INFO     | app.utils.logging:log:15 - ws push status d4bd9b24-0b1b-47e0-a09f-ead48242a33c: completed
+2026-01-23 12:07:39.176 | INFO     | app.utils.logging:log:15 - ws loop error b9a01982-0e16-4995-b980-936be2ed5f5d: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:43.037 | INFO     | app.utils.logging:log:15 - ws loop error b9a01982-0e16-4995-b980-936be2ed5f5d: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.570 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.577 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.582 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.584 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.591 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.595 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.599 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.637 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.637 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.638 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.639 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:07:46.639 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.640 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.640 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.641 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.647 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.682 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.691 | INFO     | app.utils.logging:log:15 - ws push status b9a01982-0e16-4995-b980-936be2ed5f5d: completed
+2026-01-23 12:07:46.700 | INFO     | app.utils.logging:log:15 - ws loop error b9a01982-0e16-4995-b980-936be2ed5f5d: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.705 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.706 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.707 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.707 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.707 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.708 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.708 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.709 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.711 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.711 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.712 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:07:46.712 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.712 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.713 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.713 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.713 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.714 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.714 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.715 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:46.715 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:07:50.270 | INFO     | app.utils.logging:log:15 - ws loop error b9a01982-0e16-4995-b980-936be2ed5f5d: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:12.422 | INFO     | app.utils.logging:log:15 - ws loop error 61d503f2-dd1a-407b-8e62-f00ae2425101: 
+2026-01-23 12:09:12.432 | INFO     | app.utils.logging:log:15 - ws loop error 61d503f2-dd1a-407b-8e62-f00ae2425101: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.326 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.326 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.327 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:09:16.327 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.328 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.328 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.348 | INFO     | app.utils.logging:log:15 - ws-history loop error: 
+2026-01-23 12:09:16.357 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.357 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.360 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.396 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.420 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.420 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.421 | INFO     | app.utils.logging:log:15 - ws push status 61d503f2-dd1a-407b-8e62-f00ae2425101: completed
+2026-01-23 12:09:16.421 | INFO     | app.utils.logging:log:15 - ws loop error 61d503f2-dd1a-407b-8e62-f00ae2425101: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.421 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.422 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.423 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.424 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.425 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.426 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.426 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.429 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.430 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.431 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.432 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.433 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.434 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.434 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.435 | INFO     | app.utils.logging:log:15 - ws push status 61d503f2-dd1a-407b-8e62-f00ae2425101: completed
+2026-01-23 12:09:16.435 | INFO     | app.utils.logging:log:15 - ws loop error 61d503f2-dd1a-407b-8e62-f00ae2425101: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.435 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.436 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.436 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.436 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.437 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.437 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.437 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.438 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.438 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.438 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.439 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:16.439 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:20.397 | INFO     | app.utils.logging:log:15 - ws loop error 61d503f2-dd1a-407b-8e62-f00ae2425101: Cannot call "send" once a close message has been sent.
+2026-01-23 12:09:20.417 | INFO     | app.utils.logging:log:15 - ws loop error 61d503f2-dd1a-407b-8e62-f00ae2425101: Cannot call "send" once a close message has been sent.

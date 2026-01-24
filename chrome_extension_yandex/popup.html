@@ -1,0 +1,195 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FileTrace</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --text: #111827;
+        --muted: #6b7280;
+        --border: #e5e7eb;
+        --blue: #2563eb;
+        --blue-700: #1d4ed8;
+        --gray: #6b7280;
+        --surface: rgba(255, 255, 255, 0.78);
+        --shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        --tab-active: #e5e7eb;
+        --bg-blue: #dbeafe;
+      }
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        width: 360px;
+        margin: 0;
+        padding: 12px;
+        background: var(--bg-blue);
+        color: var(--text);
+      }
+      .app {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        background: var(--bg);
+      }
+      .tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+        padding: 10px;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+      }
+      .tab {
+        appearance: none;
+        border: 1px solid var(--border);
+        background: #fff;
+        border-radius: 10px;
+        padding: 8px 10px;
+        font-weight: 600;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--text);
+      }
+      .tab[aria-selected="true"] {
+        background: var(--tab-active);
+        border-color: #cbd5e1;
+        box-shadow: none;
+      }
+      .panel { padding: 10px; }
+      .panel.hidden { display: none; }
+      .hint { font-size: 12px; color: var(--muted); line-height: 1.35; }
+      .row { margin-top: 10px; }
+      .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+      label { display: block; font-size: 12px; margin-bottom: 6px; color: var(--muted); font-weight: 600; }
+      input[type="url"], input[type="text"] {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px 10px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        outline: none;
+        background: #fff;
+      }
+      input[type="url"]:focus, input[type="text"]:focus {
+        border-color: rgba(37, 99, 235, 0.55);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+      }
+      input[type="file"] { width: 100%; }
+      button {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        background: var(--blue);
+        color: white;
+        cursor: pointer;
+        font-weight: 700;
+      }
+      button:hover { background: var(--blue-700); }
+      button.secondary {
+        background: #fff;
+        color: var(--text);
+        border-color: var(--border);
+      }
+      button.secondary:hover { background: var(--surface); }
+      button:disabled { opacity: 0.6; cursor: default; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+      .ticket { font-size: 12px; color: var(--muted); margin-top: 6px; }
+      .dropzone {
+        border: 2px dashed #d1d5db;
+        border-radius: 12px;
+        padding: 18px;
+        text-align: center;
+        background: #fff;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .dropzone.dragover {
+        border-color: rgba(37, 99, 235, 0.65);
+        background: rgba(37, 99, 235, 0.06);
+        color: var(--text);
+      }
+      .footer {
+        border-top: 1px solid var(--border);
+        padding: 10px;
+        background: var(--surface);
+      }
+      .logsTitle { font-size: 12px; font-weight: 800; color: var(--muted); margin-bottom: 6px; }
+      .status {
+        font-size: 12px;
+        white-space: pre-wrap;
+        max-height: 120px;
+        overflow: auto;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="tabs" role="tablist" aria-label="FileTrace tabs">
+        <button id="tabFileTrace" class="tab" type="button" role="tab" aria-selected="true" data-tab="filetrace">FileTrace</button>
+        <button id="tabFile" class="tab" type="button" role="tab" aria-selected="false" data-tab="file">Файл</button>
+        <button id="tabUrl" class="tab" type="button" role="tab" aria-selected="false" data-tab="url">Ссылка</button>
+      </div>
+
+      <div id="panelFileTrace" class="panel" role="tabpanel" data-panel="filetrace">
+        <div class="hint">
+          Приветствую в расширении FileTrace, перед использованием авторизуйтесь.
+          FileTrace — анализ исполняемых файлов в изолированной среде.
+        </div>
+
+        <div class="row">
+          <div class="grid">
+            <button id="btnOpen" class="secondary" type="button">Открыть FileTrace</button>
+            <button id="btnAttach" type="button">Авторизация</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="hint">
+            "Авторизация" откроет/найдёт вкладку FileTrace и подготовит её для запросов.
+          </div>
+        </div>
+
+        <div class="row">
+          <a id="linkAgreement" href="#" class="hint">Пользовательское соглашение</a>
+        </div>
+      </div>
+
+      <div id="panelFile" class="panel hidden" role="tabpanel" data-panel="file">
+        <div id="dropzone" class="dropzone" tabindex="0">
+          Прикрепить файл
+        </div>
+        <input id="fileInput" type="file" style="display:none" />
+        <div class="row">
+          <button id="btnUpload" type="button">Начать анализ</button>
+        </div>
+      </div>
+
+      <div id="panelUrl" class="panel hidden" role="tabpanel" data-panel="url">
+        <label for="urlInput">Введите URL</label>
+        <input id="urlInput" type="url" placeholder="https://example.com/file.exe" />
+        <div class="row">
+          <div class="grid">
+            <button id="btnCheck" class="secondary" type="button">Проверить</button>
+            <button id="btnDownload" type="button">Начать анализ</button>
+          </div>
+          <div class="ticket mono" id="ticketHint"></div>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="logsTitle">Логи</div>
+        <div id="status" class="status mono"></div>
+      </div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
