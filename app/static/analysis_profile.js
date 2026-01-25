@@ -1,19 +1,26 @@
 console.log("analysis_profile.js loaded");
 
 window.ftAnalysisInitProfile = function(ctx) {
-    const logoutButton = document.getElementById('logoutButton');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', function() {
-            fetch('/users/logout', {
-                method: 'POST',
-                credentials: 'include'
-            }).then(response => {
+    const logoutButtons = [
+        document.getElementById('profileLogout'),
+        document.getElementById('logoutBtn'),
+    ].filter(Boolean);
+
+    logoutButtons.forEach((btn) => {
+        btn.addEventListener('click', async function() {
+            try {
+                const response = await fetch('/users/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
                 if (response.ok) {
                     window.location.href = '/';
                 }
-            });
+            } catch (e) {
+                console.error('Logout error:', e);
+            }
         });
-    }
+    });
 
     const profileChangePasswordBtn = document.getElementById('profileChangePassword');
     if (profileChangePasswordBtn) {

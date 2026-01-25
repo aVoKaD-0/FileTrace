@@ -2,13 +2,13 @@ import json
 import os
 from typing import Any, Optional
 
-from app.repositories.analysis import docker
+from app.infra.docker.paths import get_docker_root
 
 
 class AnalysisArtifactsRepository:
     @staticmethod
     def get_base_dir(analysis_id: str) -> str:
-        return os.path.join(docker, "analysis", str(analysis_id))
+        return os.path.join(get_docker_root(), "analysis", str(analysis_id))
 
     @classmethod
     def get_threat_report_path(cls, analysis_id: str) -> str:

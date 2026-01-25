@@ -1,15 +1,11 @@
 import asyncio
 import json
-import math
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from sqlalchemy import select
 
 from app.auth.auth import uuid_by_token
-from app.core.db import AsyncSessionLocal
-from app.core.settings import settings
-from app.models.analysis import Analysis
-from app.services.user_service import UserService
+from app.infra.db.session import AsyncSessionLocal
+from app.services.analysis_ws_service import AnalysisWsService
 from app.utils.logging import Logger
 from app.utils.sse_operations import subscribers
 from app.utils.websocket_manager import manager
@@ -35,6 +31,8 @@ async def sse_endpoint(request):
                 data = await q.get()
                 Logger.log(f"Sending data: {data}")
                 yield f"data: {json.dumps(data)}\n\n"
+        except asyncio.CancelledError:
+            return
         finally:
             Logger.log("Event generator finished")
             subscribers.remove(q)
@@ -52,8 +50,8 @@ async def websocket_endpoint(websocket: WebSocket, analysis_id: str):
         while True:
             try:
                 async with AsyncSessionLocal() as db_ws:
-                    userservice = UserService(db_ws)
-                    result_data = await userservice.get_result_data(str(analysis_id))
+                    ws_service = AnalysisWsService(db_ws)
+                    result_data = await ws_service.get_analysis_snapshot(str(analysis_id))
 
                 status = (result_data or {}).get("status")
                 if status and status != last_status:
@@ -70,12 +68,18 @@ async def websocket_endpoint(websocket: WebSocket, analysis_id: str):
                 Logger.log(f"ws loop error {analysis_id}: {str(loop_err)}")
 
             await asyncio.sleep(1)
+    except asyncio.CancelledError:
+        return
     except WebSocketDisconnect:
         Logger.log(f"disconnect websocket {analysis_id}, {websocket.client.host}")
-        manager.disconnect(analysis_id, websocket)
     except Exception as e:
         Logger.log(f"websocket error {analysis_id}: {str(e)}")
+    finally:
         manager.disconnect(analysis_id, websocket)
+        try:
+            await websocket.close()
+        except Exception:
+            pass
 
 
 @router.websocket("/ws-history")
@@ -92,50 +96,8 @@ async def websocket_history_endpoint(websocket: WebSocket):
         while True:
             try:
                 async with AsyncSessionLocal() as db_ws:
-                    userservice = UserService(db_ws)
-                    rows = await userservice.get_user_analyses(user_id)
-
-                    history = []
-                    for row in rows:
-                        ts = getattr(row, "timestamp", None) or row[0]
-                        history.append(
-                            {
-                                "timestamp": ts.isoformat() if ts else None,
-                                "filename": getattr(row, "filename", None) or row[1],
-                                "status": getattr(row, "status", None) or row[2],
-                                "analysis_id": str(getattr(row, "analysis_id", None) or row[3]),
-                            }
-                        )
-
-                    global_active_rows = (
-                        await db_ws.execute(
-                            select(Analysis.analysis_id, Analysis.status, Analysis.timestamp)
-                            .where(Analysis.status.in_(["queued", "running"]))
-                            .order_by(Analysis.timestamp.asc())
-                        )
-                    ).all()
-
-                    active_total = len(global_active_rows)
-                    max_conc = max(int(getattr(settings, "MAX_CONCURRENT_ANALYSES", 1) or 1), 1)
-
-                    positions = {}
-                    for idx, (aid, st, ts) in enumerate(global_active_rows):
-                        ahead = idx
-                        eta_minutes = int(3 * math.ceil(ahead / max_conc)) if ahead > 0 else 0
-                        positions[str(aid)] = {
-                            "active_position": idx + 1,
-                            "active_total": active_total,
-                            "ahead": ahead,
-                            "eta_minutes": eta_minutes,
-                        }
-
-                    for item in history:
-                        if item.get("status") in ("queued", "running"):
-                            q = positions.get(item["analysis_id"])
-                            if q:
-                                item.update(q)
-
-                payload = {"event": "history", "history": history}
+                    ws_service = AnalysisWsService(db_ws)
+                    payload = await ws_service.get_history_payload(user_id=user_id)
                 payload_str = json.dumps(payload, ensure_ascii=False)
                 if payload_str != last_payload:
                     last_payload = payload_str
@@ -144,6 +106,8 @@ async def websocket_history_endpoint(websocket: WebSocket):
                 Logger.log(f"ws-history loop error: {str(loop_err)}")
 
             await asyncio.sleep(1)
+    except asyncio.CancelledError:
+        return
     except WebSocketDisconnect:
         return
     except Exception as e:

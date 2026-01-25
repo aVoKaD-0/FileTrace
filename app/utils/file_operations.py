@@ -3,7 +3,7 @@ import uuid
 import json
 from datetime import datetime
 from shutil import copyfileobj
-from app.repositories.analysis import docker
+from app.infra.docker.paths import get_docker_root
 
 
 project_dir = os.getcwd()
@@ -12,7 +12,7 @@ project_dir = os.getcwd()
 class FileOperations:
     @staticmethod
     def hash_based_storage(file_hash: str, pipeline_version: str):
-        base = os.path.join(docker, "storage")
+        base = os.path.join(get_docker_root(), "storage")
 
         structure = {
             "files": os.path.join(base, "files", file_hash),
@@ -49,7 +49,7 @@ class FileOperations:
 
     @staticmethod
     def user_upload(email):
-        upload_path = os.path.join(docker, "analysis", email)
+        upload_path = os.path.join(get_docker_root(), "analysis", email)
         os.makedirs(upload_path, exist_ok=True)
         return upload_path
 

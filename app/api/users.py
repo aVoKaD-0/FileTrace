@@ -1,7 +1,7 @@
 from fastapi import Response
 from fastapi.staticfiles import StaticFiles
 from app.core.security import verify_password
-from app.core.db import get_db
+from app.infra.db.deps import get_db
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.security import OAuth2PasswordBearer
@@ -13,7 +13,9 @@ from app.auth.auth import send_email, create_access_token, create_refresh_token,
 from app.services.audit_service import AuditService
 from app.schemas.users import EmailConfirmation, UserLogin, UserRegistration, UserPasswordReset, ForgotPasswordRequest
 from app.core.crypto import decrypt_str
-
+from jose import jwt
+from jose.exceptions import JWTError
+from app.config.auth import SECRET_KEY, ALGORITHM
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -221,6 +223,50 @@ async def login(request: Request, response: Response, user_data: UserLogin, db: 
             content={"detail": f"Ошибка при входе: {str(e)}"}
         )
 
+@router.post("/refresh")
+async def refresh(request: Request, db: AsyncSession = Depends(get_db)):
+    refresh_token_cookie = request.cookies.get("refresh_token")
+    if not refresh_token_cookie:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token отсутствует")
+
+    try:
+        payload = jwt.decode(refresh_token_cookie, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Некорректный refresh token")
+    except JWTError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token недействителен или истек")
+
+    user_service = UserService(db)
+    user = await user_service.get_refresh_token(refresh_token=refresh_token_cookie)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token не найден")
+
+    new_access_token = create_access_token({"sub": str(user.id)})
+    new_refresh_token = create_refresh_token({"sub": str(user.id)})
+    await user_service.update_refresh_token_by_user_id(user.id, new_refresh_token)
+
+    resp = JSONResponse(status_code=200, content={"message": "Token refreshed"})
+    resp.set_cookie(
+        key="access_token",
+        value=new_access_token,
+        httponly=True,
+        secure=(request.url.scheme == "https"),
+        max_age=30 * 60,
+        samesite="Lax",
+        path="/",
+    )
+    resp.set_cookie(
+        key="refresh_token",
+        value=new_refresh_token,
+        httponly=True,
+        secure=(request.url.scheme == "https"),
+        max_age=7 * 24 * 60 * 60,
+        samesite="Lax",
+        path="/",
+    )
+    return resp
+
 @router.get("/captcha")
 async def generate_captcha():
     from app.utils.captcha import captcha
@@ -248,7 +294,7 @@ async def logout(response: Response, request: Request, db: AsyncSession = Depend
         resp.delete_cookie(key="refresh_token", path="/")
         return resp
     else:
-        return RedirectResponse(url="/users/")
+        return RedirectResponse(url="/main/")
 
 @router.post("/resend-code")
 async def reset_code_page(request: Request, db: AsyncSession = Depends(get_db)):

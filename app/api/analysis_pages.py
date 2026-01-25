@@ -7,8 +7,8 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.auth import uuid_by_token
-from app.core.db import get_db
-from app.repositories.analysis import docker
+from app.infra.db.deps import get_db
+from app.infra.docker.paths import get_analysis_dir
 from app.services.audit_service import AuditService
 from app.services.user_service import UserService
 from app.utils.logging import Logger
@@ -46,7 +46,7 @@ async def get_analysis_page(request: Request, analysis_id: uuid.UUID, db: AsyncS
             return RedirectResponse(url="/main")
 
         etl_output = ""
-        json_file_path = f"{docker}\\analysis\\{analysis_id}\\trace.json"
+        json_file_path = os.path.join(get_analysis_dir(str(analysis_id)), "trace.json")
         if os.path.exists(json_file_path):
             try:
                 with open(json_file_path, "rb") as f:

@@ -9,14 +9,13 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 import redis
-from sqlalchemy import select
 
 from app.core.settings import settings
-from app.core.db import AsyncSessionLocal
+from app.infra.db.session import AsyncSessionLocal
 from app.infra.redis_semaphore import acquire_semaphore_slot, refresh_semaphore_slot, release_semaphore_slot
-from app.models.analysis import Analysis
-from app.models.result import Results
-from app.repositories.analysis_artifacts_repository import AnalysisArtifactsRepository
+from app.infra.artifacts.analysis_artifacts_repository import AnalysisArtifactsRepository
+from app.repositories.analysis_repository import AnalysisRepository
+from app.repositories.result_repository import ResultRepository
 from app.services.analysis_service import AnalysisService
 from app.services.user_service import UserService
 from app.utils.file_operations import FileOperations
@@ -142,13 +141,14 @@ def register_url_tasks(celery_app, analyze_file_task):
             db = AsyncSessionLocal()
             try:
                 userservice = UserService(db)
+                analysis_repo = AnalysisRepository(db)
+                results_repo = ResultRepository(db)
                 analysis_uuid = uuid.UUID(str(analysis_id))
                 user_uuid = uuid.UUID(str(user_id))
 
                 async def _set_error(message: str) -> None:
-                    analysis_res = await db.execute(select(Analysis).where(Analysis.analysis_id == analysis_uuid).limit(1))
-                    analysis = analysis_res.scalars().first()
-                    result = await db.get(Results, analysis_uuid)
+                    analysis = await analysis_repo.get_by_id(analysis_uuid)
+                    result = await results_repo.get_by_analysis_id(analysis_uuid)
                     if analysis and result:
                         analysis.status = "error"
                         result.docker_output = message
@@ -174,8 +174,7 @@ def register_url_tasks(celery_app, analyze_file_task):
                 if active:
                     await userservice.subscribe_user_to_analysis(analysis_id=active.analysis_id, user_id=user_uuid)
 
-                    analysis_res = await db.execute(select(Analysis).where(Analysis.analysis_id == analysis_uuid).limit(1))
-                    analysis = analysis_res.scalars().first()
+                    analysis = await analysis_repo.get_by_id(analysis_uuid)
                     if analysis:
                         analysis.filename = filename
                         analysis.file_hash = file_hash
@@ -184,17 +183,19 @@ def register_url_tasks(celery_app, analyze_file_task):
                         await db.commit()
 
                     # Poll until the active analysis finishes (best-effort)
+                    active_latest = None
                     for _ in range(360):  # up to ~30 minutes
-                        await db.refresh(active)
-                        if active.status in {"completed", "error"}:
+                        active_latest = await analysis_repo.get_by_id(active.analysis_id)
+                        if not active_latest:
+                            break
+                        if active_latest.status in {"completed", "error"}:
                             break
                         await asyncio.sleep(5)
 
-                    if active.status == "completed":
-                        cached_result = await db.get(Results, active.analysis_id)
-                        current_result = await db.get(Results, analysis_uuid)
-                        current_analysis_res = await db.execute(select(Analysis).where(Analysis.analysis_id == analysis_uuid).limit(1))
-                        current_analysis = current_analysis_res.scalars().first()
+                    if active_latest and active_latest.status == "completed":
+                        cached_result = await results_repo.get_by_analysis_id(active.analysis_id)
+                        current_result = await results_repo.get_by_analysis_id(analysis_uuid)
+                        current_analysis = await analysis_repo.get_by_id(analysis_uuid)
                         if current_analysis:
                             current_analysis.status = "completed"
                             current_analysis.file_hash = file_hash
@@ -218,10 +219,9 @@ def register_url_tasks(celery_app, analyze_file_task):
                 if cached:
                     await userservice.subscribe_user_to_analysis(analysis_id=cached.analysis_id, user_id=user_uuid)
 
-                    cached_result = await db.get(Results, cached.analysis_id)
-                    current_result = await db.get(Results, analysis_uuid)
-                    current_analysis_res = await db.execute(select(Analysis).where(Analysis.analysis_id == analysis_uuid).limit(1))
-                    current_analysis = current_analysis_res.scalars().first()
+                    cached_result = await results_repo.get_by_analysis_id(cached.analysis_id)
+                    current_result = await results_repo.get_by_analysis_id(analysis_uuid)
+                    current_analysis = await analysis_repo.get_by_id(analysis_uuid)
                     if current_analysis:
                         current_analysis.status = "completed"
                         current_analysis.file_hash = file_hash
@@ -257,8 +257,7 @@ def register_url_tasks(celery_app, analyze_file_task):
                 FileOperations.user_file_upload(file=mem2, user_upload_folder=upload_folder)
 
                 # Update analysis metadata
-                analysis_res = await db.execute(select(Analysis).where(Analysis.analysis_id == analysis_uuid).limit(1))
-                analysis = analysis_res.scalars().first()
+                analysis = await analysis_repo.get_by_id(analysis_uuid)
                 if analysis:
                     analysis.filename = filename
                     analysis.file_hash = file_hash

@@ -19,7 +19,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.auth import uuid_by_token
-from app.core.db import get_db
+from app.infra.db.deps import get_db
 from app.core.settings import settings
 from app.services.audit_service import AuditService
 from app.services.user_service import UserService
@@ -89,7 +89,6 @@ def _enforce_ssrf_protection(url: str) -> Dict[str, Any]:
     if host.lower() in {"localhost"}:
         raise HTTPException(status_code=400, detail="Запрещено проверять localhost")
 
-    # direct IP in URL
     try:
         ipaddress.ip_address(host)
         if _is_ip_private_or_local(host):
@@ -120,7 +119,6 @@ def _check_url_rate_limit(user_id: str) -> None:
     r = redis.Redis.from_url(settings.REDIS_URL, decode_responses=True)
     key = _url_rate_limit_key(user_id)
 
-    # fixed window 60s
     now = int(time.time())
     window = now // 60
     window_key = f"{key}:{window}"
@@ -134,7 +132,6 @@ def _check_url_rate_limit(user_id: str) -> None:
     except HTTPException:
         raise
     except Exception:
-        # If redis is down - do not block core feature
         return
 
 
@@ -192,7 +189,6 @@ def _issue_download_ticket(user_id: str, url: str) -> Optional[str]:
         r.set(key, url, ex=5 * 60)
         return ticket
     except Exception:
-        # Fallback: stateless signed ticket (5 minutes)
         try:
             exp = int(time.time()) + 5 * 60
             return _sign_ticket({"uid": user_id, "url": url, "exp": exp})
@@ -204,7 +200,6 @@ def _consume_download_ticket(user_id: str, ticket: str, url: str) -> None:
     if not ticket:
         raise HTTPException(status_code=403, detail="Требуется подтверждение проверки ссылки")
 
-    # Signed ticket path
     if "." in ticket:
         data = _verify_ticket(ticket)
         exp = int(data.get("exp") or 0)
@@ -263,7 +258,6 @@ def _fetch_head_or_range(url: str, *, timeout_s: int, max_redirects: int) -> Dic
         "Accept": "*/*",
     }
 
-    # HEAD often blocked; try HEAD then GET range 0-0
     try:
         resp = session.head(url, allow_redirects=True, timeout=timeout_s, headers=headers)
         final_url = str(resp.url)
@@ -300,7 +294,6 @@ def _vt_url_report(url: str) -> Optional[Dict[str, Any]]:
     if not api_key:
         return None
 
-    # VirusTotal v3: POST /urls, then GET /analyses/{id}
     try:
         s = requests.Session()
         headers = {"x-apikey": api_key}
@@ -338,8 +331,6 @@ def _yandex_sb_lookup(url: str) -> Optional[Dict[str, Any]]:
     if not api_key:
         return None
 
-    # Lookup endpoint
-    # POST https://sba.yandex.net/v4/threatMatches:find?key=<API key>
     body = {
         "client": {
             "clientId": "filetrace",
@@ -463,7 +454,6 @@ async def url_check(request: Request, payload: UrlRequest, db: AsyncSession = De
     url = _normalize_url(payload.url)
     _enforce_ssrf_protection(url)
 
-    # Fetch metadata to enforce file policy early and provide user-friendly feedback
     meta = _fetch_head_or_range(
         url,
         timeout_s=int(getattr(settings, "URL_META_TIMEOUT_SECONDS", 10) or 10),
@@ -519,7 +509,6 @@ def _download_stream(url: str, *, timeout_s: int, max_bytes: int) -> bytes:
 
         with s.get(url, stream=True, timeout=timeout, headers=headers, allow_redirects=True) as r:
             r.raise_for_status()
-            # Pre-check by server-reported content length
             cl = r.headers.get("Content-Length") or r.headers.get("content-length")
             if str(cl or "").isdigit() and max_bytes > 0 and int(cl) > max_bytes:
                 raise HTTPException(status_code=413, detail=f"Слишком большой файл по ссылке (лимит {max_bytes} bytes)")
@@ -530,7 +519,6 @@ def _download_stream(url: str, *, timeout_s: int, max_bytes: int) -> bytes:
                 buf.extend(chunk)
                 if len(buf) > max_bytes:
                     raise HTTPException(status_code=413, detail="Слишком большой файл по ссылке")
-                # Early PE magic check once we have first bytes
                 if len(buf) >= 2 and buf[0:2] != b"MZ":
                     raise HTTPException(status_code=400, detail="Файл по ссылке не похож на Windows PE (.exe)")
             return bytes(buf)
@@ -572,7 +560,6 @@ async def url_download_and_analyze(request: Request, payload: UrlDownloadRequest
 
         _consume_download_ticket(str(uuid_user), payload.ticket or "", url)
 
-        # file policy precheck using HEAD/Range
         meta = _fetch_head_or_range(
             url,
             timeout_s=int(getattr(settings, "URL_META_TIMEOUT_SECONDS", 10) or 10),

@@ -57,7 +57,6 @@
             <button id="logoutBtn" class="btn btn-danger" style="display: none;"><i class="bi bi-box-arrow-right"></i> Выйти</button>
         </div>
 
-        <!-- Зона загрузки файла -->
         <div class="upload-section" {% if analysis_id %}style="display: none;"{% else %}style="display: block;"{% endif %}>
             <div id="dropZone" class="drop-zone">
                 <div class="drop-zone-content">
@@ -101,9 +100,7 @@
             </div>
         </div>
 
-        <!-- Секция результатов -->
         <div id="resultsSection" class="results-section mt-4" {% if analysis_id %}style="display: block;"{% else %}style="display: none;"{% endif %}>
-            <!-- Контейнер для отображения статуса загрузки -->
             <div id="uploadStatus">
                 <div class="status-bar d-flex align-items-center">
                     <span id="analysisStatus">Ожидание...</span>
@@ -161,7 +158,6 @@
                         </div>
                         <div id="fileActivityContainer">
                             <pre id="fileActivityContent" class="result-content" style="max-height: 600px; overflow-y: auto;">{% if file_activity %}{{ file_activity | map('trim') | join('\n') }}{% else %}Нет данных по файловой активности.{% endif %}</pre>
-                            <!-- Вывод остатка элементов -->
                             <p id="remainingCount"></p>
                         </div>
                     </div>
@@ -208,7 +204,6 @@
             </div>
         </div>
 
-        <!-- История анализов -->
         <div class="history-section mt-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h3>История анализов</h3>

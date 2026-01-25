@@ -1,9 +1,7 @@
-from sqlalchemy import select
-from datetime import datetime
-from app.models.user import Users
 from apscheduler.triggers.interval import IntervalTrigger
-from app.core.db import AsyncSessionLocal
+from app.infra.db.session import AsyncSessionLocal
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from app.repositories.user_repository import UserRepository
 
 class CleanupService:
     def __init__(self):
@@ -21,16 +19,12 @@ class CleanupService:
 
     async def cleanup_expired_users(self):
         async with AsyncSessionLocal() as db:
-            query = select(Users).where(Users.confirmed == False)
-            result = await db.execute(query)
-            expired_users = result.scalars().all()
-            
-            for user in expired_users:
-                await db.delete(user)
-            
-            await db.commit()
+            await UserRepository(db).delete_unconfirmed_users()
 
     async def stop(self):
         if self.scheduler:
-            self.scheduler.shutdown()
-            self.scheduler = None 
+            try:
+                self.scheduler.shutdown(wait=False)
+            except Exception:
+                pass
+            self.scheduler = None

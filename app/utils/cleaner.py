@@ -55,20 +55,35 @@ def is_garbage(event_name, event_type, user_data):
 
     return False
 
-def detect_threat(event_name, user_data):
+def detect_threat(event_name, event_type, row, user_data):
     """
     Определяет, является ли строка опасной (для подсветки на сайте).
     """
-    data = user_data.lower()
-    
-    if "powershell" in data:
-        return "CRITICAL: Использование PowerShell"
-    if "cmd.exe" in data:
-        return "CRITICAL: Запуск командной строки"
-    if "wscript" in data or "cscript" in data:
-        return "CRITICAL: Запуск скриптов Windows"
+    et = str(event_type or "")
+    is_process_start = event_name == "Process" and ("Start" in et or str(row[6]).strip() == "1")
 
-    if event_name == "Image" and "clr.dll" in data:
+    try:
+        process_name = str(row[11] or "")
+        image_file_name = str(row[12] or "")
+        command_line = str(row[13] or "")
+        path = str(row[14] or "")
+    except Exception:
+        process_name = ""
+        image_file_name = ""
+        command_line = ""
+        path = ""
+
+    data = " ".join([process_name, image_file_name, command_line, path, str(user_data or "")]).lower()
+    
+    if is_process_start:
+        if "\\powershell.exe" in data or " powershell.exe" in data or "\\pwsh.exe" in data or " pwsh.exe" in data:
+            return "CRITICAL: Запуск PowerShell"
+        if "\\cmd.exe" in data or " cmd.exe" in data:
+            return "CRITICAL: Запуск командной строки"
+        if "\\wscript.exe" in data or " wscript.exe" in data or "\\cscript.exe" in data or " cscript.exe" in data:
+            return "CRITICAL: Запуск Windows Script Host"
+
+    if event_name == "Image" and "clr.dll" in data and "\\programdata\\docker\\windowsfilter\\" not in data:
         return "WARNING: Загрузка .NET Runtime (подозрительно для C++)"
 
     if "TcpIp" in event_name:
@@ -80,7 +95,10 @@ def detect_threat(event_name, user_data):
                 return f"HIGH: Создание исполняемого файла (Dropper)"
         if "system32" in data and "drivers" in data and "etc" in data:
             return "HIGH: Попытка модификации HOSTS"
-        if "startup" in data:
+        if "startupprofiledata" not in data and (
+            "\\start menu\\programs\\startup\\" in data
+            or "\\microsoft\\windows\\start menu\\programs\\startup\\" in data
+        ):
             return "CRITICAL: Запись в Автозагрузку"
 
     return None
@@ -125,7 +143,7 @@ def main():
                     if is_garbage(event_name, event_type, user_data_full):
                         continue
                     
-                    threat_msg = detect_threat(event_name, user_data_full)
+                    threat_msg = detect_threat(event_name, event_type, row, user_data_full)
                     if threat_msg:
                         line_idx = len(rows_to_keep) + 1
                         threats_log.append({
@@ -200,7 +218,13 @@ def main():
                     evt_data = event.get("User Data", "")
                     
                     if not is_garbage(evt_name, evt_type, evt_data):
-                        threat_msg = detect_threat(evt_name, evt_data)
+                        synthetic_row = [""] * 16
+                        synthetic_row[6] = str(event.get("Flags", ""))
+                        synthetic_row[11] = str(event.get("ProcessName", ""))
+                        synthetic_row[12] = str(event.get("ImageFileName", ""))
+                        synthetic_row[13] = str(event.get("CommandLine", ""))
+                        synthetic_row[14] = str(event.get("Path", ""))
+                        threat_msg = detect_threat(evt_name, evt_type, synthetic_row, evt_data)
                         if len(json_kept) >= MAX_ROWS and not threat_msg and not (evt_name == "Process" and (evt_type == "Start" or str(event.get("Flags", "")) == "1")):
                             continue
                         json_kept.append(event)

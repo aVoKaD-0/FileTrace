@@ -1,6 +1,6 @@
 import asyncpg
 import asyncio
-from app.config.db import DATABASE_URL
+from app.infra.db.session import DATABASE_URL
 
 class AsyncPostgresDB:
     def __init__(self, dsn):
@@ -28,4 +28,6 @@ async def main():
 
     await db.close()
 
-asyncio.run(main())
+
+if __name__ == "__main__":
+    asyncio.run(main())

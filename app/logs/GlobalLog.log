@@ -4260,3 +4260,12 @@ Step 2/5 : WORKDIR C:\sandbox
 2026-01-23 12:09:16.439 | INFO     | app.utils.logging:log:15 - ws-history loop error: Cannot call "send" once a close message has been sent.
 2026-01-23 12:09:20.397 | INFO     | app.utils.logging:log:15 - ws loop error 61d503f2-dd1a-407b-8e62-f00ae2425101: Cannot call "send" once a close message has been sent.
 2026-01-23 12:09:20.417 | INFO     | app.utils.logging:log:15 - ws loop error 61d503f2-dd1a-407b-8e62-f00ae2425101: Cannot call "send" once a close message has been sent.
+2026-01-25 02:52:58.446 | INFO     | app.utils.logging:log:15 - URL download queued. ID: 0740877b-9664-4176-aee9-5c1b453d7099, task_id: 2dc1cb5f-0f01-4428-a00c-5c1b9b1e7848
+2026-01-25 02:52:59.010 | INFO     | app.utils.logging:log:15 - connect websocket 0740877b-9664-4176-aee9-5c1b453d7099, 127.0.0.1
+2026-01-25 02:52:59.256 | INFO     | app.utils.logging:log:15 - ws push status 0740877b-9664-4176-aee9-5c1b453d7099: queued
+2026-01-25 04:09:46.495 | INFO     | app.utils.logging:log:11 - ws-history loop error: 
+2026-01-25 04:09:46.496 | INFO     | app.utils.logging:log:11 - ws-history loop error: 
+2026-01-25 04:09:46.498 | INFO     | app.utils.logging:log:11 - ws-history loop error: 
+2026-01-25 04:09:46.499 | INFO     | app.utils.logging:log:11 - ws-history loop error: 
+2026-01-25 04:09:46.499 | INFO     | app.utils.logging:log:11 - ws-history loop error: 
+2026-01-25 04:09:46.500 | INFO     | app.utils.logging:log:11 - ws-history loop error: 

@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 from sqlalchemy import Column, UUID, ForeignKey, Integer, TIMESTAMP, UniqueConstraint
-from app.config.db import Base
+from app.infra.db.base import Base
 
 
 class AnalysisSubscriber(Base):

@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Request
 from app.repositories.audit_repository import AuditRepository
 from app.core.crypto import encrypt_str, encrypt_ip
+from app.core.logging import REQUEST_ID_CTX
 
 
 class AuditService:
@@ -20,6 +21,12 @@ class AuditService:
                 rid = request.headers.get("x-request-id")
         except Exception:
             pass
+
+        if not rid:
+            try:
+                rid = REQUEST_ID_CTX.get()
+            except Exception:
+                rid = None
         safe_metadata = self._sanitize_metadata(metadata or {})
         await self.repo.create(
             event_type=event_type,

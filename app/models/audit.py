@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy import Column, String, DateTime, Text, ForeignKey
-from app.config.db import Base
+from app.infra.db.base import Base
 
 
 class AuditEvent(Base):
